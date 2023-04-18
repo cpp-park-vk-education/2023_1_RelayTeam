@@ -1,7 +1,4 @@
 #pragma once
-#include "Device.h"
-#include <example_gstreamer.h>
-#include <list>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
@@ -10,8 +7,9 @@
 #include <QScrollArea>
 #include <QSlider>
 #include <QTextEdit>
+#include "Device.h"
+#include <list>
 #include <string>
-
 
 class MainWindow : public QMainWindow {
 private:
