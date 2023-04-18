@@ -41,12 +41,14 @@ else()
     )
 endif()
 
+
 add_subdirectory(qt_gstreamer)
 add_subdirectory(qt_bluetooth)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
 target_link_libraries(${PROJECT_NAME} PRIVATE qt_gstreamer)
 target_link_libraries(${PROJECT_NAME} PRIVATE qt_bluetooth)
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${PROJECT_SOURCE_DIR}/include"

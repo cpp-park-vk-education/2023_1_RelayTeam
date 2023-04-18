@@ -12,6 +12,7 @@
 #include <QTextEdit>
 #include <string>
 
+
 class MainWindow : public QMainWindow {
 private:
 	Q_OBJECT
