@@ -13,7 +13,15 @@
  * MultiRelay
 
 Зависимости требующиеся к текущему моменту:
- * Qt5.15.2
+ * Qt 5.15.2
  * CMake 3.5 и старше
+ * gstreamer 1.20.3 и старше 
+```
+ https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c
+```
+ * QtGstreamer 2.8.9 и старше 
+```
+ https://github.com/GStreamer/qt-gstreamer
+```
 
 Компиллируется в Qt Creator при помощи CMake.
