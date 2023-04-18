@@ -17,28 +17,28 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
-file(GLOB SRC_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-)
 
-set(PROJECT_SOURCES
-    ${SRC_FILES}
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+
+
+file(GLOB SRC_FILES
+  ${PROJECT_SOURCE_DIR}/sources/*.cpp
+  ${PROJECT_SOURCE_DIR}/include/*.h
 )
 
 add_library(${PROJECT_NAME} SHARED
-    ${PROJECT_SOURCES}
+	${SRC_FILES}
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core ${GSTREAMER_LIBRARIES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+	"${PROJECT_SOURCE_DIR}/include"
+	${GSTREAMER_INCLUDE_DIRS}
 )
-
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
@@ -52,5 +52,8 @@ install(TARGETS ${PROJECT_NAME}
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+
+
 
 

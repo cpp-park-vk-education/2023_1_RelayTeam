@@ -20,17 +20,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
-file(GLOB SRC_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/*.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-)
 
-set(PROJECT_SOURCES
-    ${SRC_FILES}
+file(GLOB SRC_FILES
+  ${PROJECT_SOURCE_DIR}/sources/*.cpp
+  ${PROJECT_SOURCE_DIR}/include/*.h
 )
 
 add_library(${PROJECT_NAME} SHARED
-    ${PROJECT_SOURCES}
+	${SRC_FILES}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core)

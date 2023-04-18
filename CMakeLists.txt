@@ -26,7 +26,6 @@ configure_file(${PROJECT_SOURCE_DIR}/include/variables.h.in ${PROJECT_SOURCE_DIR
 file(GLOB SRC_FILES
     ${PROJECT_SOURCE_DIR}/sources/*.cpp
     ${PROJECT_SOURCE_DIR}/include/*.h
-
 )
 
 if(ANDROID)
@@ -41,12 +40,15 @@ else()
     )
 endif()
 
+
 add_subdirectory(qt_gstreamer)
 add_subdirectory(qt_bluetooth)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
-target_link_libraries(${PROJECT_NAME} PRIVATE qt_gstreamer)
-target_link_libraries(${PROJECT_NAME} PRIVATE qt_bluetooth)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	Qt5::Widgets
+	qt_gstreamer
+	qt_bluetooth
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${PROJECT_SOURCE_DIR}/include"
