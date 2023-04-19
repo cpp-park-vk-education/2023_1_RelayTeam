@@ -1,9 +1,9 @@
 #include "example_gstreamer.h"
 
 typedef struct _CustomData {
-    gboolean is_live;
-    GstElement *pipeline;
-    GMainLoop *loop;
+	gboolean is_live;
+	GstElement* pipeline;
+	GMainLoop* loop;
 } CustomData;
 
 QString get_QString() {
@@ -15,17 +15,17 @@ static void cb_message (GstBus *bus, GstMessage *msg, CustomData *data) {
 
     switch (GST_MESSAGE_TYPE (msg)) {
     case GST_MESSAGE_ERROR: {
-        GError *err;
-        gchar *debug;
+			GError* err;
+			gchar* debug;
 
-        gst_message_parse_error (msg, &err, &debug);
-        g_print ("Error: %s\n", err->message);
-        g_error_free (err);
-        g_free (debug);
+			gst_message_parse_error(msg, &err, &debug);
+			g_print("Error: %s\n", err->message);
+			g_error_free(err);
+			g_free(debug);
 
-        gst_element_set_state (data->pipeline, GST_STATE_READY);
-        g_main_loop_quit (data->loop);
-        break;
+			gst_element_set_state(data->pipeline, GST_STATE_READY);
+			g_main_loop_quit(data->loop);
+			break;
     }
     case GST_MESSAGE_EOS:
         /* end-of-stream */
@@ -59,11 +59,11 @@ static void cb_message (GstBus *bus, GstMessage *msg, CustomData *data) {
 }
 
 int display(int argc, char *argv[]) {
-    GstElement *pipeline;
-    GstBus *bus;
-    GstStateChangeReturn ret;
-    GMainLoop *main_loop;
-    CustomData data;
+	GstElement* pipeline;
+	GstBus* bus;
+	GstStateChangeReturn ret;
+	GMainLoop* main_loop;
+	CustomData data;
 
     /* Initialize GStreamer */
     gst_init (&argc, &argv);

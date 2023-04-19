@@ -23,7 +23,9 @@
 ```
  https://github.com/GStreamer/qt-gstreamer
 ```
+ * Sqlite3
+```
+ sudo apt-get install libsqlite3-dev
+```
 
 Компиллируется в Qt Creator при помощи CMake.
-
-sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake

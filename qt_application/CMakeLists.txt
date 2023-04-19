@@ -1,6 +1,6 @@
 project(qt_application VERSION 0.1 LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets)
+find_package(Qt5 REQUIRED COMPONENTS Widgets Sql)
 
 set(PROJECT_PATH \"${CMAKE_SOURCE_DIR}\")
 set(RESOURCES_PATH \"${CMAKE_SOURCE_DIR}/resources\")
@@ -19,17 +19,18 @@ if(ANDROID)
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
 else()
     add_executable(${PROJECT_NAME}
-        ${SRC_FILES}
+		${SRC_FILES}
     )
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt5::Widgets
+	Qt5::Sql
 	qt_gstreamer
 	qt_bluetooth
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/include
 )
 

@@ -1,18 +1,21 @@
-#include "Device.h"
+#include "DeviceWidget.h"
+#include <QDebug>
 
-DeviceWidget::DeviceWidget(QString name_, QWidget *parent) : QHBoxLayout(parent) {
-	QLabel *name_box = new QLabel(name_);  // Creating label with device name.
+void DeviceWidget::defineWdgets() {
+	QLabel* name_box = new QLabel(name);  // Creating label with device name.
 	this->addWidget(name_box);
-	QSlider *volume_slider = new QSlider(Qt::Horizontal);  // Creating volume slider.
+	QSlider* volume_slider = new QSlider(Qt::Horizontal);  // Creating volume slider.
 	volume_slider->setFixedWidth(160);
 	volume_slider->setMaximum(100);
 	this->addWidget(volume_slider);
-	QSpinBox *volume_box = new QSpinBox();	// Creating volume level label.
+	QSpinBox* volume_box = new QSpinBox();	// Creating volume level label.
 	volume_box->setFixedSize(50, 50);
 	volume_box->setMaximum(100);
 	this->addWidget(volume_box);
 	connect(volume_slider, SIGNAL(valueChanged(int)), volume_box, SLOT(setValue(int)));	 // Connecting slider and label
 	connect(volume_box, SIGNAL(valueChanged(int)), volume_slider, SLOT(setValue(int)));
+	connect(volume_box, SIGNAL(valueChanged(int)), this, SLOT(onVolumeChanged(int)));
+	volume_slider->setValue(volume);
 	audio_button = new QPushButton();  // Creating audio toggle button.
 	audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio-disabled.png")));
 	audio_button->setIconSize(QSize(40, 40));
@@ -33,22 +36,38 @@ DeviceWidget::DeviceWidget(QString name_, QWidget *parent) : QHBoxLayout(parent)
 	this->addWidget(settings_button);
 }
 
+DeviceWidget::DeviceWidget(int ID_, QString& name_, int volume_, QWidget* parent)
+	: ID(ID_), name(name_), volume(volume_), QHBoxLayout(parent) {
+	defineWdgets();
+}
+
+DeviceWidget::DeviceWidget(int ID_, QString&& name_, int volume_, QWidget* parent)
+	: ID(ID_), name(std::move(name_)), volume(volume_), QHBoxLayout(parent) {
+	defineWdgets();
+}
+
 void DeviceWidget::onAudioPressed() {
-	if (info.audio_state) {
+	if (audio_state) {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio-disabled.png")));
 	} else {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio.png")));
 	}
-	info.audio_state = !info.audio_state;
+	audio_state = !audio_state;
 }
 
 void DeviceWidget::onCastPressed() {
-	if (info.cast_state) {
+	if (cast_state) {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
 	} else {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
 	}
-	info.cast_state = !info.cast_state;
+	cast_state = !cast_state;
 }
 
-void DeviceWidget::onSettingsPressed() {}
+void DeviceWidget::onSettingsPressed() {
+	// DeviceSettingsDialog settings_widget = new DeviceSettingsDialog;
+}
+
+void DeviceWidget::onVolumeChanged(int volume_) {
+	volume = volume_;
+}
