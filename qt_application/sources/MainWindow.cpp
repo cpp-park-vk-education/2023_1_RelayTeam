@@ -15,12 +15,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 	QVBoxLayout* left_bar = new QVBoxLayout;
 	main_grid->addLayout(left_bar, 1, 0);
 	QPushButton* settings_button = new QPushButton("Settings");	 // Creating settings button.
-	settings_button->setFixedWidth(250);
+	// settings_button->setFixedWidth(250);
 	settings_button->setFixedHeight(60);
 	connect(settings_button, SIGNAL(clicked()), this, SLOT(onSettingsButtonPressed()));
 	left_bar->addWidget(settings_button);
 	QPushButton* scan_network_button = new QPushButton("Scan Network");	 // Creating settings button.
-	scan_network_button->setFixedWidth(250);
+	// scan_network_button->setFixedWidth(250);
 	scan_network_button->setFixedHeight(60);
 	connect(scan_network_button, SIGNAL(clicked()), this, SLOT(onScanNetworkButtonPressed()));
 	left_bar->addWidget(scan_network_button);
