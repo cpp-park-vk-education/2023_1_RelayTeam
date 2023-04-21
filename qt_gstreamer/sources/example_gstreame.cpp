@@ -1,103 +1,76 @@
 #include "example_gstreamer.h"
 
-typedef struct _CustomData {
-	gboolean is_live;
-	GstElement* pipeline;
-	GMainLoop* loop;
-} CustomData;
+//static GMainLoop *loop;
 
-QString get_QString() {
-    return "qt_gstreamer library\n";
-
-}
-
-static void cb_message (GstBus *bus, GstMessage *msg, CustomData *data) {
-
-    switch (GST_MESSAGE_TYPE (msg)) {
-    case GST_MESSAGE_ERROR: {
-			GError* err;
-			gchar* debug;
-
-			gst_message_parse_error(msg, &err, &debug);
-			g_print("Error: %s\n", err->message);
-			g_error_free(err);
-			g_free(debug);
-
-			gst_element_set_state(data->pipeline, GST_STATE_READY);
-			g_main_loop_quit(data->loop);
-			break;
-    }
+static gboolean on_message(GstBus *bus, GstMessage *message, gpointer user_data) {
+    switch (GST_MESSAGE_TYPE(message)) {
     case GST_MESSAGE_EOS:
-        /* end-of-stream */
-        gst_element_set_state (data->pipeline, GST_STATE_READY);
-        g_main_loop_quit (data->loop);
+        g_print("End of stream\n");
+        gst_element_set_state(GST_ELEMENT(user_data), GST_STATE_NULL);
+        //g_main_loop_quit(loop);
         break;
-    case GST_MESSAGE_BUFFERING: {
-        gint percent = 0;
 
-        /* If the stream is live, we do not care about buffering. */
-        if (data->is_live) break;
-
-        gst_message_parse_buffering (msg, &percent);
-        g_print ("Buffering (%3d%%)\r", percent);
-        /* Wait until buffering is complete before start/resume playing */
-        if (percent < 100)
-            gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
-        else
-            gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
+    case GST_MESSAGE_ERROR: {
+        gchar *debug;
+        GError *error;
+        gst_message_parse_error(message, &error, &debug);
+        g_free(debug);
+        g_printerr("Error: %s\n", error->message);
+        g_error_free(error);
+        gst_element_set_state(GST_ELEMENT(user_data), GST_STATE_NULL);
+        //g_main_loop_quit(loop);
         break;
     }
-    case GST_MESSAGE_CLOCK_LOST:
-        /* Get a new clock */
-        gst_element_set_state (data->pipeline, GST_STATE_PAUSED);
-        gst_element_set_state (data->pipeline, GST_STATE_PLAYING);
-        break;
+
     default:
-        /* Unhandled message */
         break;
     }
+    printf("lol");
+    return TRUE;
 }
 
-int display(int argc, char *argv[]) {
-	GstElement* pipeline;
-	GstBus* bus;
-	GstStateChangeReturn ret;
-	GMainLoop* main_loop;
-	CustomData data;
 
-    /* Initialize GStreamer */
-    gst_init (&argc, &argv);
+int srcincast(int argc ,char** argv) {
 
-    /* Initialize our data structure */
-    memset (&data, 0, sizeof (data));
+    gst_init(&argc, &argv);
 
-    /* Build the pipeline */
-    pipeline = gst_parse_launch ("playbin uri=https://gstreamer.freedesktop.org/data/media/sintel_trailer-480p.webm", NULL);
-    bus = gst_element_get_bus (pipeline);
 
-    /* Start playing */
-    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
-    if (ret == GST_STATE_CHANGE_FAILURE) {
-        g_printerr ("Unable to set the pipeline to the playing state.\n");
-        gst_object_unref (pipeline);
+    GstElement *screen_source = gst_element_factory_make("ximagesrc", "screen");
+    GstElement *video_convert = gst_element_factory_make("videoconvert", "video-convert");
+    GstElement *video_sink = gst_element_factory_make("ximagesink", "video-sink");
+
+
+    GstElement *pipeline1 = gst_pipeline_new("screen-capture-pipeline");
+    gst_bin_add_many(GST_BIN(pipeline1), screen_source, video_convert, video_sink, NULL);
+    gst_element_link_many(screen_source, video_convert, video_sink, NULL);
+
+    if (!pipeline1 || !screen_source || !video_sink || !video_convert) {
+        g_printerr ("Not all elements could be created.\n");
         return -1;
-    } else if (ret == GST_STATE_CHANGE_NO_PREROLL) {
-        data.is_live = TRUE;
     }
 
-    main_loop = g_main_loop_new (NULL, FALSE);
-    data.loop = main_loop;
-    data.pipeline = pipeline;
 
-    gst_bus_add_signal_watch (bus);
-    g_signal_connect (bus, "message", G_CALLBACK (cb_message), &data);
 
-    g_main_loop_run (main_loop);
+    g_object_set(G_OBJECT(screen_source), "use-damage", 0, "show-pointer", 1, NULL);
 
-    /* Free resources */
-    g_main_loop_unref (main_loop);
-    gst_object_unref (bus);
-    gst_element_set_state (pipeline, GST_STATE_NULL);
-    gst_object_unref (pipeline);
+
+    gst_element_set_state(pipeline1, GST_STATE_PLAYING);
+
+    GMainLoop *loop = g_main_loop_new(NULL, FALSE);
+
+
+    GstBus *bus = gst_element_get_bus(pipeline1);
+
+    //gst_bus_set_sync_handler(bus, (GstBusSyncHandler)on_message, pipeline1, NULL);
+   GstMessage *msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+    if (msg != NULL) {
+        gst_message_unref(msg);
+    }
+
+    gst_element_set_state(pipeline1, GST_STATE_NULL);
+
+    gst_object_unref(GST_OBJECT(pipeline1));
+    gst_object_unref(GST_OBJECT(bus));
+
     return 0;
 }

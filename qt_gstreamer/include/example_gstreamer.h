@@ -2,10 +2,9 @@
 
 #include <QString>
 #include <gst/gst.h>
-#include <string.h>
+#include <gst/video/video.h>
+#include <stdio.h>
 
-typedef struct _CustomData CustomData;
+static gboolean on_message(GstBus*, GstMessage*, gpointer );
 
-QString get_QString();
-static void cb_message(GstBus*, GstMessage*, CustomData*);
-int display(int, char**);
+int srcincast(int argc=0,char** argv = nullptr);
