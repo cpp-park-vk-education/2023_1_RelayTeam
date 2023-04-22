@@ -30,6 +30,11 @@ void DBManager::createDB() {
 	if (!query.exec()) {
 		qDebug() << "Error adding table to database: " << sql_data_base.lastError().text();
 	}
+	query.prepare(
+		"create table Options("
+		"name VARCHAR(20)"
+		")");
+
 	addTestEntries();  // TEMP
 }
 

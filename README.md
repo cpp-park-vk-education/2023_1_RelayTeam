@@ -27,5 +27,15 @@
 ```
  sudo apt-get install libsqlite3-dev
 ```
+ * qmdnsengine
+```
+ https://github.com/Ant0nL0rd/qmdnsengine-qt5-my-fix
+```
+```
+ mkdir build
+ cd build
+ cmake ..
+ sudo make install
+```
 
 Компиллируется в Qt Creator при помощи CMake.

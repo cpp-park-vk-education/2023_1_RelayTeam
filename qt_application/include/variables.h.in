@@ -1,8 +1,0 @@
-#pragma once
-#include <QDir>
-
-#define PROJECT_PATH @PROJECT_PATH@
-
-#define RESOURCES_PATH @RESOURCES_PATH@
-
-const QDir Q_RESOURCE_DIR(RESOURCES_PATH);
