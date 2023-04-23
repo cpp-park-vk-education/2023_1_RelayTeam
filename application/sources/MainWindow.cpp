@@ -57,11 +57,15 @@ void MainWindow::onScanNetworkButtonPressed() {
 	current_pairing_mod_is_manual = !current_pairing_mod_is_manual;
 }
 
-void MainWindow::closeEvent(QCloseEvent* event) {
+void MainWindow::saveAllChanges() {
 	for (size_t i = 0; i < devices_layout->count(); ++i) {
 		data_base.saveDeviceChanges(static_cast<DeviceWidget*>(devices_layout->itemAt(i)));
 	}
 	data_base.saveOptionsChanges(current_options);
+}
+
+void MainWindow::closeEvent(QCloseEvent* event) {
+	saveAllChanges();
 
 	QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Warning", tr("Are you sure what to close the application?\n"),
 															   QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);

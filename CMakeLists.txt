@@ -21,6 +21,6 @@ set(QT_DEBUG_PLUGINS 1)
 
 add_subdirectory(general_use)
 add_subdirectory(search_devices)
-add_subdirectory(gstreamer)
+add_subdirectory(gstreamer_interface)
 add_subdirectory(bluetooth)
 add_subdirectory(application)

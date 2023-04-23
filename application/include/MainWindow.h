@@ -32,6 +32,8 @@ private:
 
 	DBManager data_base;
 
+	void saveAllChanges();
+
 	void closeEvent(QCloseEvent* event);
 
 public:

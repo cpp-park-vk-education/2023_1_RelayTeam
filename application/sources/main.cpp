@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include "variables.h"
-#include <example_gstreamer.h>
+// #include <example_gstreamer.h>
 #include <QApplication>
 #include <QtDebug>
 

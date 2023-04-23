@@ -1,4 +1,4 @@
-project(gstreamer VERSION 0.1 LANGUAGES CXX)
+project(gstreamer_interface VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt5 REQUIRED COMPONENTS Core)
 

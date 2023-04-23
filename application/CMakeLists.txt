@@ -26,7 +26,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt5::Widgets
 	Qt5::Sql
 	general_use
-	gstreamer
+	gstreamer_interface
 	bluetooth
 	search_devices
 )

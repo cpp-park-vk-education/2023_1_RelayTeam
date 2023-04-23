@@ -13,10 +13,6 @@ private:
 
 	void createDefualtOptions();
 
-	void getOptions(Options& options);
-
-	void saveOptionsChanges(const Options& current_options);
-
 	void addTestEntries();
 
 public:
@@ -27,6 +23,10 @@ public:
 	DBManager();
 
 	~DBManager();
+
+	void saveOptionsChanges(const Options& current_options);
+
+	void getOptions(Options& options);
 
 	void addDevice(QString& name, int volume);
 
