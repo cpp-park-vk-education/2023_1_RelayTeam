@@ -10,18 +10,38 @@
 // qmdnsengine
 #include <qmdnsengine/service.h>
 
-class ServiceWidget : public QWidget {
+class ServiceItem : public QListWidgetItem {
 private:
-	Q_OBJECT
 	QLabel* service_name_label;
 	QLabel* machine_id_label;
 	QHBoxLayout* main_layout;
-	QListWidgetItem* item;
+	QLabel* os_icon_label;
+	QLabel* resolved_icon;
+	QWidget* main_widget;
+	QMdnsEngine::Service service;
 
 public:
-	ServiceWidget(const QMdnsEngine::Service& service, QListWidgetItem* item, QWidget* parent = nullptr);
+	ServiceItem(const QMdnsEngine::Service& service_);
 
-	inline QListWidgetItem* get_item() {
-		return item;
+	void update(const QMdnsEngine::Service& service_);
+
+	inline QWidget* getWidget() {
+		return main_widget;
+	}
+
+	inline QMdnsEngine::Service getService() {
+		return service;
+	}
+
+	inline void setUnResolved() {
+		resolved_icon->setStyleSheet("QLabel {background-color : red}");
+	}
+
+	inline void setResolved() {
+		resolved_icon->setStyleSheet("QLabel {background-color : yellow}");
+	}
+
+	inline void setGotLocalIP() {
+		resolved_icon->setStyleSheet("QLabel {background-color : green}");
 	}
 };

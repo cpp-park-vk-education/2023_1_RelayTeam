@@ -4,6 +4,7 @@
 #include <QSlider>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), current_pairing_mod_is_manual(true) {
+	data_base.getOptions(current_options);
 	main_widget = new QWidget();  // Setting up main window widgets
 	main_grid = new QGridLayout();
 	main_widget->setLayout(main_grid);
@@ -36,7 +37,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), current_pairing_m
 
 	search_w = new SearchWidget();	// launching network widgets
 	left_bar->addWidget(search_w);
-	publisher_widget = new Publisher(this);
+	publisher_widget = new Publisher(current_options.device_name, this);
 
 	search_w->hide();
 	main_widget->show();
@@ -66,7 +67,6 @@ void MainWindow::saveAllChanges() {
 
 void MainWindow::closeEvent(QCloseEvent* event) {
 	saveAllChanges();
-
 	QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Warning", tr("Are you sure what to close the application?\n"),
 															   QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 	if (resBtn != QMessageBox::Yes) {
@@ -74,5 +74,4 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	} else {
 		event->accept();
 	}
-	search_w->hide();
 }

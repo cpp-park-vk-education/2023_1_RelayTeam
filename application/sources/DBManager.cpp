@@ -43,7 +43,8 @@ void DBManager::createDefualtOptions() {
 
 void DBManager::getOptions(Options& options) {
 	QSqlQuery query;
-	if (query.exec("SELECT * FROM Person WHERE ID = 0;")) {
+	if (query.exec("SELECT * FROM Options WHERE ID = 0;")) {
+		query.next();
 		options.update(query.value("ID").toUInt(), query.value("device_name").toString());
 	} else {
 		qDebug() << "Error making query to get options: " << sql_data_base.lastError().text();

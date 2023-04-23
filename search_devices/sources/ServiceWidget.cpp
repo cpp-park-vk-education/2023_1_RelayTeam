@@ -1,12 +1,13 @@
 #include "ServiceWidget.h"
 #include "variables.h"
 
-ServiceWidget::ServiceWidget(const QMdnsEngine::Service& service, QListWidgetItem* item_, QWidget* parent) : QWidget(parent), item(item_) {
-	main_layout = new QHBoxLayout;	// creating layout
-	this->setLayout(main_layout);
+ServiceItem::ServiceItem(const QMdnsEngine::Service& service_) : service(service_) {
+	main_widget = new QWidget();
+	main_layout = new QHBoxLayout();  // Creating layout.
+	main_widget->setLayout(main_layout);
 	main_layout->addStretch();
 	main_layout->setSizeConstraint(QLayout::SetFixedSize);
-	QPixmap icon_pixmap;
+	QPixmap icon_pixmap;  // Creating up OS icon.
 	QStringList os_types;
 	os_types << "linux"	   // 0
 			 << "windows"  // 1
@@ -28,13 +29,21 @@ ServiceWidget::ServiceWidget(const QMdnsEngine::Service& service, QListWidgetIte
 		default:
 			icon_pixmap.load(Q_RESOURCE_DIR.absoluteFilePath("unknown_os.png"));
 	}
-	QLabel* os_icon_label = new QLabel();
+	os_icon_label = new QLabel();
 	os_icon_label->setFixedSize(50, 50);
-
 	os_icon_label->setPixmap(icon_pixmap.scaled(50, 50));
 	main_layout->addWidget(static_cast<QWidget*>(os_icon_label));
+	resolved_icon = new QLabel();
+	resolved_icon->setFixedSize(20, 20);
+	main_layout->addWidget(resolved_icon);
 	service_name_label = new QLabel(service.name());  // creating name label
 	service_name_label->setFont(QFont("Arial", 16));
 	main_layout->addWidget(static_cast<QWidget*>(service_name_label));
-	item->setSizeHint(this->sizeHint());  // setting item to fit content
+	this->setSizeHint(main_widget->sizeHint());	 // setting item to fit content
+	this->setUnResolved();
+}
+
+void ServiceItem::update(const QMdnsEngine::Service& service_) {
+	service = service_;
+	service_name_label->setText(service.name());
 }
