@@ -1,9 +1,12 @@
-project(qt_gstreamer VERSION 0.1 LANGUAGES CXX)
+project(search_devices VERSION 0.1 LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt5 REQUIRED COMPONENTS
+	Widgets
+	Core
+	Network
+)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+find_package(qmdnsengine 0.2.0)
 
 file(GLOB SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
@@ -16,10 +19,14 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt5::Core
-	${GSTREAMER_LIBRARIES}
+	Qt5::Widgets
+	Qt5::Network
+	qmdnsengine
+	general_use
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include
-	${GSTREAMER_INCLUDE_DIRS}
+	${QMDNSENGINE_INCLUDE_DIRS}
+
 )

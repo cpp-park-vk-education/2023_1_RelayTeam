@@ -1,4 +1,4 @@
-project(qt_general_use VERSION 0.1 LANGUAGES CXX)
+project(general_use VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt5 REQUIRED COMPONENTS
 	Widgets

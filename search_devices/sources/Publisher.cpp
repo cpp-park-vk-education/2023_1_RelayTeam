@@ -6,8 +6,8 @@ Publisher::Publisher(QWidget* parent) : QObject(parent), server(), hostname(&ser
 	service.setPort(5353);
 	qDebug() << QString(QSysInfo::kernelType());
 	QMap<QByteArray, QByteArray> attributes;
-	attributes["OS_type"] = QSysInfo::kernelType().toUtf8();
-	attributes["mID"] = QSysInfo::machineUniqueId();
+	attributes["OS_type"] = QSysInfo::kernelType().toUtf8().toLower();
+	//	attributes["mID"] = QSysInfo::machineUniqueId();
 	service.setAttributes(std::move(attributes));
 	provider.update(service);
 	connect(&hostname, &QMdnsEngine::Hostname::hostnameChanged, this, &Publisher::onHostnameChanged);

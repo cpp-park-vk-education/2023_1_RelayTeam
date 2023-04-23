@@ -20,4 +20,8 @@ private:
 
 public:
 	ServiceWidget(const QMdnsEngine::Service& service, QListWidgetItem* item, QWidget* parent = nullptr);
+
+	inline QListWidgetItem* get_item() {
+		return item;
+	}
 };

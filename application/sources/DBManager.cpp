@@ -1,21 +1,5 @@
 #include "DBManager.h"
 
-void DBManager::addDevice(QString& name, int volume) {
-	QSqlQuery query;
-	query.prepare(
-		"INSERT INTO Device("
-		"ID,"
-		"name,"
-		"volume)"
-		"VALUES(:ID, :name, :volume);");
-	query.bindValue(":ID", query.lastInsertId());
-	query.bindValue(":name", name);
-	query.bindValue(":volume", volume);
-	if (!query.exec()) {
-		qDebug() << "Error adding Device to data base." << sql_data_base.lastError().text();
-	}
-}
-
 void DBManager::createDB() {
 	qDebug() << "Creating new database.";
 	sql_data_base = QSqlDatabase::addDatabase(db_type);
@@ -24,18 +8,56 @@ void DBManager::createDB() {
 	QSqlQuery query;
 	query.prepare(
 		"create table Device("
-		"ID integer primary key, "
+		"ID integer primary key,"
 		"name VARCHAR(20),"
 		"volume integer)");
 	if (!query.exec()) {
-		qDebug() << "Error adding table to database: " << sql_data_base.lastError().text();
+		qDebug() << "Error adding Device table to database: " << sql_data_base.lastError().text();
 	}
 	query.prepare(
 		"create table Options("
-		"name VARCHAR(20)"
+		"ID integer primary key,"
+		"device_name VARCHAR(20)"
 		")");
+	if (!query.exec()) {
+		qDebug() << "Error adding Options table to database: " << sql_data_base.lastError().text();
+	}
 
+	createDefualtOptions();
 	addTestEntries();  // TEMP
+}
+
+void DBManager::createDefualtOptions() {
+	QSqlQuery query;
+	query.prepare(
+		"INSERT INTO Options("
+		"ID,"
+		"device_name)"
+		"VALUES(:ID, :device_name);");
+	query.bindValue(":ID", 0);
+	query.bindValue(":device_name", QSysInfo::machineHostName());
+	if (!query.exec()) {
+		qDebug() << "Error adding default options item to data base." << sql_data_base.lastError().text();
+	}
+}
+
+void DBManager::getOptions(Options& options) {
+	QSqlQuery query;
+	if (query.exec("SELECT * FROM Person WHERE ID = 0;")) {
+		options.update(query.value("ID").toUInt(), query.value("device_name").toString());
+	} else {
+		qDebug() << "Error making query to get options: " << sql_data_base.lastError().text();
+	}
+}
+
+void DBManager::saveOptionsChanges(const Options& options) {
+	QSqlQuery query;
+	query.prepare("UPDATE Options SET device_name=:device_name WHERE ID=:ID");
+	query.bindValue(":device_name", options.device_name);
+	query.bindValue(":ID", options.ID);
+	if (!query.exec()) {
+		qDebug() << "Error updating Options in data base." << sql_data_base.lastError().text();
+	}
 }
 
 DBManager::DBManager() {
@@ -61,6 +83,22 @@ DBManager::~DBManager() {
 	instance_exist = false;
 }
 
+void DBManager::addDevice(QString& name, int volume) {	// change to "DeviceWidget* device" later
+	QSqlQuery query;
+	query.prepare(
+		"INSERT INTO Device("
+		"ID,"
+		"name,"
+		"volume)"
+		"VALUES(:ID, :name, :volume);");
+	query.bindValue(":ID", query.lastInsertId());
+	query.bindValue(":name", name);
+	query.bindValue(":volume", volume);
+	if (!query.exec()) {
+		qDebug() << "Error adding Device to data base." << sql_data_base.lastError().text();
+	}
+}
+
 void DBManager::getDevices(QVBoxLayout* device_layout) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Device")) {
@@ -76,7 +114,6 @@ void DBManager::getDevices(QVBoxLayout* device_layout) {
 
 void DBManager::saveDeviceChanges(DeviceWidget* device) {
 	QSqlQuery query;
-	//"UPDATE student SET faults = 2 WHERE id =1"
 	query.prepare("UPDATE Device SET name=:name, volume=:volume WHERE ID=:ID");
 	query.bindValue(":name", device->name);
 	query.bindValue(":volume", device->volume);

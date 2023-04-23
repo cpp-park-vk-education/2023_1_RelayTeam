@@ -1,6 +1,7 @@
 #pragma once
 #include "DBManager.h"
 #include "DeviceWidget.h"
+#include "Options.h"
 #include <Publisher.h>
 #include <QCloseEvent>
 #include <QGridLayout>
@@ -24,7 +25,10 @@ private:
 	QTextEdit* input_box;
 	SearchWidget* search_w;
 	Publisher* publisher_widget;
-	bool layout_state = false;
+	QLabel* device_name_label;
+	bool current_pairing_mod_is_manual;
+
+	Options current_options;
 
 	DBManager data_base;
 

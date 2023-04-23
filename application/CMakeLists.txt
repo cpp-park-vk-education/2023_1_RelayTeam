@@ -1,4 +1,4 @@
-project(qt_application VERSION 0.1 LANGUAGES CXX)
+project(application VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt5 REQUIRED COMPONENTS
 	Widgets
@@ -25,10 +25,10 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt5::Widgets
 	Qt5::Sql
-	qt_general_use
-	qt_gstreamer
-	qt_bluetooth
-	qt_search_devices
+	general_use
+	gstreamer
+	bluetooth
+	search_devices
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

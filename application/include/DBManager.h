@@ -1,15 +1,23 @@
 #pragma once
 #include "DeviceWidget.h"
+#include "Options.h"
 #include <QtSql>
 #include <QVBoxLayout>
 
 class DBManager {
 private:
 	static bool instance_exist;
+	QSqlDatabase sql_data_base;
 
 	void createDB();
 
-	QSqlDatabase sql_data_base;
+	void createDefualtOptions();
+
+	void getOptions(Options& options);
+
+	void saveOptionsChanges(const Options& current_options);
+
+	void addTestEntries();
 
 public:
 	const QString db_name = "MultiRelayData.sqlite";
@@ -25,6 +33,4 @@ public:
 	void getDevices(QVBoxLayout* device_layout);
 
 	void saveDeviceChanges(DeviceWidget* device);
-
-	void addTestEntries();
 };
