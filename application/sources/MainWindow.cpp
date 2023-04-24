@@ -67,8 +67,8 @@ void MainWindow::saveAllChanges() {
 
 void MainWindow::closeEvent(QCloseEvent* event) {
 	saveAllChanges();
-	QMessageBox::StandardButton resBtn = QMessageBox::question(this, "Warning", tr("Are you sure what to close the application?\n"),
-															   QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+	QMessageBox::StandardButton resBtn =
+		QMessageBox::question(this, "Warning", tr("Exit the application?\n"), QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
 	if (resBtn != QMessageBox::Yes) {
 		event->ignore();
 	} else {

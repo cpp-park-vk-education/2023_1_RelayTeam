@@ -19,10 +19,6 @@
 ```
  https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c
 ```
- * QtGstreamer 2.8.9 и старше 
-```
- https://github.com/GStreamer/qt-gstreamer
-```
  * Sqlite3
 ```
  sudo apt-get install libsqlite3-dev

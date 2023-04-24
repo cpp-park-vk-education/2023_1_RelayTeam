@@ -10,7 +10,7 @@ SearchWidget::SearchWidget(QWidget* parent)
 	main_layout = new QGridLayout();
 	this->setLayout(main_layout);
 	service_list = new QListWidget();
-
+	service_list->setStyleSheet("QListWidget:item { selection-background-color: white; }");
 	main_layout->addWidget(static_cast<QWidget*>(service_list), 0, 0);
 
 	connect(&mdns_browser, &QMdnsEngine::Browser::serviceAdded, this, &SearchWidget::onDiscovered);
@@ -83,12 +83,10 @@ void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_receive
 	if (message_received.transactionId() != 3663) {
 		return;
 	}
-	if (message_received.queries().size() != 1) {
-		return;
-	}
-	if (message_received.queries().first().type() == 8234) {
-		selected_item->setGotLocalIP();
-		qDebug() << "got requested local ip from: " << message_received.address();
-		qDebug() << "which is: " << message_received.queries().first().name();
+	for (auto& it : message_received.queries()) {
+		if (it.type() == 8234) {  // change to (auto it : queries) at both onMessageReceived.
+			selected_item->setGotLocalIP();
+			qDebug() << "got requested local ip from: " << message_received.address() << "which is: " << it.name();
+		}
 	}
 }

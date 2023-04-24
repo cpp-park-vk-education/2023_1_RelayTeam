@@ -33,9 +33,10 @@ ServiceItem::ServiceItem(const QMdnsEngine::Service& service_) : service(service
 	os_icon_label->setFixedSize(50, 50);
 	os_icon_label->setPixmap(icon_pixmap.scaled(50, 50));
 	main_layout->addWidget(static_cast<QWidget*>(os_icon_label));
-	resolved_icon = new QLabel();
-	resolved_icon->setFixedSize(20, 20);
-	main_layout->addWidget(resolved_icon);
+	add_button = new QPushButton();
+	add_button->setText("+");
+	add_button->setFixedSize(30, 30);
+	main_layout->addWidget(add_button);
 	service_name_label = new QLabel(service.name());  // creating name label
 	service_name_label->setFont(QFont("Arial", 16));
 	main_layout->addWidget(static_cast<QWidget*>(service_name_label));

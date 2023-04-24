@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QPixmap>
+#include <QPushButton>
 #include <QString>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -16,7 +17,7 @@ private:
 	QLabel* machine_id_label;
 	QHBoxLayout* main_layout;
 	QLabel* os_icon_label;
-	QLabel* resolved_icon;
+	QPushButton* add_button;
 	QWidget* main_widget;
 	QMdnsEngine::Service service;
 
@@ -34,14 +35,14 @@ public:
 	}
 
 	inline void setUnResolved() {
-		resolved_icon->setStyleSheet("QLabel {background-color : red}");
+		add_button->setStyleSheet("QPushButton {background-color : red}");
 	}
 
 	inline void setResolved() {
-		resolved_icon->setStyleSheet("QLabel {background-color : yellow}");
+		add_button->setStyleSheet("QPushButton {background-color : yellow}");
 	}
 
 	inline void setGotLocalIP() {
-		resolved_icon->setStyleSheet("QLabel {background-color : green}");
+		add_button->setStyleSheet("QPushButton {background-color : green}");
 	}
 };
