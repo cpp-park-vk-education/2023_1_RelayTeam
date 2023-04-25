@@ -14,32 +14,41 @@ MainWindow::MainWindow(QWidget* parent)
 	this->setCentralWidget(main_widget);
 	left_bar = new QVBoxLayout;
 	main_layout->addLayout(left_bar);
-	settings_button = new QPushButton("Settings");	// Creating settings button.
-	settings_button->setFixedHeight(60);
-	connect(settings_button, &QPushButton::clicked, this, &MainWindow::onSettingsButtonPressed);
-	left_bar->addWidget(settings_button);
+	button_layout = new QHBoxLayout();					  // Creating button layout.
 	scan_network_button = new QPushButton("Scan local");  // Creating settings button.
 	scan_network_button->setFixedHeight(60);
 	connect(scan_network_button, &QPushButton::clicked, this, &MainWindow::onScanNetworkButtonPressed);
-	left_bar->addWidget(scan_network_button);
-	// device_name_label = new QLabel;
+	button_layout->addWidget(scan_network_button);
+	settings_button = new QPushButton("Settings");	// Creating settings button.
+	settings_button->setFixedHeight(60);
+	connect(settings_button, &QPushButton::clicked, this, &MainWindow::onSettingsButtonPressed);
+	button_layout->addWidget(settings_button);
+	left_bar->addLayout(button_layout);
+	add_button = new QPushButton("Add");
+	add_button->setFixedHeight(60);
+	left_bar->addWidget(add_button);
 	input_box = new QTextEdit("Text box");	// Creating input box.
 	left_bar->addWidget(input_box);
 	devices_layout = new QVBoxLayout();	 // Creating devices layout with scroll area.
 	data_base.getDevices(devices_layout);
 	devices_layout->setContentsMargins(0, 0, 0, 0);
 	devices_widget = new QWidget();
+	devices_widget->sizeHint();
 	devices_widget->setLayout(devices_layout);
 	devices_scroll_area = new QScrollArea();
 	devices_scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	devices_scroll_area->setWidgetResizable(true);
 	devices_scroll_area->setAlignment(Qt::AlignRight);
-	devices_scroll_area->setFixedWidth(500);
+	devices_scroll_area->setMinimumWidth(500);
+	devices_scroll_area->setMaximumWidth(620);
 	devices_scroll_area->setWidget(devices_widget);
 	main_layout->addWidget(devices_scroll_area);
 
-	search_w = new SearchWidget();	// Creating network widgets.
-	search_w->hide();
-	left_bar->addWidget(search_w);
+	search_widget = new SearchWidget();	 // Creating network widgets.
+	search_widget->hide();
+	left_bar->addWidget(search_widget);
+	connect(add_button, &QPushButton::clicked, search_widget, &SearchWidget::onAddButtonCLicked);
+	connect(search_widget, &SearchWidget::devicePreparedToAdd, this, &MainWindow::onDevicePreparedToAdd);
 	publisher_widget = new Publisher(current_options->device_name, this);
 
 	settings_widget = new SettingsWidget(current_options);
@@ -67,10 +76,10 @@ void MainWindow::onSettingsButtonPressed() {
 void MainWindow::onScanNetworkButtonPressed() {
 	if (current_search_widget_is_manual) {
 		input_box->hide();
-		search_w->show();
+		search_widget->show();
 		scan_network_button->setText("Manual pairing");
 	} else {
-		search_w->hide();
+		search_widget->hide();
 		input_box->show();
 		scan_network_button->setText("Scan local");
 	}
@@ -93,4 +102,10 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	} else {
 		event->accept();
 	}
+}
+
+void MainWindow::onDevicePreparedToAdd(QString name, QString local_ip) {
+	qDebug() << "Adding device: " << name;
+	DeviceWidget* device_widget = new DeviceWidget(-1, name, 0);
+	devices_layout->addLayout(device_widget);
 }

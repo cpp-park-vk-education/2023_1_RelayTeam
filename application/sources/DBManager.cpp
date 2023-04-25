@@ -24,7 +24,7 @@ void DBManager::createDB() {
 	}
 
 	createDefualtOptions();
-	addTestEntries();  // TEMP
+	//	addTestEntries();  // TEMP
 }
 
 void DBManager::createDefualtOptions() {

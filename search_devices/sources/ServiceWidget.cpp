@@ -7,12 +7,10 @@ ServiceItem::ServiceItem(const QMdnsEngine::Service& service_) : service(service
 	main_widget->setLayout(main_layout);
 	main_layout->addStretch();
 	main_layout->setSizeConstraint(QLayout::SetFixedSize);
-	add_button = new QPushButton();	 // Create connect button
-	add_button->setText("add");
-	add_button->setFixedSize(50, 50);
-	add_button->setStyleSheet("QPushButton{background-color: red; color: black;}");
-	add_button->setEnabled(false);
-	main_layout->addWidget(add_button);
+	connection_status_icon = new QLabel();
+	connection_status_icon->setStyleSheet("QLabel{background-color: red; color: black;}");
+	connection_status_icon->setFixedSize(15, 50);
+	main_layout->addWidget(connection_status_icon);
 	QPixmap icon_pixmap;  // Creating up OS icon.
 	QStringList os_types;
 	os_types << "linux"	   // 0

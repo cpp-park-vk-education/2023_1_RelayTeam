@@ -14,9 +14,9 @@
 class ServiceItem : public QListWidgetItem {
 private:
 	QLabel* service_name_label;
-	QLabel* machine_id_label;
-	QHBoxLayout* main_layout;
+	QLabel* connection_status_icon;
 	QLabel* os_icon_label;
+	QHBoxLayout* main_layout;
 	QPushButton* add_button;
 	QWidget* main_widget;
 	QMdnsEngine::Service service;
@@ -39,12 +39,15 @@ public:
 	}
 
 	inline void setResolved() {
-		add_button->setStyleSheet("QPushButton {background-color : yellow}");
+		connection_status_icon->setStyleSheet("QLabel {background-color : yellow}");
 	}
 
 	inline void setLocalIP(const QString& local_ip_) {
 		local_ip = local_ip_;
-		add_button->setStyleSheet("QPushButton {background-color : green}");
-		add_button->setEnabled(true);
+		connection_status_icon->setStyleSheet("QLabel {background-color : green}");
+	}
+
+	inline QString getLocalIP() {
+		return local_ip;
 	}
 };

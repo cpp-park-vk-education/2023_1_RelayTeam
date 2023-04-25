@@ -1,18 +1,15 @@
 #include "SearchWidget.h"
 
 SearchWidget::SearchWidget(QWidget* parent)
-	: QWidget(parent), server(), cache(), mdns_browser(&server, "_mrelay-connect._tcp.local.", &cache), resolver(nullptr) {
-	main_layout = new QGridLayout();
-	this->setLayout(main_layout);
-	service_list = new QListWidget();
-	service_list->setStyleSheet("QListWidget:item { selection-background-color: white; }");
-	main_layout->addWidget(static_cast<QWidget*>(service_list), 0, 0);
-
+	: QListWidget(parent), server(), cache(), mdns_browser(&server, "_mrelay-connect._tcp.local.", &cache), resolver(nullptr) {
+	this->setStyleSheet("QListWidget:item { selection-background-color: #00b4d8 }");
+	this->setSelectionBehavior(QAbstractItemView::SelectItems);
+	this->setSelectionMode(QAbstractItemView::SingleSelection);
 	connect(&mdns_browser, &QMdnsEngine::Browser::serviceAdded, this, &SearchWidget::onDiscovered);
 	connect(&mdns_browser, &QMdnsEngine::Browser::serviceRemoved, this, &SearchWidget::onServiceRemoved);
 	connect(&mdns_browser, &QMdnsEngine::Browser::serviceUpdated, this, &SearchWidget::onServiceUpdated);
 	connect(&server, &QMdnsEngine::Server::messageReceived, this, &SearchWidget::onMessageReceived);
-	connect(service_list, &QListWidget::itemClicked, this, &SearchWidget::onSelected);
+	connect(this, &QListWidget::itemClicked, this, &SearchWidget::onSelected);
 }
 
 void SearchWidget::onDiscovered(const QMdnsEngine::Service& service) {
@@ -23,8 +20,9 @@ void SearchWidget::onDiscovered(const QMdnsEngine::Service& service) {
 
 	ServiceItem* service_item = new ServiceItem(service);
 	service_item_map[getServiceName(service)] = service_item;
-	service_list->addItem(service_item);
-	service_list->setItemWidget(service_item, service_item->getWidget());
+	this->addItem(service_item);
+	this->setItemWidget(service_item, service_item->getWidget());
+	//	connect(service_item->getAddButton(), QPushButton::clicked(), this, &SearchWidget::onAddButtonClicked);
 }
 
 void SearchWidget::onServiceRemoved(const QMdnsEngine::Service& service) {
@@ -54,13 +52,12 @@ void SearchWidget::onSelected(QListWidgetItem* item_) {
 		resolver = nullptr;
 	}
 	resolver = new QMdnsEngine::Resolver(&server, service_item->getService().hostname(), &cache, this);
-	connect(resolver, &QMdnsEngine::Resolver::resolved, [this, service_item](const QHostAddress& address) {
+	connect(resolver, &QMdnsEngine::Resolver::resolved, this, [this, service_item](const QHostAddress& address) {
 		if (address.protocol() != QAbstractSocket::IPv6Protocol) {
 			return;
 		}
 		service_item->setResolved();
 		qDebug() << address << " resolved.";
-
 		QMdnsEngine::Message message;
 		QMdnsEngine::Query query;
 		query.setName("mrelay-request-local-ip");
@@ -88,5 +85,15 @@ void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_receive
 		qDebug() << "got requested local ip from: " << service_name << "which is: " << local_ip;
 		ServiceItem* service_item = service_item_map[service_name];
 		service_item->setLocalIP(local_ip);
+	}
+}
+
+void SearchWidget::onAddButtonCLicked() {
+	QList<QListWidgetItem*> selected_items = this->selectedItems();	 // Only one can actually be selected at a time.
+	if (!selected_items.empty()) {
+		ServiceItem* service_item = dynamic_cast<ServiceItem*>(selected_items.front());
+		emit devicePreparedToAdd(service_item->getService().name(), service_item->getLocalIP());
+	} else {
+		qDebug() << "Device selection empty.";
 	}
 }

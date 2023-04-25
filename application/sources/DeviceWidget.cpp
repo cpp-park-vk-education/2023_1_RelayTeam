@@ -2,7 +2,11 @@
 #include <QDebug>
 
 void DeviceWidget::defineWdgets() {
+	this->setMargin(0);
+	this->setAlignment(Qt::AlignTop);
 	QLabel* name_box = new QLabel(name);  // Creating label with device name.
+	name_box->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	name_box->setFixedHeight(50);
 	this->addWidget(name_box);
 	QSlider* volume_slider = new QSlider(Qt::Horizontal);  // Creating volume slider.
 	volume_slider->setFixedWidth(160);

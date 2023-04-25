@@ -20,14 +20,12 @@
 
 #include "ServiceWidget.h"
 
-class SearchWidget : public QWidget {
+class SearchWidget : public QListWidget {
 private:
 	Q_OBJECT
 	QMdnsEngine::Server server;
 	QMdnsEngine::Cache cache;
 	QMdnsEngine::Browser mdns_browser;
-	QListWidget* service_list;
-	QGridLayout* main_layout;
 	QMdnsEngine::Resolver* resolver;
 
 	QMap<QString, ServiceItem*> service_item_map;
@@ -49,4 +47,10 @@ private slots:
 	void onSelected(QListWidgetItem* item);
 
 	void onMessageReceived(const QMdnsEngine::Message& message_received);
+
+public slots:
+	void onAddButtonCLicked();
+
+signals:
+	void devicePreparedToAdd(QString name, QString local_ip);
 };

@@ -22,10 +22,12 @@ private:
 	QWidget* main_widget;			   // main  widget
 	QHBoxLayout* main_layout;		   // min widget layout
 	QVBoxLayout* devices_layout;	   // layout with device widgets
-	QScrollArea* devices_scroll_area;  // scroll area for devices
 	QVBoxLayout* left_bar;
+	QHBoxLayout* button_layout;
+	QScrollArea* devices_scroll_area;  // scroll area for devices
 	QPushButton* settings_button;
 	QPushButton* scan_network_button;
+	QPushButton* add_button;
 	QTextEdit* input_box;
 	QLabel* device_name_label;
 	QWidget* devices_widget;
@@ -35,7 +37,7 @@ private:
 
 	Options* current_options;
 	DBManager data_base;
-	SearchWidget* search_w;
+	SearchWidget* search_widget;
 	Publisher* publisher_widget;
 	SettingsWidget* settings_widget;
 
@@ -50,4 +52,7 @@ private slots:
 	void onSettingsButtonPressed();
 
 	void onScanNetworkButtonPressed();
+
+public slots:
+	void onDevicePreparedToAdd(QString name, QString local_ip);
 };
