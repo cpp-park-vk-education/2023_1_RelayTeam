@@ -41,21 +41,21 @@ void DBManager::createDefualtOptions() {
 	}
 }
 
-void DBManager::getOptions(Options& options) {
+void DBManager::getOptions(Options* options) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Options WHERE ID = 0;")) {
 		query.next();
-		options.update(query.value("ID").toUInt(), query.value("device_name").toString());
+		options->update(query.value("ID").toInt(), query.value("device_name").toString());
 	} else {
 		qDebug() << "Error making query to get options: " << sql_data_base.lastError().text();
 	}
 }
 
-void DBManager::saveOptionsChanges(const Options& options) {
+void DBManager::saveOptionsChanges(Options* options) {
 	QSqlQuery query;
 	query.prepare("UPDATE Options SET device_name=:device_name WHERE ID=:ID");
-	query.bindValue(":device_name", options.device_name);
-	query.bindValue(":ID", options.ID);
+	query.bindValue(":device_name", options->device_name);
+	query.bindValue(":ID", options->ID);
 	if (!query.exec()) {
 		qDebug() << "Error updating Options in data base." << sql_data_base.lastError().text();
 	}

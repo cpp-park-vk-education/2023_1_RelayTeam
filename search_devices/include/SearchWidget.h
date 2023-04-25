@@ -30,8 +30,11 @@ private:
 	QGridLayout* main_layout;
 	QMdnsEngine::Resolver* resolver;
 
-	ServiceItem* selected_item;
-	QMap<QString, ServiceItem*> service_widgets_map;
+	QMap<QString, ServiceItem*> service_item_map;
+
+	inline QString getServiceName(const QMdnsEngine::Service& service) {
+		return service.hostname() + service.name();
+	}
 
 public:
 	SearchWidget(QWidget* parent = nullptr);
@@ -44,8 +47,6 @@ private slots:
 	void onServiceUpdated(const QMdnsEngine::Service& service);
 
 	void onSelected(QListWidgetItem* item);
-
-	void onResolved(const QHostAddress& address);
 
 	void onMessageReceived(const QMdnsEngine::Message& message_received);
 };

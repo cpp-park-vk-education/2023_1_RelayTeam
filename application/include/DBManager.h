@@ -1,4 +1,5 @@
 #pragma once
+
 #include "DeviceWidget.h"
 #include "Options.h"
 #include <QtSql>
@@ -24,9 +25,9 @@ public:
 
 	~DBManager();
 
-	void saveOptionsChanges(const Options& current_options);
+	void saveOptionsChanges(Options* options);
 
-	void getOptions(Options& options);
+	void getOptions(Options* options);
 
 	void addDevice(QString& name, int volume);
 

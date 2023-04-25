@@ -6,7 +6,7 @@ find_package(Qt5 REQUIRED COMPONENTS
 	Network
 )
 
-find_package(qmdnsengine 0.2.0)
+find_library(qmdnsengine 0.2.0 CONFIG)
 
 file(GLOB SRC_FILES
   ${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
@@ -22,6 +22,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt5::Widgets
 	Qt5::Network
 	qmdnsengine
+#	${QMDNSENGINE_LIBRARIES}
 	general_use
 )
 

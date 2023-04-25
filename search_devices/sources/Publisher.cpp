@@ -4,7 +4,7 @@ Publisher::Publisher(const QString& device_name, QWidget* parent)
 	: QObject(parent), server(), hostname(&server), provider(&server, &hostname), service() {
 	service.setType("_mrelay-connect._tcp.local.");
 	service.setName(device_name.toUtf8());
-	service.setPort(5353);
+	service.setPort(1234);
 	QMap<QByteArray, QByteArray> attributes;
 	attributes["OS_type"] = QSysInfo::kernelType().toLower().toUtf8();
 	//	attributes["mID"] = QSysInfo::machineUniqueId();
@@ -24,7 +24,6 @@ QString Publisher::getLocalIP() {
 			local_ip = address.toString();
 		}
 	}
-	qDebug() << "local ip address: " << local_ip;
 	return local_ip;
 }
 
@@ -36,17 +35,28 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) 
 	if (message_received.transactionId() != 1264) {
 		return;
 	}
-	for (auto& it : message_received.queries()) {
-		if (it.name() == QString("request_local_ip.").toUtf8()) {
-			qDebug() << "got direct request for local ip from: " << message_received.address();
-			QMdnsEngine::Message message_send;
-			QMdnsEngine::Query query;
-			query.setName(getLocalIP().toUtf8());
-			query.setType(8234);
-			message_send.addQuery(query);
-			message_send.reply(message_received);
-			message_send.setTransactionId(3663);
-			server.sendMessage(message_send);
-		}
+	QList<QMdnsEngine::Query> queries = message_received.queries();
+	if (queries.front().name() == "mrelay-request-local-ip.") {
+		qDebug() << "mrelay-request-local-ip. query recieved";
+		QMdnsEngine::Message message;
+		QMdnsEngine::Query query;
+		query.setName("mrelay-answer-local-ip");
+		query.setType(2222);
+		message.addQuery(query);
+		query.setName(queries.back().name());
+		query.setType(2222);
+		message.addQuery(query);
+		query.setName(getLocalIP().toUtf8());
+		query.setType(2222);
+		message.addQuery(query);
+		message.reply(message_received);
+		message.setTransactionId(3663);
+		server.sendMessage(message);
 	}
+}
+
+void Publisher::onChangeServiceName(const QString& service_name) {
+	qDebug() << "changing service name to: " << service_name;
+	service.setName(service_name.toUtf8());
+	provider.update(service);
 }

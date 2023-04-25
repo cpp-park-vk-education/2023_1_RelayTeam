@@ -11,7 +11,6 @@ int main(int argc, char *argv[]) {
 	a.setApplicationName("MultiRelay");
 	MainWindow w;
 	w.show();
-	//	display(0, nullptr);
 
 	return a.exec();
 }

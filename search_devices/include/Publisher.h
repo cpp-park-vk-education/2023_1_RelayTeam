@@ -30,4 +30,7 @@ private slots:
 	void onHostnameChanged(const QByteArray& hostname);
 
 	void onMessageReceived(const QMdnsEngine::Message& message_received);
+
+public slots:
+	void onChangeServiceName(const QString& service_name);
 };

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "variables.h"
 #include <QDir>
 #include <QHBoxLayout>
@@ -21,13 +22,13 @@ private:
 	void defineWdgets();
 
 public:
-	const int ID;
-	int volume;
+	const qint32 ID;
+	qint16 volume;
 	QString name;
 
-	explicit DeviceWidget(int ID_, QString& name_, int volume_, QWidget* parent = nullptr);
+	explicit DeviceWidget(qint32 ID_, QString& name_, qint16 volume_, QWidget* parent = nullptr);
 
-	explicit DeviceWidget(int ID_, QString&& name_, int volume_, QWidget* parent = nullptr);
+	explicit DeviceWidget(qint32 ID_, QString&& name_, qint16 volume_, QWidget* parent = nullptr);
 
 private slots:
 	void onAudioPressed();
@@ -36,5 +37,5 @@ private slots:
 
 	void onSettingsPressed();
 
-	void onVolumeChanged(int volume_);
+	void onVolumeChanged(qint16 volume_);
 };

@@ -1,12 +1,18 @@
 #include "ServiceWidget.h"
 #include "variables.h"
 
-ServiceItem::ServiceItem(const QMdnsEngine::Service& service_) : service(service_) {
+ServiceItem::ServiceItem(const QMdnsEngine::Service& service_) : service(service_), local_ip("") {
 	main_widget = new QWidget();
 	main_layout = new QHBoxLayout();  // Creating layout.
 	main_widget->setLayout(main_layout);
 	main_layout->addStretch();
 	main_layout->setSizeConstraint(QLayout::SetFixedSize);
+	add_button = new QPushButton();	 // Create connect button
+	add_button->setText("add");
+	add_button->setFixedSize(50, 50);
+	add_button->setStyleSheet("QPushButton{background-color: red; color: black;}");
+	add_button->setEnabled(false);
+	main_layout->addWidget(add_button);
 	QPixmap icon_pixmap;  // Creating up OS icon.
 	QStringList os_types;
 	os_types << "linux"	   // 0
@@ -33,15 +39,10 @@ ServiceItem::ServiceItem(const QMdnsEngine::Service& service_) : service(service
 	os_icon_label->setFixedSize(50, 50);
 	os_icon_label->setPixmap(icon_pixmap.scaled(50, 50));
 	main_layout->addWidget(static_cast<QWidget*>(os_icon_label));
-	add_button = new QPushButton();
-	add_button->setText("+");
-	add_button->setFixedSize(30, 30);
-	main_layout->addWidget(add_button);
 	service_name_label = new QLabel(service.name());  // creating name label
 	service_name_label->setFont(QFont("Arial", 16));
 	main_layout->addWidget(static_cast<QWidget*>(service_name_label));
 	this->setSizeHint(main_widget->sizeHint());	 // setting item to fit content
-	this->setUnResolved();
 }
 
 void ServiceItem::update(const QMdnsEngine::Service& service_) {

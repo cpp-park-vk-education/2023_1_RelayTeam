@@ -36,12 +36,12 @@ void DeviceWidget::defineWdgets() {
 	this->addWidget(settings_button);
 }
 
-DeviceWidget::DeviceWidget(int ID_, QString& name_, int volume_, QWidget* parent)
+DeviceWidget::DeviceWidget(qint32 ID_, QString& name_, qint16 volume_, QWidget* parent)
 	: ID(ID_), name(name_), volume(volume_), QHBoxLayout(parent) {
 	defineWdgets();
 }
 
-DeviceWidget::DeviceWidget(int ID_, QString&& name_, int volume_, QWidget* parent)
+DeviceWidget::DeviceWidget(qint32 ID_, QString&& name_, qint16 volume_, QWidget* parent)
 	: ID(ID_), name(std::move(name_)), volume(volume_), QHBoxLayout(parent) {
 	defineWdgets();
 }
@@ -68,6 +68,6 @@ void DeviceWidget::onSettingsPressed() {
 	// DeviceSettingsDialog settings_widget = new DeviceSettingsDialog;
 }
 
-void DeviceWidget::onVolumeChanged(int volume_) {
+void DeviceWidget::onVolumeChanged(qint16 volume_) {
 	volume = volume_;
 }
