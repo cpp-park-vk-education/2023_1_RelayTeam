@@ -21,10 +21,11 @@ private:
 	QWidget* main_widget;
 	QMdnsEngine::Service service;
 
+	bool already_added;
 	QString local_ip;
 
 public:
-	ServiceItem(const QMdnsEngine::Service& service_);
+	ServiceItem(const QMdnsEngine::Service& service_, qreal scale);
 
 	~ServiceItem() {}
 
@@ -40,6 +41,15 @@ public:
 
 	inline void setResolved() {
 		connection_status_icon->setStyleSheet("QLabel {background-color : yellow}");
+	}
+
+	inline void setAlreadyAdded() {
+		already_added = true;
+		main_widget->setStyleSheet("QWidget { background-color : grey; }");
+	}
+
+	inline bool getAdded() {
+		return already_added;
 	}
 
 	inline void setLocalIP(const QString& local_ip_) {

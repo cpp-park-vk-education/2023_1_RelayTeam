@@ -18,7 +18,7 @@
 #include <qmdnsengine/server.h>
 #include <qmdnsengine/service.h>
 
-#include "ServiceWidget.h"
+#include "ServiceItem.h"
 
 class SearchWidget : public QListWidget {
 private:
@@ -28,6 +28,7 @@ private:
 	QMdnsEngine::Browser mdns_browser;
 	QMdnsEngine::Resolver* resolver;
 
+	qreal scale;
 	QMap<QString, ServiceItem*> service_item_map;
 
 	inline QString getServiceName(const QMdnsEngine::Service& service) {
@@ -35,7 +36,7 @@ private:
 	}
 
 public:
-	SearchWidget(QWidget* parent = nullptr);
+	SearchWidget(qreal scale_, QWidget* parent = nullptr);
 
 private slots:
 	void onDiscovered(const QMdnsEngine::Service& service);

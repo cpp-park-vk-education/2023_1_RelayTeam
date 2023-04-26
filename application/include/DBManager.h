@@ -31,7 +31,7 @@ public:
 
 	void addDevice(QString& name, int volume);
 
-	void getDevices(QVBoxLayout* device_layout);
+	void getDevices(QVBoxLayout* device_layout, qreal scale);
 
 	void saveDeviceChanges(DeviceWidget* device);
 };

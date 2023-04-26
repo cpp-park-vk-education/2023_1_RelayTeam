@@ -35,7 +35,7 @@ private:
 	bool current_search_widget_is_manual;
 	bool current_control_widget_is_settings;
 
-	Options* current_options;
+	Options* options;
 	DBManager data_base;
 	SearchWidget* search_widget;
 	Publisher* publisher_widget;

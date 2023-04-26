@@ -1,7 +1,17 @@
 #include "SearchWidget.h"
 
-SearchWidget::SearchWidget(QWidget* parent)
-	: QListWidget(parent), server(), cache(), mdns_browser(&server, "_mrelay-connect._tcp.local.", &cache), resolver(nullptr) {
+#include <QtMath>
+
+SearchWidget::SearchWidget(qreal scale_, QWidget* parent)
+	: QListWidget(parent),
+	  server(),
+	  cache(),
+	  mdns_browser(&server, "_mrelay-connect._tcp.local.", &cache),
+	  resolver(nullptr),
+	  scale(scale_) {
+	QFont font = this->font();
+	font.setPointSize(16 * (scale > 1 ? qSqrt(scale) : scale));
+	this->setFont(font);
 	this->setStyleSheet("QListWidget:item { selection-background-color: #00b4d8 }");
 	this->setSelectionBehavior(QAbstractItemView::SelectItems);
 	this->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -18,7 +28,7 @@ void SearchWidget::onDiscovered(const QMdnsEngine::Service& service) {
 		return;
 	}
 
-	ServiceItem* service_item = new ServiceItem(service);
+	ServiceItem* service_item = new ServiceItem(service, scale);
 	service_item_map[getServiceName(service)] = service_item;
 	this->addItem(service_item);
 	this->setItemWidget(service_item, service_item->getWidget());
@@ -90,10 +100,20 @@ void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_receive
 
 void SearchWidget::onAddButtonCLicked() {
 	QList<QListWidgetItem*> selected_items = this->selectedItems();	 // Only one can actually be selected at a time.
-	if (!selected_items.empty()) {
-		ServiceItem* service_item = dynamic_cast<ServiceItem*>(selected_items.front());
-		emit devicePreparedToAdd(service_item->getService().name(), service_item->getLocalIP());
-	} else {
-		qDebug() << "Device selection empty.";
+	if (selected_items.empty()) {
+		qDebug() << "Can't add device. Device selection empty.";
+		return;
 	}
+	ServiceItem* service_item = dynamic_cast<ServiceItem*>(selected_items.front());
+	if (service_item->getLocalIP().size() == 0) {
+		qDebug() << "Can't add device. Local IP not yet known.";
+		return;
+	}
+	if (service_item->getAdded()) {	 // still can add if service name changed.
+		qDebug() << "Can't add device. Device already added.";
+		return;
+	}
+
+	service_item->setAlreadyAdded();
+	emit devicePreparedToAdd(service_item->getService().name(), service_item->getLocalIP());
 }

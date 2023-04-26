@@ -17,7 +17,8 @@ void DBManager::createDB() {
 	query.prepare(
 		"create table Options("
 		"ID integer primary key,"
-		"device_name VARCHAR(20)"
+		"device_name VARCHAR(20),"
+		"scale integer"
 		")");
 	if (!query.exec()) {
 		qDebug() << "Error adding Options table to database: " << sql_data_base.lastError().text();
@@ -32,10 +33,12 @@ void DBManager::createDefualtOptions() {
 	query.prepare(
 		"INSERT INTO Options("
 		"ID,"
-		"device_name)"
-		"VALUES(:ID, :device_name);");
+		"device_name,"
+		"scale)"
+		"VALUES(:ID, :device_name, :scale);");
 	query.bindValue(":ID", 0);
 	query.bindValue(":device_name", QSysInfo::machineHostName());
+	query.bindValue(":scale", 100);
 	if (!query.exec()) {
 		qDebug() << "Error adding default options item to data base." << sql_data_base.lastError().text();
 	}
@@ -45,7 +48,7 @@ void DBManager::getOptions(Options* options) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Options WHERE ID = 0;")) {
 		query.next();
-		options->update(query.value("ID").toInt(), query.value("device_name").toString());
+		options->update(query.value("ID").toInt(), query.value("device_name").toString(), query.value("scale").toInt());
 	} else {
 		qDebug() << "Error making query to get options: " << sql_data_base.lastError().text();
 	}
@@ -53,9 +56,10 @@ void DBManager::getOptions(Options* options) {
 
 void DBManager::saveOptionsChanges(Options* options) {
 	QSqlQuery query;
-	query.prepare("UPDATE Options SET device_name=:device_name WHERE ID=:ID");
+	query.prepare("UPDATE Options SET device_name=:device_name, scale=:scale WHERE ID=:ID");
 	query.bindValue(":device_name", options->device_name);
 	query.bindValue(":ID", options->ID);
+	query.bindValue(":scale", options->scale_factor_new);
 	if (!query.exec()) {
 		qDebug() << "Error updating Options in data base." << sql_data_base.lastError().text();
 	}
@@ -100,12 +104,12 @@ void DBManager::addDevice(QString& name, int volume) {	// change to "DeviceWidge
 	}
 }
 
-void DBManager::getDevices(QVBoxLayout* device_layout) {
+void DBManager::getDevices(QVBoxLayout* device_layout, qreal scale) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Device")) {
 		while (query.next()) {
 			DeviceWidget* current_device =
-				new DeviceWidget(query.value("ID").toUInt(), query.value("name").toString(), query.value("volume").toInt());
+				new DeviceWidget(query.value("ID").toUInt(), query.value("name").toString(), query.value("volume").toInt(), scale);
 			device_layout->addLayout(current_device);
 		}
 	} else {

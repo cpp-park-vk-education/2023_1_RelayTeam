@@ -16,19 +16,22 @@ private:
 	QPushButton* audio_button;
 	QPushButton* cast_button;
 	QPushButton* settings_button;
+	QLabel* name_box;
+	QSlider* volume_slider;
+	QSpinBox* volume_box;
 	bool audio_state = false;
 	bool cast_state = false;
 
-	void defineWdgets();
+	void defineWdgets(qreal scale);
 
 public:
 	const qint32 ID;
 	qint16 volume;
 	QString name;
 
-	explicit DeviceWidget(qint32 ID_, QString& name_, qint16 volume_, QWidget* parent = nullptr);
+	explicit DeviceWidget(qint32 ID_, QString& name_, qint16 volume_, qreal scale, QWidget* parent = nullptr);
 
-	explicit DeviceWidget(qint32 ID_, QString&& name_, qint16 volume_, QWidget* parent = nullptr);
+	explicit DeviceWidget(qint32 ID_, QString&& name_, qint16 volume_, qreal scale, QWidget* parent = nullptr);
 
 private slots:
 	void onAudioPressed();
