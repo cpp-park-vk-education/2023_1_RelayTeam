@@ -9,7 +9,6 @@ struct CustomData {
 
 void startReceive();
 
-
 gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
   GMainLoop *loop = (GMainLoop *)data;
 
@@ -151,16 +150,14 @@ void addLinkAudio() {
 void startVideoSession() {
   addLinkVideo();
   addLinkAudio();
-  
+
   startReceive();
-  
 }
 
 void startAudioSession() {
   addLinkAudio();
-  
+
   startReceive();
-  
 }
 
 void startReceive() {
@@ -175,38 +172,27 @@ void startReceive() {
   gst_object_unref(data.bus);
 
   g_main_loop_run(data.loop);
-
 }
 
-void killVideoSession()
-{
+void killVideoSession() {
   g_main_loop_unref(data.loop);
   gst_element_set_state(data.pipeline, GST_STATE_NULL);
   gst_object_unref(data.pipeline);
 }
 
-void killAudioSession()
-{
+void killAudioSession() {
   g_main_loop_unref(data.loop);
   gst_element_set_state(data.pipeline, GST_STATE_NULL);
   gst_object_unref(data.pipeline);
 }
-
-
 
 int main(int argc, char *argv[]) {
 
   startVideoSession();
   killVideoSession();
 
- //startAudioSession();
- //killAudioSession();
+  // startAudioSession();
+  // killAudioSession();
 
   return 0;
 }
-
-
-
-
-
-
