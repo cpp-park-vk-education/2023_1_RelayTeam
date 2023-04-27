@@ -1,8 +1,7 @@
-#include "session_manager.h"
+#include "SessionManager.h"
+#include <cstring>
 
-void start();
-
-gboolean SessionManager::on_bus_message(GstBus *bus, GstMessage *message) {
+gboolean SessionManager::SessionManager::on_bus_message(GstBus *bus, GstMessage *message) {
     GError *error = NULL;
     gchar *debug_info = NULL;
 
@@ -30,7 +29,8 @@ gboolean SessionManager::on_bus_message(GstBus *bus, GstMessage *message) {
     return TRUE;
 }
 
-void SessionManager::addLinkVideo(const QString& local_ip) {
+void SessionManager::SessionManager::addLinkVideo(const QString &local_ip)
+{
     GstElement *alsasrc, *audioconvert, *audioresample, *opusenc, *rtpopuspay,
         *udpsink2;
 
@@ -62,9 +62,7 @@ void SessionManager::addLinkVideo(const QString& local_ip) {
         gst_object_unref(data.pipeline);
         return;
     }
-
-    g_object_set(udpsink2, "sync", FALSE, "host", "127.0.0.1", "port", 5000,
-                 NULL);
+    g_object_set(udpsink2, "sync", FALSE, "host", local_ip.toStdString().c_str(), "port", 5000, NULL);
 }
 
 void SessionManager::addLinkAudio(const QString& local_ip) {
@@ -100,7 +98,7 @@ void SessionManager::addLinkAudio(const QString& local_ip) {
         return;
     }
 
-    g_object_set(udpsink2, "sync", FALSE, "host", "127.0.0.1", "port", 5000, NULL);
+    g_object_set(udpsink2, "sync", FALSE, "host", local_ip.toStdString().c_str(), "port", 5000, NULL);
 }
 
 void SessionManager::startVideoSession(const QString& local_ip) {
@@ -131,11 +129,10 @@ void SessionManager::killAudioSession(const QString& local_ip)
 void SessionManager::startSend() {
     data.bus = gst_element_get_bus(data.pipeline);
 
-    gst_bus_add_watch(data.bus, (GstBusFunc)SessionManager::on_bus_message(data.bus,data.msg), NULL);
+    //gst_bus_add_watch(data.bus, (GstBusFunc)SessionManager::on_bus_message(data.bus,data.msg), NULL);
 
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered(
         data.bus, GST_CLOCK_TIME_NONE,
         (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
-

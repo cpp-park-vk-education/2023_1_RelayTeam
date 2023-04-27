@@ -16,7 +16,17 @@ private:
     gboolean on_bus_message(GstBus *bus, GstMessage *msg);
     void addLinkVideo(const QString& local_ip);
     void addLinkAudio(const QString& local_ip);
+
+    typedef struct _CustomData {
+        gboolean is_live;
+        GstElement* pipeline;
+        GMainLoop* loop;
+        GstBus *bus;
+        GstMessage *msg;
+    } CustomData;
+
     CustomData data;
+
 
 public slots:
     void startVideoSession(const QString& local_ip);
@@ -40,4 +50,3 @@ signals:
     void sendAudioSessionKilled();
 };
 #endif // SESSIONMANAGER_H
-
