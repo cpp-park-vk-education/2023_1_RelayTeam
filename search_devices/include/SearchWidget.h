@@ -53,5 +53,5 @@ public slots:
 	void onAddButtonCLicked();
 
 signals:
-	void devicePreparedToAdd(QString name, QString local_ip);
+	void devicePreparedToAdd(QString name, QString ipv6_address, QString local_ip);
 };

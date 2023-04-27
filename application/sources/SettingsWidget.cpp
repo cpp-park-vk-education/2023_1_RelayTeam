@@ -1,10 +1,11 @@
 #include "SettingsWidget.h"
 
 #include <QtMath>
+#include <UITools.h>
 
 SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(parrent), options(options_) {
 	QFont font = this->font();
-	font.setPointSize(14 * (options->getScale() > 1 ? qSqrt(options->getScale()) : options->getScale()));
+	font.setPointSize(14 * getFontScaling(options->getScale()));
 	this->setFont(font);
 	qreal scale = options->getScale();
 	main_layout = new QVBoxLayout();
@@ -40,6 +41,7 @@ SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(pa
 	change_scale_layout->addWidget(scale_box);
 	scaling_warning_label = new QLabel("Requires a restart.");
 	scaling_warning_label->setStyleSheet("QLabel { color : grey; }");
+	scaling_warning_label->setFont(font);
 	change_scale_layout->addWidget(scaling_warning_label);
 	connect(scale_slider, &QSlider::valueChanged, scale_box, &QSpinBox::setValue);	// Connecting slider and label
 	connect(scale_slider, &QSlider::valueChanged, this, &SettingsWidget::onScaleChanged);

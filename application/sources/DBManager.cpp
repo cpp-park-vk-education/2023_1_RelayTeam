@@ -10,6 +10,7 @@ void DBManager::createDB() {
 		"create table Device("
 		"ID integer primary key,"
 		"name VARCHAR(20),"
+		"ipv6_address VARCHAR(39),"
 		"volume integer)");
 	if (!query.exec()) {
 		qDebug() << "Error adding Device table to database: " << sql_data_base.lastError().text();
@@ -88,17 +89,19 @@ DBManager::~DBManager() {
 	instance_exist = false;
 }
 
-void DBManager::addDevice(QString& name, int volume) {	// change to "DeviceWidget* device" later
+void DBManager::addDevice(DeviceWidget* device) {  // change to "DeviceWidget* device" later
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Device("
 		"ID,"
 		"name,"
+		"ipv6_address,"
 		"volume)"
-		"VALUES(:ID, :name, :volume);");
+		"VALUES(:ID, :name, :ipv6_address, :volume);");
 	query.bindValue(":ID", query.lastInsertId());
-	query.bindValue(":name", name);
-	query.bindValue(":volume", volume);
+	query.bindValue(":name", device->name);
+	query.bindValue(":ipv6_address", device->ipv6_address);
+	query.bindValue(":volume", device->volume);
 	if (!query.exec()) {
 		qDebug() << "Error adding Device to data base." << sql_data_base.lastError().text();
 	}
@@ -108,8 +111,8 @@ void DBManager::getDevices(QVBoxLayout* device_layout, qreal scale) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Device")) {
 		while (query.next()) {
-			DeviceWidget* current_device =
-				new DeviceWidget(query.value("ID").toUInt(), query.value("name").toString(), query.value("volume").toInt(), scale);
+			DeviceWidget* current_device = new DeviceWidget(query.value("ID").toUInt(), query.value("name").toString(),
+															query.value("ipv6_address").toString(), query.value("volume").toInt(), scale);
 			device_layout->addLayout(current_device);
 		}
 	} else {
@@ -130,8 +133,8 @@ void DBManager::saveDeviceChanges(DeviceWidget* device) {
 
 void DBManager::addTestEntries() {
 	for (size_t i = 0; i < 8; ++i) {
-		QString name = QString("Device ") + QString::number(i);
-		addDevice(name, 0);
+		DeviceWidget* new_device = new DeviceWidget(i, QString("device"), QString("undefined"), 50, 100);
+		addDevice(new_device);
 	}
 }
 

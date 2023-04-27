@@ -54,5 +54,5 @@ private slots:
 	void onScanNetworkButtonPressed();
 
 public slots:
-	void onDevicePreparedToAdd(QString name, QString local_ip);
+	void onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip);
 };

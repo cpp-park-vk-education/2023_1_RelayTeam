@@ -1,6 +1,7 @@
 #include "SearchWidget.h"
 
-#include <QtMath>
+#include <QScrollBar>
+#include <UITools.h>
 
 SearchWidget::SearchWidget(qreal scale_, QWidget* parent)
 	: QListWidget(parent),
@@ -10,9 +11,9 @@ SearchWidget::SearchWidget(qreal scale_, QWidget* parent)
 	  resolver(nullptr),
 	  scale(scale_) {
 	QFont font = this->font();
-	font.setPointSize(16 * (scale > 1 ? qSqrt(scale) : scale));
+	font.setPointSize(16 * getFontScaling(scale));
 	this->setFont(font);
-	this->setStyleSheet("QListWidget:item { selection-background-color: #00b4d8 }");
+	this->setStyleSheet("QListWidget:item { selection-background-color: #bbbbff }");
 	this->setSelectionBehavior(QAbstractItemView::SelectItems);
 	this->setSelectionMode(QAbstractItemView::SingleSelection);
 	connect(&mdns_browser, &QMdnsEngine::Browser::serviceAdded, this, &SearchWidget::onDiscovered);
@@ -66,7 +67,10 @@ void SearchWidget::onSelected(QListWidgetItem* item_) {
 		if (address.protocol() != QAbstractSocket::IPv6Protocol) {
 			return;
 		}
-		service_item->setResolved();
+		if (service_item->getResolved()) {
+			return;
+		}
+		service_item->setResolved(address);
 		qDebug() << address << " resolved.";
 		QMdnsEngine::Message message;
 		QMdnsEngine::Query query;
@@ -115,5 +119,5 @@ void SearchWidget::onAddButtonCLicked() {
 	}
 
 	service_item->setAlreadyAdded();
-	emit devicePreparedToAdd(service_item->getService().name(), service_item->getLocalIP());
+	emit devicePreparedToAdd(service_item->getService().name(), service_item->getAddress(), service_item->getLocalIP());
 }

@@ -2,14 +2,14 @@
 #include <iostream>
 #include <QMessageBox>
 #include <QSlider>
-#include <QtMath>
+#include <UITools.h>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false) {
 	options = new Options();
 	data_base.getOptions(options);
 	QFont font = this->font();
-	font.setPointSize(16 * (options->getScale() > 1 ? qSqrt(options->getScale()) : options->getScale()));
+	font.setPointSize(16 * getFontScaling(options->getScale()));
 	this->setFont(font);
 	main_widget = new QWidget();  // Setting up main window widgets.
 	main_layout = new QHBoxLayout();
@@ -114,8 +114,8 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	}
 }
 
-void MainWindow::onDevicePreparedToAdd(QString name, QString local_ip) {
+void MainWindow::onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip) {
 	qDebug() << "Adding device: " << name;
-	DeviceWidget* device_widget = new DeviceWidget(-1, name, 50, options->getScale());
+	DeviceWidget* device_widget = new DeviceWidget(-1, name, ipv6_address, 50, options->getScale(), local_ip);
 	devices_layout->addLayout(device_widget);
 }

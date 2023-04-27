@@ -1,7 +1,9 @@
 #include "ServiceItem.h"
 #include "variables.h"
+#include <UITools.h>
 
-ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale) : service(service_), local_ip(""), already_added(false) {
+ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale)
+	: service(service_), local_ip(""), is_added(false), is_resolved(false) {
 	main_widget = new QWidget();
 	main_layout = new QHBoxLayout();  // Creating layout.
 	main_widget->setLayout(main_layout);
@@ -37,8 +39,10 @@ ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale) : se
 	os_icon_label->setFixedSize(50 * scale, 50 * scale);
 	os_icon_label->setPixmap(icon_pixmap.scaled(50 * scale, 50 * scale));
 	main_layout->addWidget(static_cast<QWidget*>(os_icon_label));
+	name_layout = new QVBoxLayout();
+	main_layout->addLayout(name_layout);
 	service_name_label = new QLabel(service.name());  // creating name label
-	main_layout->addWidget(static_cast<QWidget*>(service_name_label));
+	name_layout->addWidget(static_cast<QWidget*>(service_name_label));
 	this->setSizeHint(main_widget->sizeHint());	 // setting item to fit content
 }
 

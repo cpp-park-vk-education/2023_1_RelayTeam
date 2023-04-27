@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QString>
+#include <QtNetwork/QHostAddress>
 #include <QVBoxLayout>
 #include <QWidget>
 // qmdnsengine
@@ -16,13 +17,17 @@ private:
 	QLabel* service_name_label;
 	QLabel* connection_status_icon;
 	QLabel* os_icon_label;
+	QLabel* address_label;
 	QHBoxLayout* main_layout;
+	QVBoxLayout* name_layout;
 	QPushButton* add_button;
 	QWidget* main_widget;
 	QMdnsEngine::Service service;
 
-	bool already_added;
+	bool is_added;
+	bool is_resolved;
 	QString local_ip;
+	QHostAddress address;
 
 public:
 	ServiceItem(const QMdnsEngine::Service& service_, qreal scale);
@@ -39,17 +44,30 @@ public:
 		return service;
 	}
 
-	inline void setResolved() {
+	inline void setResolved(const QHostAddress& address_) {
+		is_resolved = true;
+		address = address_;
+		address_label = new QLabel(address.toString());
+		address_label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		name_layout->addWidget(address_label);
 		connection_status_icon->setStyleSheet("QLabel {background-color : yellow}");
 	}
 
+	inline QString getAddress() {
+		return address.toString();
+	}
+
+	inline bool getResolved() {
+		return is_resolved;
+	}
+
 	inline void setAlreadyAdded() {
-		already_added = true;
-		main_widget->setStyleSheet("QWidget { background-color : grey; }");
+		is_added = true;
+		connection_status_icon->setStyleSheet("QLabel {background-color : blue}");
 	}
 
 	inline bool getAdded() {
-		return already_added;
+		return is_added;
 	}
 
 	inline void setLocalIP(const QString& local_ip_) {

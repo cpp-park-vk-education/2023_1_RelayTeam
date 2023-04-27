@@ -29,7 +29,7 @@ public:
 
 	void getOptions(Options* options);
 
-	void addDevice(QString& name, int volume);
+	void addDevice(DeviceWidget* device);
 
 	void getDevices(QVBoxLayout* device_layout, qreal scale);
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QFloat16>
 #include <QString>
 
 struct Options {
