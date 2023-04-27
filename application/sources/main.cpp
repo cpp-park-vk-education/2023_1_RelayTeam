@@ -9,29 +9,29 @@
 #include <transmmiter.h>
 #include <example_gstreamer.h>
 
-int main(int argc, char *argv[]) {
-	qDebug() << "Application started.";
+int main(int argc, char *argv[])
+{
+    qDebug() << "Application123 ЛУЛ.";
     QApplication a(argc, argv);
 
-//    Reciver session1("A");
+    //    Reciver session1("A");
     Reciver session1("A"), session2("B");
-    Transmiter session3("C"),session4("C");
+    Transmiter session3("C"), session4("C");
 
-//    display(NULL, NULL);
-
+    //    display(NULL, NULL);
 
     session3.start();
     //    session4.start();
 
     session1.start();
-//    session2.start();
+    //    session2.start();
 
     qDebug() << "Application end.";
-//    a.setApplicationDisplayName("MultiRelay");
-//    a.setApplicationName("MultiRelay");
-//    MainWindow w;
-//    w.show();
-//    display(0, nullptr);
+    //    a.setApplicationDisplayName("MultiRelay");
+    //    a.setApplicationName("MultiRelay");
+    //    MainWindow w;
+    //    w.show();
+    //    display(0, nullptr);
 
     return a.exec();
 }

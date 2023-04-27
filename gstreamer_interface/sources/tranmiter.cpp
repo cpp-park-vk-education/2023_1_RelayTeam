@@ -150,7 +150,7 @@ void Transmiter::startSend()
     data.bus = gst_element_get_bus(data.pipeline);
 
     //gst_bus_add_watch(data.bus, (GstBusFunc)Transmiter::on_bus_message(data.bus,data.msg,NULL), NULL );
-   // gst_bus_add_watch(data.bus, (GstBusFunc)Transmiter::on_bus_message(data.bus,data.msg,(gpointer)data.loop), NULL);
+    // gst_bus_add_watch(data.bus, (GstBusFunc)Transmiter::on_bus_message(data.bus,data.msg,(gpointer)data.loop), NULL);
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered (data.bus, GST_CLOCK_TIME_NONE, (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
