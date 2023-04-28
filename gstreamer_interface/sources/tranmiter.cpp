@@ -1,9 +1,17 @@
 #include "transmmiter.h"
 #include <QDebug>
 
-Transmiter::Transmiter(QString port_to_transmit) : Session()
+Transmiter::~Transmiter()
 {
-    port = port_to_transmit;
+    gst_object_unref(data.bus);
+    gst_element_set_state(data.pipeline, GST_STATE_NULL);
+    gst_object_unref(data.pipeline);
+}
+
+Transmiter::Transmiter(const QString &local_ip)
+    : Session()
+{
+    ip = local_ip;
     qDebug() << "port for transmitter:" << this->port;
 }
 
@@ -15,8 +23,8 @@ void Transmiter::run()
 
 int Transmiter::start_transmit()
 {
-    Transmiter::startVideoSession();
-    Transmiter::killVideoSession();
+    Transmiter::onStartVideoSession();
+    Transmiter::onKillVideoSession();
 }
 
 gboolean Transmiter::on_bus_message (GstBus *bus, GstMessage *message, gpointer user_data)
@@ -111,7 +119,7 @@ void Transmiter::addLinkAudio()
 {
     GstElement *alsasrc, *audioconvert, *audioresample, *opusenc, *rtpopuspay, *udpsink2;
 
-    //    gst_init(0, nullptr);
+    gst_init(0, nullptr);
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
@@ -139,14 +147,14 @@ void Transmiter::addLinkAudio()
     g_object_set(udpsink2,"sync", FALSE, "host", "127.0.0.1", "port", 5000, NULL);
 
 }
-void Transmiter::startAudioSession()
+void Transmiter::onStartAudioSession()
 {
     addLinkAudio();
     startSend();
 
 }
 
-void Transmiter::startVideoSession()
+void Transmiter::onStartVideoSession()
 {
     gst_init(nullptr, nullptr);
     addLinkVideo();
@@ -162,23 +170,23 @@ void Transmiter::startSend()
     //    gst_bus_add_watch(data.bus,
     //                      (GstBusFunc) Transmiter::on_bus_message(data.bus, data.msg, NULL),
     //                      NULL);
-    gst_bus_add_watch(data.bus,
+    /*gst_bus_add_watch(data.bus,
                       (GstBusFunc) Transmiter::on_bus_message(data.bus,
                                                               data.msg,
                                                               (gpointer) data.loop),
-                      NULL);
+                      NULL);*/
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered (data.bus, GST_CLOCK_TIME_NONE, (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
 
-void Transmiter::killVideoSession()
+void Transmiter::onKillVideoSession()
 {
     gst_object_unref(data.bus);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);
 }
 
-void Transmiter::killAudioSession()
+void Transmiter::onKillAudioSession()
 {
     gst_object_unref(data.bus);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);

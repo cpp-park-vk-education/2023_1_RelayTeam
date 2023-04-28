@@ -13,20 +13,36 @@ class Reciver : public Session
         // constructor
         // set name using initializer
         explicit Reciver(QString port_to_reciving);
-
+        ~Reciver();
 
         // overriding the QThread's run() method
         void run();
         int start_reciver();
 
+    public slots:
+        void onStartAudioSession();
+
+        void onStartVideoSession();
+
+        void onKillVideoSession();
+
+        void onKillAudioSession();
+
+    signals:
+        void sendVideoSessionStarted();
+
+        void sendAudioSessionStarted();
+
+        void sendVideoSessionKilled();
+
+        void sendAudioSessionKilled();
+
     private:
         void addLinkVideo();
+
         void addLinkAudio();
-        void startAudioSession();
-        void startVideoSession();
+
         void startReceive();
-        void killVideoSession();
-        void killAudioSession();
 
         gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data);
 

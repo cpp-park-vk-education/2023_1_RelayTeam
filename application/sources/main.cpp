@@ -4,14 +4,13 @@
 #include <QApplication>
 #include <QtDebug>
 
-
+#include <example_gstreamer.h>
 #include <reciver.h>
 #include <transmmiter.h>
-#include <example_gstreamer.h>
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "Application123 ЛУЛ.";
+    qDebug() << "Application1";
     QApplication a(argc, argv);
 
     //    Reciver session1("A");
@@ -20,7 +19,7 @@ int main(int argc, char *argv[])
 
     //    display(NULL, NULL);
 
-    //    session3.start_transmit();
+    // session4.start();
     session3.start();
 
     //    session1.start_reciver();

@@ -1,18 +1,29 @@
 #include "reciver.h"
 #include <QDebug>
 
+Reciver::~Reciver()
+{
+    gst_object_unref(data.bus);
+    gst_element_set_state(data.pipeline, GST_STATE_NULL);
+    gst_object_unref(data.pipeline);
+}
 
 Reciver::Reciver(QString port_to_reciving):Session()
 {
     port = port_to_reciving;
     /* Initialize our data structure */
     qDebug() << "port for transmitter:" << this->port;
+
+    // connect(this, &Reciver::sendVideoSessionStarted, this, &Reciver::startVideoSession);
+    // connect(this, &Reciver::sendAudioSessionStarted, this, &Reciver::startAudioSession);
+    // connect(this, &Reciver::sendVideoSessionKilled, this, &Reciver::killVideoSession);
+    // connect(this, &Reciver::sendAudioSessionKilled, this, &Reciver::killAudioSession);
 }
 
 int Reciver::start_reciver()
 {
-    Reciver::startVideoSession();
-    Reciver::killVideoSession();
+    Reciver::onStartVideoSession();
+    Reciver::onKillVideoSession();
 }
 
 void Reciver::run()
@@ -176,7 +187,7 @@ void Reciver::addLinkAudio() {
     g_object_set(udpsrc2, "port", 5000, NULL);
 }
 
-void Reciver::startVideoSession()
+void Reciver::onStartVideoSession()
 {
     gst_init(0, nullptr);
     Reciver::addLinkVideo();
@@ -185,7 +196,8 @@ void Reciver::startVideoSession()
     Reciver::startReceive();
 }
 
-void Reciver::startAudioSession() {
+void Reciver::onStartAudioSession()
+{
     Reciver::addLinkAudio();
 
     Reciver::startReceive();
@@ -212,13 +224,15 @@ void Reciver::startReceive()
     g_main_loop_run(data.loop);
 }
 
-void Reciver::killVideoSession() {
+void Reciver::onKillVideoSession()
+{
     g_main_loop_unref(data.loop);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);
 }
 
-void Reciver::killAudioSession() {
+void Reciver::onKillAudioSession()
+{
     g_main_loop_unref(data.loop);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);

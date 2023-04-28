@@ -8,27 +8,46 @@
 
 class Transmiter : public Session
 {
+private:
+    gboolean on_bus_message(GstBus *bus, GstMessage *message, gpointer user_data);
+
+    void addLinkVideo();
+
+    void addLinkAudio();
+
+    void startSend();
+
 public:
     // constructor
     // set name using initializer
-    explicit Transmiter(QString port_to_transmit);
+    explicit Transmiter(const QString &local_ip);
+    ~Transmiter();
 
     // overriding the QThread's run() method
     void run();
+
     int start_transmit();
 
-private:
-    gboolean on_bus_message (GstBus *bus, GstMessage *message, gpointer user_data);
-    void addLinkVideo();
-    void addLinkAudio();
-    void startAudioSession();
-    void startVideoSession();
-    void startSend();
-    void killVideoSession();
-    void killAudioSession();
+public slots:
+    void onStartAudioSession();
 
+    void onStartVideoSession();
 
-    typedef struct _CustomData {
+    void onKillVideoSession();
+
+    void onKillAudioSession();
+
+signals:
+    void sendVideoSessionStarted();
+
+    void sendAudioSessionStarted();
+
+    void sendVideoSessionKilled();
+
+    void sendAudioSessionKilled();
+
+    typedef struct _CustomData
+    {
         gboolean is_live;
         GstElement *pipeline = NULL;
         GMainLoop* loop;

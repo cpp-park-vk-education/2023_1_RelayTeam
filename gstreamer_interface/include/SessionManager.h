@@ -4,18 +4,20 @@
 #include <QMap>
 #include <QObject>
 #include <Session.h>
+#include <transmmiter.h>
 
-class SessionManager : public QObject {
+class SessionManager : public QObject
+{
 private:
     Q_OBJECT
     QMap<QString, std::unique_ptr<Session>> live_sessions;	 // map<session_id, session>
 
     //void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
-
+    SessionManager();
     void startSend();
     gboolean on_bus_message(GstBus *bus, GstMessage *msg);
-    void addLinkVideo(const QString& local_ip);
-    void addLinkAudio(const QString& local_ip);
+    void addLinkVideo(const QString &local_ip);
+    void addLinkAudio(const QString &local_ip);
 
     typedef struct _CustomData {
         gboolean is_live;
