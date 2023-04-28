@@ -53,9 +53,9 @@ void Transmiter::addLinkVideo()
     GstElement *ximagesrc, *videoscale, *videoconvert, *x264enc, *h264parse, *rtph264pay, *udpsink1, *capsfilter1, *capsfilter2;
     GstCaps *caps1, *caps2;
 
-    gst_init(nullptr, nullptr);
+    //    gst_init(nullptr, nullptr);
 
-    if (data.pipeline != NULL) {
+    if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
     //    if (!GST_IS_BUS(data.pipeline)) {
@@ -109,10 +109,10 @@ void Transmiter::addLinkVideo()
 
 void Transmiter::addLinkAudio()
 {
-    GstElement  *alsasrc, *audioconvert, *audioresample, *opusenc, *rtpopuspay, *udpsink2;
+    GstElement *alsasrc, *audioconvert, *audioresample, *opusenc, *rtpopuspay, *udpsink2;
 
-    gst_init(0, nullptr);
-    if (data.pipeline != NULL) {
+    //    gst_init(0, nullptr);
+    if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
 
@@ -148,6 +148,7 @@ void Transmiter::startAudioSession()
 
 void Transmiter::startVideoSession()
 {
+    gst_init(nullptr, nullptr);
     addLinkVideo();
     addLinkAudio();
     startSend();
@@ -156,6 +157,7 @@ void Transmiter::startVideoSession()
 void Transmiter::startSend()
 {
     data.bus = gst_element_get_bus(data.pipeline);
+    qDebug() << data.pipeline;
 
     //    gst_bus_add_watch(data.bus,
     //                      (GstBusFunc) Transmiter::on_bus_message(data.bus, data.msg, NULL),

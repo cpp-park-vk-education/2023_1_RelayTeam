@@ -32,7 +32,7 @@ class Reciver : public Session
 
         typedef struct _CustomData {
             gboolean is_live;
-            GstElement* pipeline;
+            GstElement *pipeline = NULL;
             GMainLoop* loop;
             GstBus *bus;
             GstMessage *msg;

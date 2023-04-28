@@ -68,9 +68,9 @@ void Reciver::addLinkVideo() {
         *convert1, *autovideosink1;
     GstCaps *caps1;
 
-    gst_init(0, nullptr);
+    //    gst_init(0, nullptr);
 
-    if (data.pipeline != NULL) {
+    if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
 
@@ -123,9 +123,9 @@ void Reciver::addLinkAudio() {
         *audioresample, *capsfilter2, *queue2;
     GstCaps *caps2;
 
-    gst_init(0, nullptr);
+    //    gst_init(0, nullptr);
 
-    if (data.pipeline != NULL) {
+    if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
 
@@ -178,6 +178,7 @@ void Reciver::addLinkAudio() {
 
 void Reciver::startVideoSession()
 {
+    gst_init(0, nullptr);
     Reciver::addLinkVideo();
     Reciver::addLinkAudio();
 
@@ -202,6 +203,9 @@ void Reciver::startReceive()
     //    gst_bus_add_watch(data.bus,
     //                      (GstBusFunc) Reciver::bus_callback(data.bus, data.msg, (gpointer) data.loop),
     //                      data.loop);
+    //    gst_bus_add_watch(data.bus,
+    //                      (GstBusFunc) Reciver::bus_callback(data.bus, data.msg, (gpointer) data.loop),
+    //                      NULL);
 
     gst_object_unref(data.bus);
 
