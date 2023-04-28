@@ -9,11 +9,16 @@ Reciver::Reciver(QString port_to_reciving):Session()
     qDebug() << "port for transmitter:" << this->port;
 }
 
+int Reciver::start_reciver()
+{
+    Reciver::startVideoSession();
+    Reciver::killVideoSession();
+}
+
 void Reciver::run()
 {
    // this->start_reciver();
-    Reciver::startVideoSession();
-    Reciver::killVideoSession();
+    Reciver::start_reciver();
 }
 
 
@@ -65,7 +70,7 @@ void Reciver::addLinkVideo() {
 
     gst_init(0, nullptr);
 
-    if (data.pipeline == NULL) {
+    if (data.pipeline != NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
 
@@ -93,11 +98,19 @@ void Reciver::addLinkVideo() {
 
     gst_caps_unref(caps1);
 
-    gst_bin_add_many(GST_BIN(data.pipeline), udpsrc1, queue1, capsfilter1, depay1,
-                     parse1, decode1, convert1, autovideosink1, NULL);
+    gst_bin_add_many(GST_BIN(data.pipeline),
+                     udpsrc1,
+                     queue1,
+                     capsfilter1,
+                     depay1,
+                     parse1,
+                     decode1,
+                     convert1,
+                     autovideosink1,
+                     NULL);
 
-    if (!gst_element_link_many(udpsrc1, queue1, capsfilter1, depay1, parse1,
-                               decode1, convert1, autovideosink1, NULL)) {
+    if (!gst_element_link_many(
+            udpsrc1, queue1, capsfilter1, depay1, parse1, decode1, convert1, autovideosink1, NULL)) {
         g_printerr("Could not link all elements. Exiting.\n");
         return;
     }
@@ -112,7 +125,7 @@ void Reciver::addLinkAudio() {
 
     gst_init(0, nullptr);
 
-    if (data.pipeline == NULL) {
+    if (data.pipeline != NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
 
@@ -142,8 +155,16 @@ void Reciver::addLinkAudio() {
 
     gst_caps_unref(caps2);
 
-    gst_bin_add_many(GST_BIN(data.pipeline), udpsrc2, queue2, capsfilter2, depay2,
-                     parse2, decode2, convert2, audioresample, autovideosink2,
+    gst_bin_add_many(GST_BIN(data.pipeline),
+                     udpsrc2,
+                     queue2,
+                     capsfilter2,
+                     depay2,
+                     parse2,
+                     decode2,
+                     convert2,
+                     audioresample,
+                     autovideosink2,
                      NULL);
 
     if (!gst_element_link_many(udpsrc2, queue2, capsfilter2, depay2, parse2,
@@ -155,7 +176,8 @@ void Reciver::addLinkAudio() {
     g_object_set(udpsrc2, "port", 5000, NULL);
 }
 
-void Reciver::startVideoSession() {
+void Reciver::startVideoSession()
+{
     Reciver::addLinkVideo();
     Reciver::addLinkAudio();
 
@@ -168,7 +190,8 @@ void Reciver::startAudioSession() {
     Reciver::startReceive();
 }
 
-void Reciver::startReceive() {
+void Reciver::startReceive()
+{
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
 
     data.loop = g_main_loop_new(NULL, FALSE);
@@ -176,7 +199,9 @@ void Reciver::startReceive() {
     data.bus = gst_element_get_bus(data.pipeline);
 
     //gst_bus_add_watch(data.bus, (GstBusFunc)bus_callback, data.loop);
-    //gst_bus_add_watch(data.bus, (GstBusFunc)Reciver::bus_callback, data.loop);
+    //    gst_bus_add_watch(data.bus,
+    //                      (GstBusFunc) Reciver::bus_callback(data.bus, data.msg, (gpointer) data.loop),
+    //                      data.loop);
 
     gst_object_unref(data.bus);
 

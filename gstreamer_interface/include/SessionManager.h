@@ -27,19 +27,18 @@ private:
 
     CustomData data;
 
-
 public slots:
-    void startVideoSession(const QString& local_ip);
+    void startVideoSession(const QString &local_ip);
 
-    void startAudioSession(const QString& local_ip);
+    void startAudioSession(const QString &local_ip);
 
-    void killVideoSession(const QString& local_ip);
+    void killVideoSession(const QString &local_ip);
 
-    void killAudioSession(const QString& local_ip);
+    void killAudioSession(const QString &local_ip);
 
 signals:
     // All used to notify MainWindow about SessionManager events.
-    void sendErrorOccured(const QString& error_string);
+    void sendErrorOccured(const QString &error_string);
 
     void sendVideoSessionStarted();
 

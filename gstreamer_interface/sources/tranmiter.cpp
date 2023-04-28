@@ -10,9 +10,13 @@ Transmiter::Transmiter(QString port_to_transmit) : Session()
 void Transmiter::run()
 {
    // this->start_transmit();
+    start_transmit();
+}
+
+int Transmiter::start_transmit()
+{
     Transmiter::startVideoSession();
     Transmiter::killVideoSession();
-
 }
 
 gboolean Transmiter::on_bus_message (GstBus *bus, GstMessage *message, gpointer user_data)
@@ -49,11 +53,15 @@ void Transmiter::addLinkVideo()
     GstElement *ximagesrc, *videoscale, *videoconvert, *x264enc, *h264parse, *rtph264pay, *udpsink1, *capsfilter1, *capsfilter2;
     GstCaps *caps1, *caps2;
 
-    gst_init(0,nullptr);
+    gst_init(nullptr, nullptr);
 
-    if (data.pipeline == NULL){
+    if (data.pipeline != NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
+    //    if (!GST_IS_BUS(data.pipeline)) {
+    //        //        qDebug() << "Date:";
+    //        qDebug() << "GST_IS_BUS not is data.pipeline ";
+    //    }
 
     ximagesrc = gst_element_factory_make("ximagesrc", "ximagesrc");
     capsfilter1 = gst_element_factory_make("capsfilter", "capsfilter1");
@@ -104,7 +112,7 @@ void Transmiter::addLinkAudio()
     GstElement  *alsasrc, *audioconvert, *audioresample, *opusenc, *rtpopuspay, *udpsink2;
 
     gst_init(0, nullptr);
-    if (data.pipeline == NULL){
+    if (data.pipeline != NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
 
@@ -149,8 +157,14 @@ void Transmiter::startSend()
 {
     data.bus = gst_element_get_bus(data.pipeline);
 
-    //gst_bus_add_watch(data.bus, (GstBusFunc)Transmiter::on_bus_message(data.bus,data.msg,NULL), NULL );
-    // gst_bus_add_watch(data.bus, (GstBusFunc)Transmiter::on_bus_message(data.bus,data.msg,(gpointer)data.loop), NULL);
+    //    gst_bus_add_watch(data.bus,
+    //                      (GstBusFunc) Transmiter::on_bus_message(data.bus, data.msg, NULL),
+    //                      NULL);
+    gst_bus_add_watch(data.bus,
+                      (GstBusFunc) Transmiter::on_bus_message(data.bus,
+                                                              data.msg,
+                                                              (gpointer) data.loop),
+                      NULL);
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered (data.bus, GST_CLOCK_TIME_NONE, (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }

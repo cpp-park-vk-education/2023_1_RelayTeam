@@ -20,11 +20,11 @@ int main(int argc, char *argv[])
 
     //    display(NULL, NULL);
 
+    //    session3.start_transmit();
     session3.start();
-    //    session4.start();
 
+    //    session1.start_reciver();
     session1.start();
-    //    session2.start();
 
     qDebug() << "Application end.";
     //    a.setApplicationDisplayName("MultiRelay");

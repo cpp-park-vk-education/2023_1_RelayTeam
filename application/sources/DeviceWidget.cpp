@@ -55,19 +55,23 @@ void DeviceWidget::onAudioPressed() {
 	audio_state = !audio_state;
 }
 
-void DeviceWidget::onCastPressed() {
-	if (cast_state) {
-		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
-	} else {
-		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
-	}
-	cast_state = !cast_state;
+void DeviceWidget::onCastPressed()
+{
+    if (cast_state) {
+        cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
+    } else {
+        cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
+    }
+    cast_state = !cast_state;
 }
 
 void DeviceWidget::onSettingsPressed() {
 	// DeviceSettingsDialog settings_widget = new DeviceSettingsDialog;
 }
 
-void DeviceWidget::onVolumeChanged(int volume_) {
-	volume = volume_;
+void DeviceWidget::onVolumeChanged(int volume_)
+{
+    volume = volume_;
 }
+
+//fdsfsdf
