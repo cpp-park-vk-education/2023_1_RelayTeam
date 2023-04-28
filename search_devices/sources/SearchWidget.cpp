@@ -98,8 +98,9 @@ void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_receive
 		QString mac_address = queries[3].name().left(queries[3].name().size() - 1);
 		ServiceItem* service_item = service_item_map[service_name];
 		if (device_ids.contains(mac_address)) {
+			qDebug() << "Service item already added. Updating address.";
 			service_item->setAlreadyAdded();
-			qDebug() << "Service item already added.";
+			emit sendUpdateAddress(mac_address, local_ip);
 			return;
 		}
 		qDebug() << "got requested local ip from: " << service_name << "which is: " << local_ip;

@@ -55,6 +55,7 @@ MainWindow::MainWindow(QWidget* parent)
 	left_bar->addWidget(search_widget);
 	connect(add_button, &QPushButton::clicked, search_widget, &SearchWidget::onAddButtonCLicked);
 	connect(search_widget, &SearchWidget::devicePreparedToAdd, this, &MainWindow::onDevicePreparedToAdd);
+	connect(search_widget, &SearchWidget::sendUpdateAddress, this, &MainWindow::onUpdateAddress);
 	publisher_widget = new Publisher(options->device_name, this);
 
 	settings_widget = new SettingsWidget(options);
@@ -130,4 +131,14 @@ void MainWindow::getDeviceIds() {
 		device_ids.insert(static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID);
 	}
 	emit sendDeviceIdsUpdated(device_ids);
+}
+
+void MainWindow::onUpdateAddress(QString mac_address, QString local_ip) {
+	for (size_t i = 0; i < devices_layout->count(); ++i) {
+		if (static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID == mac_address) {
+			qDebug() << "Updating local ip for" << static_cast<DeviceWidget*>(devices_layout->itemAt(i))->name;
+			static_cast<DeviceWidget*>(devices_layout->itemAt(i))->local_ip = local_ip;
+			return;
+		}
+	}
 }

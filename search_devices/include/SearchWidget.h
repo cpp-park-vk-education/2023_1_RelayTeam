@@ -57,4 +57,6 @@ public slots:
 
 signals:
 	void devicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address);
+
+	void sendUpdateAddress(QString mac_address, QString local_ip);
 };

@@ -60,6 +60,8 @@ private slots:
 public slots:
 	void onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address);
 
+	void onUpdateAddress(QString mac_address, QString local_ip);
+
 signals:
 	void sendDeviceIdsUpdated(QSet<QString> device_ids);
 };
