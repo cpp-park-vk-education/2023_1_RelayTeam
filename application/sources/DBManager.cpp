@@ -8,7 +8,7 @@ void DBManager::createDB() {
 	QSqlQuery query;
 	query.prepare(
 		"create table Device("
-		"ID integer primary key,"
+		"ID VARCHAR(17) primary key,"
 		"name VARCHAR(20),"
 		"ipv6_address VARCHAR(39),"
 		"volume integer)");
@@ -98,7 +98,7 @@ void DBManager::addDevice(DeviceWidget* device) {  // change to "DeviceWidget* d
 		"ipv6_address,"
 		"volume)"
 		"VALUES(:ID, :name, :ipv6_address, :volume);");
-	query.bindValue(":ID", query.lastInsertId());
+	query.bindValue(":ID", device->ID);
 	query.bindValue(":name", device->name);
 	query.bindValue(":ipv6_address", device->ipv6_address);
 	query.bindValue(":volume", device->volume);
@@ -111,7 +111,7 @@ void DBManager::getDevices(QVBoxLayout* device_layout, qreal scale) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Device")) {
 		while (query.next()) {
-			DeviceWidget* current_device = new DeviceWidget(query.value("ID").toUInt(), query.value("name").toString(),
+			DeviceWidget* current_device = new DeviceWidget(query.value("ID").toString(), query.value("name").toString(),
 															query.value("ipv6_address").toString(), query.value("volume").toInt(), scale);
 			device_layout->addLayout(current_device);
 		}
@@ -133,7 +133,7 @@ void DBManager::saveDeviceChanges(DeviceWidget* device) {
 
 void DBManager::addTestEntries() {
 	for (size_t i = 0; i < 8; ++i) {
-		DeviceWidget* new_device = new DeviceWidget(i, QString("device"), QString("undefined"), 50, 100);
+		DeviceWidget* new_device = new DeviceWidget(QString::number(i), QString("device"), QString("undefined"), 50, 100);
 		addDevice(new_device);
 	}
 }

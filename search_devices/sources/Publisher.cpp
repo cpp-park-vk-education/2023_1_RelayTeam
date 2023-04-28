@@ -1,4 +1,5 @@
 #include "Publisher.h"
+#include <QtNetwork/QNetworkInterface>
 
 Publisher::Publisher(const QString& device_name, QWidget* parent)
 	: QObject(parent), server(), hostname(&server), provider(&server, &hostname), service() {
@@ -27,6 +28,16 @@ QString Publisher::getLocalIP() {
 	return local_ip;
 }
 
+QString Publisher::getMacAddress() {
+	foreach (QNetworkInterface netInterface, QNetworkInterface::allInterfaces()) {
+		// Return only the first non-loopback MAC Address
+		if (!(netInterface.flags() & QNetworkInterface::IsLoopBack)) {
+			return netInterface.hardwareAddress();
+		}
+	}
+	return QString();
+}
+
 void Publisher::onHostnameChanged(const QByteArray& hostname) {
 	qDebug() << QString("Hostname changed to ") + (QString(hostname));
 }
@@ -47,6 +58,9 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) 
 		query.setType(2222);
 		message.addQuery(query);
 		query.setName(getLocalIP().toUtf8());
+		query.setType(2222);
+		message.addQuery(query);
+		query.setName(getMacAddress().toUtf8());
 		query.setType(2222);
 		message.addQuery(query);
 		message.reply(message_received);

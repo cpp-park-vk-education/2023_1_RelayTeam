@@ -59,6 +59,8 @@ MainWindow::MainWindow(QWidget* parent)
 
 	settings_widget = new SettingsWidget(options);
 	settings_widget->setFixedWidth(570 * options->getScale());
+	connect(this, &MainWindow::sendDeviceIdsUpdated, search_widget, &SearchWidget::onDeviceIdsUpdated);
+	getDeviceIds();
 	main_layout->addWidget(settings_widget);
 	settings_widget->hide();
 	connect(settings_widget, &SettingsWidget::sendChangeServiceName, publisher_widget, &Publisher::onChangeServiceName);
@@ -114,8 +116,18 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	}
 }
 
-void MainWindow::onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip) {
+void MainWindow::onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address) {
 	qDebug() << "Adding device: " << name;
-	DeviceWidget* device_widget = new DeviceWidget(-1, name, ipv6_address, 50, options->getScale(), local_ip);
+	DeviceWidget* device_widget = new DeviceWidget(mac_address, name, ipv6_address, 50, options->getScale(), local_ip);
 	devices_layout->addLayout(device_widget);
+	data_base.addDevice(device_widget);
+	device_ids.insert(mac_address);
+	emit sendDeviceIdsUpdated(device_ids);
+}
+
+void MainWindow::getDeviceIds() {
+	for (size_t i = 0; i < devices_layout->count(); ++i) {
+		device_ids.insert(static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID);
+	}
+	emit sendDeviceIdsUpdated(device_ids);
 }

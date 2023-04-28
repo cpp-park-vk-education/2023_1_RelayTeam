@@ -13,6 +13,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QSet>
 #include <QTextEdit>
 
 class MainWindow : public QMainWindow {
@@ -40,10 +41,13 @@ private:
 	SearchWidget* search_widget;
 	Publisher* publisher_widget;
 	SettingsWidget* settings_widget;
+	QSet<QString> device_ids;
 
 	void saveAllChanges();
 
 	void closeEvent(QCloseEvent* event);
+
+	void getDeviceIds();
 
 public:
 	explicit MainWindow(QWidget* parent = nullptr);
@@ -54,5 +58,8 @@ private slots:
 	void onScanNetworkButtonPressed();
 
 public slots:
-	void onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip);
+	void onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address);
+
+signals:
+	void sendDeviceIdsUpdated(QSet<QString> device_ids);
 };

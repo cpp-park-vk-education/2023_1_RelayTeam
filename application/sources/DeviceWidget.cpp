@@ -41,13 +41,13 @@ void DeviceWidget::defineWdgets(qreal scale) {
 	this->addWidget(settings_button);
 }
 
-DeviceWidget::DeviceWidget(qint32 ID_, QString& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_,
+DeviceWidget::DeviceWidget(QString ID_, QString& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_,
 						   QWidget* parent)
 	: ID(ID_), name(name_), volume(volume_), ipv6_address(ipv6_address_), local_ip(local_ip_), QHBoxLayout(parent) {
 	defineWdgets(scale);
 }
 
-DeviceWidget::DeviceWidget(qint32 ID_, QString&& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_,
+DeviceWidget::DeviceWidget(QString ID_, QString&& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_,
 						   QWidget* parent)
 	: ID(ID_), name(std::move(name_)), volume(volume_), ipv6_address(ipv6_address_), local_ip(local_ip_), QHBoxLayout(parent) {
 	defineWdgets(scale);

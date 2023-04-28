@@ -92,13 +92,19 @@ void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_receive
 		return;
 	}
 	QList<QMdnsEngine::Query> queries = message_received.queries();
-	if (queries.front().name() == "mrelay-answer-local-ip.") {
-		QString service_name = (++queries.begin())->name();
-		QString local_ip = queries.back().name().left(queries.back().name().size() - 1);
-		service_name = service_name.left(service_name.size() - 1);
-		qDebug() << "got requested local ip from: " << service_name << "which is: " << local_ip;
+	if (queries[0].name() == "mrelay-answer-local-ip.") {
+		QString service_name = queries[1].name().left(queries[1].name().size() - 1);
+		QString local_ip = queries[2].name().left(queries[2].name().size() - 1);
+		QString mac_address = queries[3].name().left(queries[3].name().size() - 1);
 		ServiceItem* service_item = service_item_map[service_name];
+		if (device_ids.contains(mac_address)) {
+			service_item->setAlreadyAdded();
+			qDebug() << "Service item already added.";
+			return;
+		}
+		qDebug() << "got requested local ip from: " << service_name << "which is: " << local_ip;
 		service_item->setLocalIP(local_ip);
+		service_item->setMac(mac_address);
 	}
 }
 
@@ -119,5 +125,10 @@ void SearchWidget::onAddButtonCLicked() {
 	}
 
 	service_item->setAlreadyAdded();
-	emit devicePreparedToAdd(service_item->getService().name(), service_item->getAddress(), service_item->getLocalIP());
+	emit devicePreparedToAdd(service_item->getService().name(), service_item->getAddress(), service_item->getLocalIP(),
+							 service_item->getMac());
+}
+
+void SearchWidget::onDeviceIdsUpdated(QSet<QString> device_ids_) {
+	device_ids = device_ids_;
 }

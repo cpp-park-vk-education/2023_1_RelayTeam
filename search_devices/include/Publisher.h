@@ -23,6 +23,8 @@ private:
 
 	QString getLocalIP();
 
+	QString getMacAddress();
+
 public:
 	Publisher(const QString& device_name, QWidget* parent = nullptr);
 

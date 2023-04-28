@@ -27,6 +27,7 @@ private:
 	QMdnsEngine::Cache cache;
 	QMdnsEngine::Browser mdns_browser;
 	QMdnsEngine::Resolver* resolver;
+	QSet<QString> device_ids;
 
 	qreal scale;
 	QMap<QString, ServiceItem*> service_item_map;
@@ -52,6 +53,8 @@ private slots:
 public slots:
 	void onAddButtonCLicked();
 
+	void onDeviceIdsUpdated(QSet<QString> device_ids_);
+
 signals:
-	void devicePreparedToAdd(QString name, QString ipv6_address, QString local_ip);
+	void devicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address);
 };

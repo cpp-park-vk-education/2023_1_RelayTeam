@@ -27,6 +27,7 @@ private:
 	bool is_added;
 	bool is_resolved;
 	QString local_ip;
+	QString mac_address;
 	QHostAddress address;
 
 public:
@@ -77,5 +78,13 @@ public:
 
 	inline QString getLocalIP() {
 		return local_ip;
+	}
+
+	inline void setMac(const QString& mac_address_) {
+		mac_address = mac_address_;
+	}
+
+	inline QString getMac() {
+		return mac_address;
 	}
 };

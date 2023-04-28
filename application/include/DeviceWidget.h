@@ -25,16 +25,16 @@ private:
 	void defineWdgets(qreal scale);
 
 public:
-	const qint32 ID;
+	const QString ID;
 	qint16 volume;
 	QString name;
 	QString ipv6_address;
 	QString local_ip;
 
-	explicit DeviceWidget(qint32 ID_, QString& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_ = "",
+	explicit DeviceWidget(QString ID_, QString& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_ = "",
 						  QWidget* parent = nullptr);
 
-	explicit DeviceWidget(qint32 ID_, QString&& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_ = "",
+	explicit DeviceWidget(QString ID_, QString&& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_ = "",
 						  QWidget* parent = nullptr);
 
 private slots:
