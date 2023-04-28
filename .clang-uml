@@ -1,0 +1,19 @@
+compilation_database_dir: ../build-2023_1_RelayTeam-Desktop_Qt_5_15_2_GCC_64bit-Debug
+output_directory: puml
+diagrams:
+  cpp_expression_class_diagram:
+    type: class
+    glob:
+      - application/sources/main.cpp
+    include:
+      elements:
+        - MainWindow
+        - DeviceWidget
+        - DBManager
+        - SettingsWidget
+        - Options
+
+        - Publisher
+        - SearchWidget
+        - ServiceItem
+        - getFontScaling
