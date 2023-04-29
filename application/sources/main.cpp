@@ -4,18 +4,19 @@
 #include <QApplication>
 #include <QtDebug>
 
+#include <ReciverVideo.h>
+#include <SessionManager.h>
+#include <TransmiterVideo.h>
 #include <example_gstreamer.h>
-#include <reciver.h>
-#include <transmmiter.h>
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "Application1";
+    qDebug() << "Application123";
     QApplication a(argc, argv);
 
-    //    Reciver session1("A");
-    Reciver session1("A"), session2("B");
-    Transmiter session3("C"), session4("C");
+    //Reciver session1("A");
+    ReciverVideo session1("A");
+    TransmiterVideo session3("C");
 
     //    display(NULL, NULL);
 
@@ -24,6 +25,12 @@ int main(int argc, char *argv[])
 
     //    session1.start_reciver();
     session1.start();
+
+    //session1.quit();
+    //session1.wait();
+
+    //  session1.quit();
+    //    session1.wait();
 
     qDebug() << "Application end.";
     //    a.setApplicationDisplayName("MultiRelay");

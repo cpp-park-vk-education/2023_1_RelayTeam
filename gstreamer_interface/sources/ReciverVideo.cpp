@@ -1,40 +1,29 @@
-#include "reciver.h"
+#include "ReciverVideo.h"
 #include <QDebug>
 
-Reciver::~Reciver()
-{
-    gst_object_unref(data.bus);
-    gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    gst_object_unref(data.pipeline);
-}
-
-Reciver::Reciver(QString port_to_reciving):Session()
+ReciverVideo::ReciverVideo(QString port_to_reciving)
+    : Session()
 {
     port = port_to_reciving;
     /* Initialize our data structure */
     qDebug() << "port for transmitter:" << this->port;
-
-    // connect(this, &Reciver::sendVideoSessionStarted, this, &Reciver::startVideoSession);
-    // connect(this, &Reciver::sendAudioSessionStarted, this, &Reciver::startAudioSession);
-    // connect(this, &Reciver::sendVideoSessionKilled, this, &Reciver::killVideoSession);
-    // connect(this, &Reciver::sendAudioSessionKilled, this, &Reciver::killAudioSession);
 }
 
-int Reciver::start_reciver()
+int ReciverVideo::start_reciver()
 {
-    Reciver::onStartVideoSession();
-    Reciver::onKillVideoSession();
+    ReciverVideo::onStartVideoSession();
+    // ReciverVideo::onKillVideoSession();
 }
 
-void Reciver::run()
+void ReciverVideo::run()
 {
-   // this->start_reciver();
-    Reciver::start_reciver();
+    // this->start_reciver();
+    ReciverVideo::start_reciver();
 }
 
-
-gboolean Reciver::bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
-    GMainLoop *loop = (GMainLoop *)data;
+gboolean ReciverVideo::bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
+{
+    GMainLoop *loop = (GMainLoop *) data;
 
     switch (GST_MESSAGE_TYPE(msg)) {
     case GST_MESSAGE_ERROR: {
@@ -43,7 +32,8 @@ gboolean Reciver::bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
 
         gst_message_parse_error(msg, &error, &debug_info);
         g_printerr("Error received from element %s: %s\n",
-                   GST_OBJECT_NAME(msg->src), error->message);
+                   GST_OBJECT_NAME(msg->src),
+                   error->message);
         g_printerr("Debugging information: %s\n", debug_info ? debug_info : "none");
         g_clear_error(&error);
         g_free(debug_info);
@@ -56,7 +46,8 @@ gboolean Reciver::bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
 
         gst_message_parse_warning(msg, &error, &debug_info);
         g_printerr("Warning received from element %s: %s\n",
-                   GST_OBJECT_NAME(msg->src), error->message);
+                   GST_OBJECT_NAME(msg->src),
+                   error->message);
         g_printerr("Debugging information: %s\n", debug_info ? debug_info : "none");
         g_clear_error(&error);
         g_free(debug_info);
@@ -74,9 +65,10 @@ gboolean Reciver::bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
     return TRUE;
 }
 
-void Reciver::addLinkVideo() {
-    GstElement *udpsrc1, *queue1, *capsfilter1, *depay1, *parse1, *decode1,
-        *convert1, *autovideosink1;
+void ReciverVideo::addLinkVideo()
+{
+    GstElement *udpsrc1, *queue1, *capsfilter1, *depay1, *parse1, *decode1, *convert1,
+        *autovideosink1;
     GstCaps *caps1;
 
     //    gst_init(0, nullptr);
@@ -94,16 +86,26 @@ void Reciver::addLinkVideo() {
     convert1 = gst_element_factory_make("videoconvert", "convert1");
     autovideosink1 = gst_element_factory_make("autovideosink", "autovideosink1");
 
-    if (!data.pipeline || !udpsrc1 || !depay1 || !parse1 || !decode1 ||
-        !convert1 || !autovideosink1 || !capsfilter1 || !queue1) {
+    if (!data.pipeline || !udpsrc1 || !depay1 || !parse1 || !decode1 || !convert1 || !autovideosink1
+        || !capsfilter1 || !queue1) {
         g_printerr("Not all elements could be created. Exiting.\n");
         return;
     }
 
-    caps1 = gst_caps_new_simple("application/x-rtp", "media", G_TYPE_STRING,
-                                "video", "clock-rate", G_TYPE_INT, 90000,
-                                "encoding-name", G_TYPE_STRING, "H264", "payload",
-                                G_TYPE_INT, 96, NULL);
+    caps1 = gst_caps_new_simple("application/x-rtp",
+                                "media",
+                                G_TYPE_STRING,
+                                "video",
+                                "clock-rate",
+                                G_TYPE_INT,
+                                90000,
+                                "encoding-name",
+                                G_TYPE_STRING,
+                                "H264",
+                                "payload",
+                                G_TYPE_INT,
+                                96,
+                                NULL);
 
     g_object_set(G_OBJECT(capsfilter1), "caps", caps1, NULL);
 
@@ -129,9 +131,10 @@ void Reciver::addLinkVideo() {
     g_object_set(udpsrc1, "port", 5001, NULL);
 }
 
-void Reciver::addLinkAudio() {
-    GstElement *udpsrc2, *depay2, *parse2, *decode2, *convert2, *autovideosink2,
-        *audioresample, *capsfilter2, *queue2;
+void ReciverVideo::addLinkAudio()
+{
+    GstElement *udpsrc2, *depay2, *parse2, *decode2, *convert2, *autovideosink2, *audioresample,
+        *capsfilter2, *queue2;
     GstCaps *caps2;
 
     //    gst_init(0, nullptr);
@@ -150,17 +153,26 @@ void Reciver::addLinkAudio() {
     audioresample = gst_element_factory_make("audioresample", "audioresample");
     autovideosink2 = gst_element_factory_make("autoaudiosink", "autovideosink2");
 
-    if (!data.pipeline || !udpsrc2 || !depay2 || !parse2 || !decode2 ||
-        !convert2 || !autovideosink2 || !audioresample || !capsfilter2 ||
-        !queue2) {
+    if (!data.pipeline || !udpsrc2 || !depay2 || !parse2 || !decode2 || !convert2 || !autovideosink2
+        || !audioresample || !capsfilter2 || !queue2) {
         g_printerr("Not all elements could be created. Exiting.\n");
         return;
     }
 
-    caps2 = gst_caps_new_simple("application/x-rtp", "media", G_TYPE_STRING,
-                                "audio", "clock-rate", G_TYPE_INT, 48000,
-                                "encoding-name", G_TYPE_STRING, "OPUS", "payload",
-                                G_TYPE_INT, 96, NULL);
+    caps2 = gst_caps_new_simple("application/x-rtp",
+                                "media",
+                                G_TYPE_STRING,
+                                "audio",
+                                "clock-rate",
+                                G_TYPE_INT,
+                                48000,
+                                "encoding-name",
+                                G_TYPE_STRING,
+                                "OPUS",
+                                "payload",
+                                G_TYPE_INT,
+                                96,
+                                NULL);
 
     g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
 
@@ -178,8 +190,15 @@ void Reciver::addLinkAudio() {
                      autovideosink2,
                      NULL);
 
-    if (!gst_element_link_many(udpsrc2, queue2, capsfilter2, depay2, parse2,
-                               decode2, convert2, audioresample, autovideosink2,
+    if (!gst_element_link_many(udpsrc2,
+                               queue2,
+                               capsfilter2,
+                               depay2,
+                               parse2,
+                               decode2,
+                               convert2,
+                               audioresample,
+                               autovideosink2,
                                NULL)) {
         g_printerr("Could not link all elements. Exiting.\n");
         return;
@@ -187,23 +206,23 @@ void Reciver::addLinkAudio() {
     g_object_set(udpsrc2, "port", 5000, NULL);
 }
 
-void Reciver::onStartVideoSession()
+void ReciverVideo::onStartVideoSession()
 {
     gst_init(0, nullptr);
-    Reciver::addLinkVideo();
-    Reciver::addLinkAudio();
+    ReciverVideo::addLinkVideo();
+    ReciverVideo::addLinkAudio();
 
-    Reciver::startReceive();
+    ReciverVideo::startReceive();
 }
 
-void Reciver::onStartAudioSession()
+void ReciverVideo::onKillVideoSession()
 {
-    Reciver::addLinkAudio();
-
-    Reciver::startReceive();
+    g_main_loop_unref(data.loop);
+    gst_element_set_state(data.pipeline, GST_STATE_NULL);
+    gst_object_unref(data.pipeline);
 }
 
-void Reciver::startReceive()
+void ReciverVideo::startReceive()
 {
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
 
@@ -222,18 +241,4 @@ void Reciver::startReceive()
     gst_object_unref(data.bus);
 
     g_main_loop_run(data.loop);
-}
-
-void Reciver::onKillVideoSession()
-{
-    g_main_loop_unref(data.loop);
-    gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    gst_object_unref(data.pipeline);
-}
-
-void Reciver::onKillAudioSession()
-{
-    g_main_loop_unref(data.loop);
-    gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    gst_object_unref(data.pipeline);
 }

@@ -4,13 +4,14 @@
 #include <QMap>
 #include <QObject>
 #include <Session.h>
-#include <transmmiter.h>
+#include <TransmiterAudio.h>
+#include <TransmiterVideo.h>
 
 class SessionManager : public QObject
 {
 private:
     Q_OBJECT
-    QMap<QString, std::unique_ptr<Session>> live_sessions;	 // map<session_id, session>
+    QMap<QPair<QString, QString>, std::shared_ptr<Session>> live_sessions; // map<session_id, session>
 
     //void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
     SessionManager();

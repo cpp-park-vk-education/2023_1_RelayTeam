@@ -1,12 +1,12 @@
-#ifndef TRANSMITTER_H
-#define TRANSMITER_H
+#ifndef TRANSMITERVIDEO_H
+#define TRANSMITERVIDEO_H
 
-#include <QThread>
 #include <QString>
+#include <QThread>
 #include <Session.h>
 #include <gst/gst.h>
 
-class Transmiter : public Session
+class TransmiterVideo : public Session
 {
 private:
     gboolean on_bus_message(GstBus *bus, GstMessage *message, gpointer user_data);
@@ -18,39 +18,28 @@ private:
     void startSend();
 
 public:
-    // constructor
-    // set name using initializer
-    explicit Transmiter(const QString &local_ip);
-    ~Transmiter();
+    explicit TransmiterVideo(const QString &local_ip);
+    //~TransmiterVideo();
 
-    // overriding the QThread's run() method
     void run();
 
     int start_transmit();
 
 public slots:
-    void onStartAudioSession();
-
     void onStartVideoSession();
 
     void onKillVideoSession();
 
-    void onKillAudioSession();
-
 signals:
     void sendVideoSessionStarted();
 
-    void sendAudioSessionStarted();
-
     void sendVideoSessionKilled();
-
-    void sendAudioSessionKilled();
 
     typedef struct _CustomData
     {
         gboolean is_live;
         GstElement *pipeline = NULL;
-        GMainLoop* loop;
+        GMainLoop *loop;
         GstBus *bus;
         GstMessage *msg;
     } CustomData;
@@ -60,5 +49,4 @@ signals:
     QString port;
 };
 
-
-#endif // TRANSMITER_H
+#endif // TRANSMITERVIDEO_H
