@@ -11,15 +11,16 @@ file(GLOB SRC_FILES
 )
 
 add_library(${PROJECT_NAME} SHARED
-	${SRC_FILES}
+        ${SRC_FILES}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	Qt5::Core
-	${GSTREAMER_LIBRARIES}
+        Qt5::Core
+        ${GSTREAMER_LIBRARIES}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-	${CMAKE_CURRENT_LIST_DIR}/include
-	${GSTREAMER_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_LIST_DIR}/include
+        ${GSTREAMER_INCLUDE_DIRS}
 )
+
