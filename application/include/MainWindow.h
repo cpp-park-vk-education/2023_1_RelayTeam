@@ -6,6 +6,7 @@
 #include "SettingsWidget.h"
 #include <Publisher.h>
 #include <SearchWidget.h>
+#include <SessionManager.h>
 
 #include <QCloseEvent>
 #include <QGridLayout>
@@ -42,6 +43,7 @@ private:
 	Publisher* publisher_widget;
 	SettingsWidget* settings_widget;
 	QSet<QString> device_ids;
+	SessionManager streaming_session_manager;
 
 	void saveAllChanges();
 

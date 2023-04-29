@@ -1,4 +1,5 @@
 #include "Publisher.h"
+#include <networkTools.h>
 #include <QtNetwork/QNetworkInterface>
 
 Publisher::Publisher(const QString& device_name, QWidget* parent)
@@ -16,37 +17,25 @@ Publisher::Publisher(const QString& device_name, QWidget* parent)
 	qDebug() << device_name << " published";
 }
 
-QString Publisher::getLocalIP() {
-	QString local_ip;
-	QHostInfo info = QHostInfo::fromName(QHostInfo::localHostName());
-	// Iterate through all the IP addresses and print them
-	foreach (const QHostAddress& address, info.addresses()) {
-		if (address.protocol() == QAbstractSocket::IPv4Protocol) {
-			local_ip = address.toString();
-		}
-	}
-	return local_ip;
-}
-
-QString Publisher::getMacAddress() {
-	foreach (QNetworkInterface netInterface, QNetworkInterface::allInterfaces()) {
-		// Return only the first non-loopback MAC Address
-		if (!(netInterface.flags() & QNetworkInterface::IsLoopBack)) {
-			return netInterface.hardwareAddress();
-		}
-	}
-	return QString();
-}
-
 void Publisher::onHostnameChanged(const QByteArray& hostname) {
 	qDebug() << QString("Hostname changed to ") + (QString(hostname));
 }
 
 void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) {
+	QList<QMdnsEngine::Query> queries = message_received.queries();
+	if (message_received.transactionId() == 3645) {
+		if (queries.front().name() == "mrelay-start-receiving-session.") {
+			QString session_type = queries[1].name().left(queries[1].name().size() - 1);
+			qDebug() << "received request for receiving session from" << message_received.address().toString()
+					 << "\n session type is: " << session_type;
+			emit sendStartReceivingSession(session_type);
+		}
+		return;
+	}
+
 	if (message_received.transactionId() != 1264) {
 		return;
 	}
-	QList<QMdnsEngine::Query> queries = message_received.queries();
 	if (queries.front().name() == "mrelay-request-local-ip.") {
 		qDebug() << "mrelay-request-local-ip. query recieved";
 		QMdnsEngine::Message message;

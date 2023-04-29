@@ -2,6 +2,7 @@ project(general_use VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt5 REQUIRED COMPONENTS
 	Widgets
+	Network
 )
 
 set(PROJECT_PATH ${CMAKE_SOURCE_DIR})
@@ -20,8 +21,10 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 
-#target_link_libraries(${PROJECT_NAME} PRIVATE
-#)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	Qt5::Widgets
+	Qt5::Network
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include

@@ -21,10 +21,6 @@ private:
 	QMdnsEngine::Provider provider;
 	QMdnsEngine::Service service;
 
-	QString getLocalIP();
-
-	QString getMacAddress();
-
 public:
 	Publisher(const QString& device_name, QWidget* parent = nullptr);
 
@@ -35,4 +31,7 @@ private slots:
 
 public slots:
 	void onChangeServiceName(const QString& service_name);
+
+signals:
+	void sendStartReceivingSession(QString session_type);
 };

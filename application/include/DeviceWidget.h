@@ -13,12 +13,13 @@
 class DeviceWidget : public QHBoxLayout {
 private:
 	Q_OBJECT
-	QPushButton* audio_button;
-	QPushButton* cast_button;
-	QPushButton* settings_button;
 	QLabel* name_box;
 	QSlider* volume_slider;
 	QSpinBox* volume_box;
+	QPushButton* audio_button;
+	QPushButton* cast_button;
+	QPushButton* settings_button;
+
 	bool audio_state = false;
 	bool cast_state = false;
 
@@ -45,4 +46,9 @@ private slots:
 	void onSettingsPressed();
 
 	void onVolumeChanged(qint16 volume_);
+
+signals:
+	void sendStartVideoSession(QString local_ip, QString ipv6_address);
+
+	void sendStartAudioSession(QString local_ip, QString ipv6_address);
 };

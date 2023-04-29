@@ -1,5 +1,6 @@
 #include "SearchWidget.h"
 
+#include <networkTools.h>
 #include <QScrollBar>
 #include <UITools.h>
 
@@ -70,8 +71,8 @@ void SearchWidget::onSelected(QListWidgetItem* item_) {
 		if (service_item->getResolved()) {
 			return;
 		}
+		qDebug() << "resolved address: " << address.toString();
 		service_item->setResolved(address);
-		qDebug() << address << " resolved.";
 		QMdnsEngine::Message message;
 		QMdnsEngine::Query query;
 		query.setName("mrelay-request-local-ip");
@@ -132,4 +133,20 @@ void SearchWidget::onAddButtonCLicked() {
 
 void SearchWidget::onDeviceIdsUpdated(QSet<QString> device_ids_) {
 	device_ids = device_ids_;
+}
+
+void SearchWidget::onStartReciver(const QString& local_ip6, const QString& session_type) {
+	qDebug() << "sending receive request to: " << QHostAddress(local_ip6).toString() << " from: " << getIPv6();
+	QMdnsEngine::Message message;
+	QMdnsEngine::Query query;
+	query.setName("mrelay-start-receiving-session");
+	query.setType(7575);
+	message.addQuery(query);
+	query.setName(session_type.toUtf8());
+	query.setType(7575);
+	message.addQuery(query);
+	message.setAddress(QHostAddress(local_ip6));
+	message.setPort(5353);
+	message.setTransactionId(3645);
+	server.sendMessage(message);
 }

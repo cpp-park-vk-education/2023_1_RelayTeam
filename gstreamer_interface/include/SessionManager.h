@@ -13,8 +13,9 @@ class SessionManager : public QObject
 private:
     Q_OBJECT
     QMap<QPair<QString, QString>, std::shared_ptr<Session>> live_sessions; // map<session_id, session>
-    //void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
-    SessionManager();
+	// void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
+public:
+	SessionManager();
 
 public slots:
     void onStartVideoSession(const QString &local_ip, const QString &ip6);
@@ -23,15 +24,15 @@ public slots:
 
     void onKillVideoSession(const QString &local_ip);
 
-    void onKillAudioSession(const QString &local_ip);
+	void onKillAudioSession(const QString &local_ip);
 
-    void onStartVideoReciver(const QString &local_ip);
+	void onStartVideoReciver(const QString &local_ip);
 
-    void onStartAudioReciver(const QString &local_ip);
+	void onStartAudioReciver(const QString &local_ip);
 
-    void onKillVideoReciver(const QString &local_ip);
+	void onKillVideoReciver(const QString &local_ip);
 
-    void onKillAudioReciver(const QString &local_ip);
+	void onKillAudioReciver(const QString &local_ip);
 
 signals:
     // All used to notify MainWindow about SessionManager events.

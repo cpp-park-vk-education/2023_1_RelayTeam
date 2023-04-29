@@ -5,7 +5,7 @@
 #include <UITools.h>
 
 MainWindow::MainWindow(QWidget* parent)
-	: QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false) {
+	: QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false), streaming_session_manager() {
 	options = new Options();
 	data_base.getOptions(options);
 	QFont font = this->font();
@@ -36,6 +36,12 @@ MainWindow::MainWindow(QWidget* parent)
 	left_bar->addWidget(input_box);
 	devices_layout = new QVBoxLayout();	 // Creating devices layout with scroll area.
 	data_base.getDevices(devices_layout, options->getScale());
+	for (size_t i = 0; i < devices_layout->count(); ++i) {
+		connect(static_cast<DeviceWidget*>(devices_layout->itemAt(i)), &DeviceWidget::sendStartVideoSession, &streaming_session_manager,
+				&SessionManager::onStartVideoSession);
+		connect(static_cast<DeviceWidget*>(devices_layout->itemAt(i)), &DeviceWidget::sendStartAudioSession, &streaming_session_manager,
+				&SessionManager::onStartAudioSession);
+	}
 	devices_layout->setContentsMargins(0, 0, 0, 0);
 	devices_widget = new QWidget();
 	devices_widget->sizeHint();
@@ -49,26 +55,22 @@ MainWindow::MainWindow(QWidget* parent)
 	devices_scroll_area->setMaximumWidth(700 * options->getScale());
 	devices_scroll_area->setWidget(devices_widget);
 	main_layout->addWidget(devices_scroll_area);
-
 	search_widget = new SearchWidget(options->getScale());	// Creating network widgets.
 	search_widget->hide();
 	left_bar->addWidget(search_widget);
 	connect(add_button, &QPushButton::clicked, search_widget, &SearchWidget::onAddButtonCLicked);
+	connect(&streaming_session_manager, &SessionManager::sendStartReciver, search_widget, &SearchWidget::onStartReciver);
 	connect(search_widget, &SearchWidget::devicePreparedToAdd, this, &MainWindow::onDevicePreparedToAdd);
 	connect(search_widget, &SearchWidget::sendUpdateAddress, this, &MainWindow::onUpdateAddress);
 	publisher_widget = new Publisher(options->device_name, this);
-
-	settings_widget = new SettingsWidget(options);
+	settings_widget = new SettingsWidget(options);	// Creating settings widget.
 	settings_widget->setFixedWidth(570 * options->getScale());
 	connect(this, &MainWindow::sendDeviceIdsUpdated, search_widget, &SearchWidget::onDeviceIdsUpdated);
 	getDeviceIds();
 	main_layout->addWidget(settings_widget);
 	settings_widget->hide();
 	connect(settings_widget, &SettingsWidget::sendChangeServiceName, publisher_widget, &Publisher::onChangeServiceName);
-	for (size_t i = 0; i < devices_layout->count(); ++i) {
-		//		connect(settings_widget, &SettingsWidget::sendRescale, static_cast<DeviceWidget*>(devices_layout->itemAt(i)),
-		//				&DeviceWidget::onRescaled);
-	}
+	connect(publisher_widget, &Publisher::sendStartReceivingSession, &streaming_session_manager, &SessionManager::onStartVideoReciver);
 
 	main_widget->show();
 }

@@ -55,6 +55,8 @@ public slots:
 
 	void onDeviceIdsUpdated(QSet<QString> device_ids_);
 
+	void onStartReciver(const QString& local_ip6, const QString& session_type);
+
 signals:
 	void devicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address);
 
