@@ -1,5 +1,4 @@
-#ifndef RECIVERVIDEO_H
-#define RECIVERVIDEO_H
+#pragma once
 
 #include <QString>
 #include <QThread>
@@ -46,5 +45,3 @@ private:
 
     CustomData data;
 };
-
-#endif // RECIVERVIDEO_H

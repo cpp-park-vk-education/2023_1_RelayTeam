@@ -1,5 +1,4 @@
-#ifndef RECIVERAUDIO_H
-#define RECIVERAUDIO_H
+#pragma once
 
 #include <QString>
 #include <QThread>
@@ -46,5 +45,3 @@ private:
 
     CustomData data;
 };
-
-#endif // RECIVERAUDIO_H

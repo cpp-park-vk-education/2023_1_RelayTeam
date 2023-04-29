@@ -1,5 +1,4 @@
-#ifndef SESSION_H
-#define SESSION_H
+#pragma once
 
 #include <QThread>
 #include <QString>
@@ -28,4 +27,3 @@ protected:
     QString port;
 
 };
-#endif // SESSION_H

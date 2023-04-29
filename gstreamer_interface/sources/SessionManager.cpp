@@ -5,13 +5,8 @@ SessionManager::SessionManager() {}
 
 void SessionManager::startVideoSession(const QString &local_ip)
 {
-    Session *session = new TransmiterVideo(local_ip);
-
     QPair<QString, QString> key = qMakePair(QString("127.0.0.1"), QString("TransmiterVideo"));
-    std::unique_ptr<Session> myTransmitter(std::move(session));
-    live_sessions.insert(key, std::move(myTransmitter));
-
-    session->run();
+    live_sessions.insert(key, std::make_unique<TransmiterVideo>(local_ip));
 }
 
 void SessionManager::startAudioSession(const QString &local_ip)
@@ -19,10 +14,7 @@ void SessionManager::startAudioSession(const QString &local_ip)
     Session *session = new TransmiterAudio(local_ip);
 
     QPair<QString, QString> key = qMakePair(QString("127.0.0.1"), QString("TransmiterAudio"));
-    std::unique_ptr<Session> myTransmitter(std::move(session));
-    live_sessions.insert(key, std::move(myTransmitter));
-
-    session->run();
+    live_sessions.insert(key, std::make_unique<TransmiterVideo>(local_ip));
 }
 
 void SessionManager::killVideoSession(const QString &local_ip)
@@ -30,9 +22,7 @@ void SessionManager::killVideoSession(const QString &local_ip)
     QString key = "TransmiterVideo";
     auto it = live_sessions.find(qMakePair(local_ip, key));
     if (it != live_sessions.end()) {
-        auto shared_ptr = *it;
-        auto value_ptr = it.value();
-        value_ptr->quit();
+        it.value()->quit();
         live_sessions.erase(it);
 
     } else {
@@ -45,9 +35,7 @@ void SessionManager::killAudioSession(const QString &local_ip)
     QString key = "TransmiterAudio";
     auto it = live_sessions.find(qMakePair(local_ip, key));
     if (it != live_sessions.end()) {
-        auto shared_ptr = *it;
-        auto value_ptr = it.value();
-        value_ptr->quit();
+        it.value()->quit();
         live_sessions.erase(it);
 
     } else {

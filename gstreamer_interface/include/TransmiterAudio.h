@@ -1,5 +1,4 @@
-#ifndef TRANSMITERAUDIO_H
-#define TRANSMITERAUDIO_H
+#pragma once
 
 #include <QString>
 #include <QThread>
@@ -51,5 +50,3 @@ signals:
     QString ip;
     QString port;
 };
-
-#endif // TRANSMITERAUDIO_H

@@ -1,5 +1,4 @@
-#ifndef TRANSMITERVIDEO_H
-#define TRANSMITERVIDEO_H
+#pragma once
 
 #include <QString>
 #include <QThread>
@@ -48,5 +47,3 @@ signals:
     QString ip;
     QString port;
 };
-
-#endif // TRANSMITERVIDEO_H

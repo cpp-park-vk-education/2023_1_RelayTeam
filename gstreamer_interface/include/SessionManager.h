@@ -1,5 +1,4 @@
-#ifndef SESSIONMANAGER_H
-#define SESSIONMANAGER_H
+#pragma once
 
 #include <QMap>
 #include <QObject>
@@ -51,4 +50,3 @@ signals:
 
     void sendAudioSessionKilled();
 };
-#endif // SESSIONMANAGER_H
