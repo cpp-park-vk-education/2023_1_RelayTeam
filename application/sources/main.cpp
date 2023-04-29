@@ -7,7 +7,6 @@
 #include <ReciverVideo.h>
 #include <SessionManager.h>
 #include <TransmiterVideo.h>
-#include <example_gstreamer.h>
 
 int main(int argc, char *argv[])
 {

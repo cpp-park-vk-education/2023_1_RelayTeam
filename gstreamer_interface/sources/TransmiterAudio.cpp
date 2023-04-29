@@ -2,6 +2,14 @@
 
 #include <QDebug>
 
+TransmiterAudio::TransmiterAudio(const QString &local_ip4, const QString &ip6)
+{
+    this->local_ip4 = local_ip4;
+    this->ip6 = ip6;
+
+    qDebug() << "port for transmitter:" << this->port;
+}
+
 TransmiterAudio::~TransmiterAudio()
 {
     // gst_object_unref(data.bus);
@@ -9,13 +17,16 @@ TransmiterAudio::~TransmiterAudio()
     // gst_object_unref(data.pipeline);
 }
 
-TransmiterAudio::TransmiterAudio(const QString &local_ip)
+/*
+TransmiterAudio::TransmiterAudio(const QString local_ip4, const QString ip6)
     : Session()
 {
-    ip = local_ip;
+    this->local_ip4 = local_ip4;
+    this->ip6 = ip6;
+
     qDebug() << "port for transmitter:" << this->port;
 }
-
+*/
 void TransmiterAudio::run()
 {
     this->start_transmit();
@@ -189,7 +200,7 @@ void TransmiterAudio::addLinkAudio()
         return;
     }
 
-    g_object_set(udpsink2, "sync", FALSE, "host", "127.0.0.1", "port", 5000, NULL);
+    g_object_set(udpsink2, "sync", FALSE, "host", local_ip4.toStdString().c_str(), "port", 5000, NULL);
 }
 void TransmiterAudio::onStartAudioSession()
 {
@@ -202,14 +213,6 @@ void TransmiterAudio::startSend()
     data.bus = gst_element_get_bus(data.pipeline);
     qDebug() << data.pipeline;
 
-    //    gst_bus_add_watch(data.bus,
-    //                      (GstBusFunc) Transmiter::on_bus_message(data.bus, data.msg, NULL),
-    //                      NULL);
-    /*gst_bus_add_watch(data.bus,
-                      (GstBusFunc) Transmiter::on_bus_message(data.bus,
-                                                              data.msg,
-                                                              (gpointer) data.loop),
-                      NULL);*/
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered(data.bus,
                                GST_CLOCK_TIME_NONE,

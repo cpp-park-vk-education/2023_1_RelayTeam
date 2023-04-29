@@ -19,7 +19,7 @@ private:
 public:
     // constructor
     // set name using initializer
-    explicit TransmiterAudio(const QString &local_ip);
+    explicit TransmiterAudio(const QString &local_ip4, const QString &ip6);
     ~TransmiterAudio();
 
     // overriding the QThread's run() method
@@ -47,6 +47,7 @@ signals:
     } CustomData;
 
     CustomData data;
-    QString ip;
+    QString local_ip4;
+    QString ip6;
     QString port;
 };

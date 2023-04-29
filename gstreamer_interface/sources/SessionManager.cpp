@@ -11,10 +11,10 @@ void SessionManager::onStartVideoSession(const QString &local_ip, const QString 
     live_sessions.insert(key, std::move(it));
 }
 
-void SessionManager::onStartAudioSession(const QString &local_ip)
+void SessionManager::onStartAudioSession(const QString &local_ip, const QString &ip6)
 {
     QPair<QString, QString> key = qMakePair(QString(local_ip), QString("TransmiterAudio"));
-    auto it = std::make_unique<TransmiterAudio>(local_ip);
+    auto it = std::make_unique<TransmiterAudio>(local_ip, ip6);
     it->start();
     live_sessions.insert(key, std::move(it));
 }

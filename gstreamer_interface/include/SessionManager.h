@@ -2,8 +2,8 @@
 
 #include <QMap>
 #include <QObject>
-#include <ReciverAudio.h>.h>
-#include <ReciverVideo.h>.h>
+#include <ReciverAudio.h>
+#include <ReciverVideo.h>
 #include <Session.h>
 #include <TransmiterAudio.h>
 #include <TransmiterVideo.h>
@@ -34,7 +34,7 @@ private:
 public slots:
     void onStartVideoSession(const QString &local_ip, const QString &ip6);
 
-    void onStartAudioSession(const QString &local_ip);
+    void onStartAudioSession(const QString &local_ip, const QString &ip6);
 
     void onKillVideoSession(const QString &local_ip);
 
