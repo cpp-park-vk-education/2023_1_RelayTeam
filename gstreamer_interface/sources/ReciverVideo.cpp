@@ -4,23 +4,18 @@
 ReciverVideo::ReciverVideo(QString port_to_reciving)
     : Session()
 {
-    port = port_to_reciving;
-    /* Initialize our data structure */
-    qDebug() << "port for transmitter:" << this->port;
-
-    //ReciverVideo::run();
+    port_to_transmitter = port_to_reciving.toInt();
+    qDebug() << "port for transmitter:" << this->port_to_transmitter;
 }
 
-int ReciverVideo::start_reciver()
+int ReciverVideo::startReciver()
 {
-    ReciverVideo::onStartVideoSession();
-    // ReciverVideo::onKillVideoSession();
+    onStartVideoSession();
 }
 
 void ReciverVideo::run()
 {
-    // this->start_reciver();
-    ReciverVideo::start_reciver();
+    startReciver();
 }
 
 static gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
@@ -72,8 +67,6 @@ void ReciverVideo::addLinkVideo()
     GstElement *udpsrc1, *queue1, *capsfilter1, *depay1, *parse1, *decode1, *convert1,
         *autovideosink1;
     GstCaps *caps1;
-
-    //    gst_init(0, nullptr);
 
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
@@ -211,10 +204,10 @@ void ReciverVideo::addLinkAudio()
 void ReciverVideo::onStartVideoSession()
 {
     gst_init(0, nullptr);
-    ReciverVideo::addLinkVideo();
-    ReciverVideo::addLinkAudio();
+    addLinkVideo();
+    addLinkAudio();
 
-    ReciverVideo::startReceive();
+    startReceive();
 }
 
 void ReciverVideo::onKillVideoSession()

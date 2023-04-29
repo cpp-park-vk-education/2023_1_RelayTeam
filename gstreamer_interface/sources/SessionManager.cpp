@@ -1,5 +1,4 @@
 #include "SessionManager.h"
-#include <cstring>
 
 SessionManager::SessionManager() {}
 

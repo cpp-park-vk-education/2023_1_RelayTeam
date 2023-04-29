@@ -1,15 +1,13 @@
 #include "TransmiterVideo.h"
 
-#include <QDebug>
-
 TransmiterVideo::TransmiterVideo(const QString &local_ip4, const QString &ip6)
     : Session()
 {
     this->local_ip4 = local_ip4;
-    this->ip6 = ip6;
-    qDebug() << "port for transmitter:" << this->port;
+    this->local_ip6 = ip6;
+    qDebug() << "port for transmitter:" << this->port_to_transmitter;
 
-    //TransmiterVideo::run();
+    //run();
 }
 
 TransmiterVideo::~TransmiterVideo() {}
@@ -17,13 +15,13 @@ TransmiterVideo::~TransmiterVideo() {}
 void TransmiterVideo::run()
 {
     // this->start_transmit();
-    start_transmit();
+    startTransmit();
 }
 
-int TransmiterVideo::start_transmit()
+int TransmiterVideo::startTransmit()
 {
-    TransmiterVideo::onStartVideoSession();
-    //TransmiterVideo::onKillVideoSession();
+    onStartVideoSession();
+    //onKillVideoSession();
 }
 
 static gboolean bus_message(GstBus *bus, GstMessage *message, gpointer user_data)

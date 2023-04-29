@@ -13,7 +13,7 @@ public:
     //~ReciverVideo();
 
     void run();
-    int start_reciver();
+    int startReciver();
 
 public slots:
     void onStartVideoSession();
@@ -31,15 +31,4 @@ private:
     void addLinkAudio();
 
     void startReceive();
-
-    typedef struct _CustomData
-    {
-        gboolean is_live;
-        GstElement *pipeline = NULL;
-        GMainLoop *loop;
-        GstBus *bus;
-        GstMessage *msg;
-    } CustomData;
-
-    CustomData data;
 };

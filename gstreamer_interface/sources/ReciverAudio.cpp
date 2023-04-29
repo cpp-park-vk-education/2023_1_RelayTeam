@@ -4,37 +4,27 @@
 
 ReciverAudio::~ReciverAudio()
 {
-    // gst_object_unref(data.bus);
-    //gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    //gst_object_unref(data.pipeline);
 }
 
 ReciverAudio::ReciverAudio(QString port_to_reciving)
     : Session()
 {
-    port = port_to_reciving;
-    /* Initialize our data structure */
-    qDebug() << "port for transmitter:" << this->port;
-
-    // connect(this, &Reciver::sendVideoSessionStarted, this, &Reciver::startVideoSession);
-    // connect(this, &Reciver::sendAudioSessionStarted, this, &Reciver::startAudioSession);
-    // connect(this, &Reciver::sendVideoSessionKilled, this, &Reciver::killVideoSession);
-    // connect(this, &Reciver::sendAudioSessionKilled, this, &Reciver::killAudioSession);
+    port_to_transmitter = port_to_reciving.toInt();
+    qDebug() << "port for transmitter:" << this->port_to_transmitter;
 }
 
-int ReciverAudio::start_reciver()
+int ReciverAudio::startReciver()
 {
-    ReciverAudio::onStartAudioSession();
-    ReciverAudio::onKillAudioSession();
+    onStartAudioSession();
+    onKillAudioSession();
 }
 
 void ReciverAudio::run()
 {
-    // this->start_reciver();
-    ReciverAudio::start_reciver();
+    startReciver();
 }
 
-gboolean ReciverAudio::bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
+gboolean ReciverAudio::busCallback(GstBus *bus, GstMessage *msg, gpointer data)
 {
     GMainLoop *loop = (GMainLoop *) data;
 
@@ -83,9 +73,6 @@ void ReciverAudio::addLinkVideo()
     GstElement *udpsrc1, *queue1, *capsfilter1, *depay1, *parse1, *decode1, *convert1,
         *autovideosink1;
     GstCaps *caps1;
-
-    //    gst_init(0, nullptr);
-
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
@@ -149,8 +136,6 @@ void ReciverAudio::addLinkAudio()
     GstElement *udpsrc2, *depay2, *parse2, *decode2, *convert2, *autovideosink2, *audioresample,
         *capsfilter2, *queue2;
     GstCaps *caps2;
-
-    //    gst_init(0, nullptr);
 
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
@@ -221,9 +206,9 @@ void ReciverAudio::addLinkAudio()
 
 void ReciverAudio::onStartAudioSession()
 {
-    ReciverAudio::addLinkAudio();
+    addLinkAudio();
 
-    ReciverAudio::startReceive();
+    startReceive();
 }
 
 void ReciverAudio::startReceive()
@@ -233,14 +218,6 @@ void ReciverAudio::startReceive()
     data.loop = g_main_loop_new(NULL, FALSE);
 
     data.bus = gst_element_get_bus(data.pipeline);
-
-    //gst_bus_add_watch(data.bus, (GstBusFunc)bus_callback, data.loop);
-    //    gst_bus_add_watch(data.bus,
-    //                      (GstBusFunc) Reciver::bus_callback(data.bus, data.msg, (gpointer) data.loop),
-    //                      data.loop);
-    //    gst_bus_add_watch(data.bus,
-    //                      (GstBusFunc) Reciver::bus_callback(data.bus, data.msg, (gpointer) data.loop),
-    //                      NULL);
 
     gst_object_unref(data.bus);
 

@@ -5,9 +5,9 @@
 TransmiterAudio::TransmiterAudio(const QString &local_ip4, const QString &ip6)
 {
     this->local_ip4 = local_ip4;
-    this->ip6 = ip6;
+    this->local_ip6 = ip6;
 
-    qDebug() << "port for transmitter:" << this->port;
+    qDebug() << "port for transmitter:" << this->port_to_transmitter;
 }
 
 TransmiterAudio::~TransmiterAudio()
@@ -29,17 +29,17 @@ TransmiterAudio::TransmiterAudio(const QString local_ip4, const QString ip6)
 */
 void TransmiterAudio::run()
 {
-    this->start_transmit();
+    this->startTransmit();
     //start_transmit();
 }
 
-int TransmiterAudio::start_transmit()
+int TransmiterAudio::startTransmit()
 {
-    TransmiterAudio::onStartAudioSession();
-    //TransmiterAudio::onKillAudioSession();
+    onStartAudioSession();
+    //onKillAudioSession();
 }
 
-gboolean TransmiterAudio::on_bus_message(GstBus *bus, GstMessage *message, gpointer user_data)
+gboolean TransmiterAudio::onBusMessage(GstBus *bus, GstMessage *message, gpointer user_data)
 {
     GError *error = NULL;
     gchar *debug_info = NULL;

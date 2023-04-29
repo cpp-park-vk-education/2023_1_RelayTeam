@@ -8,7 +8,7 @@
 class TransmiterAudio : public Session
 {
 private:
-    gboolean on_bus_message(GstBus *bus, GstMessage *message, gpointer user_data);
+    gboolean onBusMessage(GstBus *bus, GstMessage *message, gpointer user_data);
 
     void addLinkVideo();
 
@@ -25,7 +25,7 @@ public:
     // overriding the QThread's run() method
     void run();
 
-    int start_transmit();
+    int startTransmit();
 
 public slots:
     void onStartAudioSession();
@@ -36,18 +36,4 @@ signals:
     void sendAudioSessionStarted();
 
     void sendAudioSessionKilled();
-
-    typedef struct _CustomData
-    {
-        gboolean is_live;
-        GstElement *pipeline = NULL;
-        GMainLoop *loop;
-        GstBus *bus;
-        GstMessage *msg;
-    } CustomData;
-
-    CustomData data;
-    QString local_ip4;
-    QString ip6;
-    QString port;
 };

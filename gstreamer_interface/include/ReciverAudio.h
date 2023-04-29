@@ -13,7 +13,7 @@ public:
     ~ReciverAudio();
 
     void run();
-    int start_reciver();
+    int startReciver();
 
 public slots:
     void onStartAudioSession();
@@ -32,16 +32,5 @@ private:
 
     void startReceive();
 
-    gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data);
-
-    typedef struct _CustomData
-    {
-        gboolean is_live;
-        GstElement *pipeline = NULL;
-        GMainLoop *loop;
-        GstBus *bus;
-        GstMessage *msg;
-    } CustomData;
-
-    CustomData data;
+    gboolean busCallback(GstBus *bus, GstMessage *msg, gpointer data);
 };

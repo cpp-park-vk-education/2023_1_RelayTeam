@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDebug>
 #include <QString>
 #include <QThread>
 #include <Session.h>
@@ -20,7 +21,7 @@ public:
 
     void run();
 
-    int start_transmit();
+    int startTransmit();
 
 public slots:
     void onStartVideoSession();
@@ -31,18 +32,4 @@ signals:
     void sendVideoSessionStarted();
 
     void sendVideoSessionKilled();
-
-    typedef struct _CustomData
-    {
-        gboolean is_live;
-        GstElement *pipeline = NULL;
-        GMainLoop *loop;
-        GstBus *bus;
-        GstMessage *msg;
-    } CustomData;
-
-    CustomData data;
-    QString local_ip4;
-    QString ip6;
-    QString port;
 };
