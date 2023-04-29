@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
 	main_layout->addWidget(settings_widget);
 	settings_widget->hide();
 	connect(settings_widget, &SettingsWidget::sendChangeServiceName, publisher_widget, &Publisher::onChangeServiceName);
-	connect(publisher_widget, &Publisher::sendStartReceivingSession, &streaming_session_manager, &SessionManager::onStartVideoReciver);
+	connect(publisher_widget, &Publisher::sendStartReceivingSession, &streaming_session_manager, &SessionManager::onStartReceivingSession);
 
 	main_widget->show();
 }
@@ -122,6 +122,8 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 void MainWindow::onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address) {
 	qDebug() << "Adding device: " << name;
 	DeviceWidget* device_widget = new DeviceWidget(mac_address, name, ipv6_address, 50, options->getScale(), local_ip);
+	connect(device_widget, &DeviceWidget::sendStartVideoSession, &streaming_session_manager, &SessionManager::onStartVideoSession);
+	connect(device_widget, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
 	devices_layout->addLayout(device_widget);
 	data_base.addDevice(device_widget);
 	device_ids.insert(mac_address);

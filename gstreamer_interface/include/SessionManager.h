@@ -18,17 +18,15 @@ public:
 	SessionManager();
 
 public slots:
-    void onStartVideoSession(const QString &local_ip, const QString &ip6);
+	void onStartVideoSession(const QString &local_ip, const QString &ip6);
 
-    void onStartAudioSession(const QString &local_ip, const QString &ip6);
+	void onStartAudioSession(const QString &local_ip, const QString &ip6);
 
-    void onKillVideoSession(const QString &local_ip);
+	void onKillVideoSession(const QString &local_ip);
 
 	void onKillAudioSession(const QString &local_ip);
 
-	void onStartVideoReciver(const QString &local_ip);
-
-	void onStartAudioReciver(const QString &local_ip);
+	void onStartReceivingSession(const QString &session_type);
 
 	void onKillVideoReciver(const QString &local_ip);
 

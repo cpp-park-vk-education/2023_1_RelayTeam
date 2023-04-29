@@ -38,22 +38,22 @@ void SessionManager::onKillAudioSession(const QString &local_ip)
     }
 }
 
-void SessionManager::onStartVideoReciver(const QString &local_ip)
-{
-    QPair<QString, QString> key = qMakePair(QString(local_ip), QString("ReciverVideo"));
-    auto it = std::make_unique<ReciverVideo>(local_ip);
-    it->start();
-    live_sessions.insert(key, std::move(it));
+void SessionManager::onStartReceivingSession(const QString &session_type) {
+	if (session_type == "audio") {
+		QPair<QString, QString> key = qMakePair(QString("local_ip"), QString("ReciverVideo"));
+		auto it = std::make_unique<ReciverVideo>("local_ip");
+		it->start();
+		live_sessions.insert(key, std::move(it));
 
-    //emit sendStartReciver(local_ip6, "");
-}
+		// emit sendStartReciver(local_ip6, "");
+	}
 
-void SessionManager::onStartAudioReciver(const QString &local_ip)
-{
-    QPair<QString, QString> key = qMakePair(QString(local_ip), QString("ReciverAudio"));
-    auto it = std::make_unique<ReciverVideo>(local_ip);
-    it->start();
-    live_sessions.insert(key, std::move(it));
+	if (session_type == "video") {
+		QPair<QString, QString> key = qMakePair(QString("local_ip"), QString("ReciverAudio"));
+		auto it = std::make_unique<ReciverVideo>("local_ip");
+		it->start();
+		live_sessions.insert(key, std::move(it));
+	}
 }
 
 void SessionManager::onKillVideoReciver(const QString &local_ip)
