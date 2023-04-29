@@ -22,14 +22,13 @@ int main(int argc, char *argv[])
 
     // session4.start();
     session3.start();
-
+    session3.quit();
     //    session1.start_reciver();
-    session1.start();
+    //session1.start();
 
-    //session1.quit();
     //session1.wait();
 
-    //  session1.quit();
+    // session1.quit();
     //    session1.wait();
 
     qDebug() << "Application end.";

@@ -19,7 +19,7 @@ private:
 
 public:
     explicit TransmiterVideo(const QString &local_ip);
-    //~TransmiterVideo();
+    ~TransmiterVideo();
 
     void run();
 

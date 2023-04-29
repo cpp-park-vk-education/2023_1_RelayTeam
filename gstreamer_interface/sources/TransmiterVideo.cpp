@@ -9,6 +9,8 @@ TransmiterVideo::TransmiterVideo(const QString &local_ip)
     qDebug() << "port for transmitter:" << this->port;
 }
 
+TransmiterVideo::~TransmiterVideo() {}
+
 void TransmiterVideo::run()
 {
     // this->start_transmit();
