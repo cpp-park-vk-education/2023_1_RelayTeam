@@ -3,42 +3,76 @@
 
 SessionManager::SessionManager() {}
 
-void SessionManager::startVideoSession(const QString &local_ip)
+void SessionManager::onStartVideoSession(const QString &local_ip, const QString &ip6)
 {
-    QPair<QString, QString> key = qMakePair(QString("127.0.0.1"), QString("TransmiterVideo"));
-    live_sessions.insert(key, std::make_unique<TransmiterVideo>(local_ip));
+    QPair<QString, QString> key = qMakePair(QString(local_ip), QString("TransmiterVideo"));
+    auto it = std::make_unique<TransmiterVideo>(local_ip, ip6);
+    it->start();
+    live_sessions.insert(key, std::move(it));
 }
 
-void SessionManager::startAudioSession(const QString &local_ip)
+void SessionManager::onStartAudioSession(const QString &local_ip)
 {
-    Session *session = new TransmiterAudio(local_ip);
-
-    QPair<QString, QString> key = qMakePair(QString("127.0.0.1"), QString("TransmiterAudio"));
-    live_sessions.insert(key, std::make_unique<TransmiterVideo>(local_ip));
+    QPair<QString, QString> key = qMakePair(QString(local_ip), QString("TransmiterAudio"));
+    auto it = std::make_unique<TransmiterAudio>(local_ip);
+    it->start();
+    live_sessions.insert(key, std::move(it));
 }
 
-void SessionManager::killVideoSession(const QString &local_ip)
+void SessionManager::onKillVideoSession(const QString &local_ip)
 {
     QString key = "TransmiterVideo";
-    auto it = live_sessions.find(qMakePair(local_ip, key));
-    if (it != live_sessions.end()) {
-        it.value()->quit();
-        live_sessions.erase(it);
-
-    } else {
-        // элемент не найден
+    if (live_sessions.contains(qMakePair(local_ip, key))) {
+        auto it = live_sessions[qMakePair(local_ip, key)];
+        it->quit();
+        live_sessions.remove(qMakePair(local_ip, key));
     }
 }
 
-void SessionManager::killAudioSession(const QString &local_ip)
+void SessionManager::onKillAudioSession(const QString &local_ip)
 {
     QString key = "TransmiterAudio";
-    auto it = live_sessions.find(qMakePair(local_ip, key));
-    if (it != live_sessions.end()) {
-        it.value()->quit();
-        live_sessions.erase(it);
+    if (live_sessions.contains(qMakePair(local_ip, key))) {
+        auto it = live_sessions[qMakePair(local_ip, key)];
+        it->quit();
+        live_sessions.remove(qMakePair(local_ip, key));
+    }
+}
 
-    } else {
-        // элемент не найден
+void SessionManager::onStartVideoReciver(const QString &local_ip)
+{
+    QPair<QString, QString> key = qMakePair(QString(local_ip), QString("ReciverVideo"));
+    auto it = std::make_unique<ReciverVideo>(local_ip);
+    it->start();
+    live_sessions.insert(key, std::move(it));
+
+    //emit sendStartReciver(local_ip6, "");
+}
+
+void SessionManager::onStartAudioReciver(const QString &local_ip)
+{
+    QPair<QString, QString> key = qMakePair(QString(local_ip), QString("ReciverAudio"));
+    auto it = std::make_unique<ReciverVideo>(local_ip);
+    it->start();
+    live_sessions.insert(key, std::move(it));
+}
+
+void SessionManager::onKillVideoReciver(const QString &local_ip)
+{
+    QString key = "ReciverVideo";
+    if (live_sessions.contains(qMakePair(local_ip, key))) {
+        auto it = live_sessions[qMakePair(local_ip, key)];
+        it->quit();
+        live_sessions.remove(qMakePair(local_ip, key));
+    }
+}
+
+void SessionManager::onKillAudioReciver(const QString &local_ip)
+{
+    QString key = "ReciverAudio";
+    if (live_sessions.contains(qMakePair(local_ip, key))) {
+        auto it = live_sessions[qMakePair(local_ip, key)];
+        it->quit();
+        live_sessions.remove(qMakePair(local_ip, key));
     }
 }

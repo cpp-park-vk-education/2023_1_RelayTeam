@@ -2,11 +2,14 @@
 
 #include <QDebug>
 
-TransmiterVideo::TransmiterVideo(const QString &local_ip)
+TransmiterVideo::TransmiterVideo(const QString &local_ip4, const QString &ip6)
     : Session()
 {
-    ip = local_ip;
+    this->local_ip4 = local_ip4;
+    this->ip6 = ip6;
     qDebug() << "port for transmitter:" << this->port;
+
+    //TransmiterVideo::run();
 }
 
 TransmiterVideo::~TransmiterVideo() {}
@@ -23,7 +26,7 @@ int TransmiterVideo::start_transmit()
     //TransmiterVideo::onKillVideoSession();
 }
 
-gboolean TransmiterVideo::on_bus_message(GstBus *bus, GstMessage *message, gpointer user_data)
+static gboolean bus_message(GstBus *bus, GstMessage *message, gpointer user_data)
 {
     GError *error = NULL;
     gchar *debug_info = NULL;
@@ -141,7 +144,7 @@ void TransmiterVideo::addLinkVideo()
         return;
     }
 
-    g_object_set(udpsink1, "sync", FALSE, "host", "127.0.0.1", "port", 5001, NULL);
+    g_object_set(udpsink1, "sync", FALSE, "host", local_ip4.toStdString().c_str(), "port", 5001, NULL);
     g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2200, NULL);
 }
 
@@ -184,7 +187,7 @@ void TransmiterVideo::addLinkAudio()
         return;
     }
 
-    g_object_set(udpsink2, "sync", FALSE, "host", "127.0.0.1", "port", 5000, NULL);
+    g_object_set(udpsink2, "sync", FALSE, "host", local_ip4.toStdString().c_str(), "port", 5000, NULL);
 }
 
 void TransmiterVideo::onStartVideoSession()
@@ -200,14 +203,7 @@ void TransmiterVideo::startSend()
     data.bus = gst_element_get_bus(data.pipeline);
     qDebug() << data.pipeline;
 
-    //    gst_bus_add_watch(data.bus,
-    //                      (GstBusFunc) Transmiter::on_bus_message(data.bus, data.msg, NULL),
-    //                      NULL);
-    //gst_bus_add_watch(data.bus,
-    //                  (GstBusFunc) TransmiterVideo::on_bus_message(data.bus,
-    //                                                              data.msg,
-    //                                                             (gpointer) data.loop),
-    //                  NULL);
+    gst_bus_add_watch(data.bus, reinterpret_cast<GstBusFunc>(bus_message), data.loop);
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered(data.bus,
                                GST_CLOCK_TIME_NONE,

@@ -1,6 +1,6 @@
 #include <Session.h>
 
-gboolean Session::bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
+/*gboolean Session::bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
     GMainLoop *loop = (GMainLoop *) data;
 
     switch (GST_MESSAGE_TYPE(msg)) {
@@ -38,5 +38,4 @@ gboolean Session::bus_callback(GstBus *bus, GstMessage *msg, gpointer data) {
 
     return TRUE;
 }
-
-
+*/

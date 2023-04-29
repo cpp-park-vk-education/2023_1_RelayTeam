@@ -32,8 +32,6 @@ private:
 
     void startReceive();
 
-    gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data);
-
     typedef struct _CustomData
     {
         gboolean is_live;

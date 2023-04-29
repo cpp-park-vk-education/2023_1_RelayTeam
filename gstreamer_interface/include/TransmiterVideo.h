@@ -8,8 +8,6 @@
 class TransmiterVideo : public Session
 {
 private:
-    gboolean on_bus_message(GstBus *bus, GstMessage *message, gpointer user_data);
-
     void addLinkVideo();
 
     void addLinkAudio();
@@ -17,7 +15,7 @@ private:
     void startSend();
 
 public:
-    explicit TransmiterVideo(const QString &local_ip);
+    explicit TransmiterVideo(const QString &local_ip4, const QString &ip6);
     ~TransmiterVideo();
 
     void run();
@@ -44,6 +42,7 @@ signals:
     } CustomData;
 
     CustomData data;
-    QString ip;
+    QString local_ip4;
+    QString ip6;
     QString port;
 };

@@ -15,21 +15,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     //Reciver session1("A");
-    ReciverVideo session1("A");
-    TransmiterVideo session3("C");
+    ReciverVideo session1("127.0.0.1");
+    TransmiterVideo session3("127.0.0.1", "0");
 
-    //    display(NULL, NULL);
-
-    // session4.start();
-    session3.start();
-    session3.quit();
-    //    session1.start_reciver();
+    //session3.start();
     //session1.start();
-
-    //session1.wait();
-
-    // session1.quit();
-    //    session1.wait();
 
     qDebug() << "Application end.";
     //    a.setApplicationDisplayName("MultiRelay");

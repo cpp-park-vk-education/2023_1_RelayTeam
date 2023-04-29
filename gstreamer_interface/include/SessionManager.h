@@ -2,6 +2,8 @@
 
 #include <QMap>
 #include <QObject>
+#include <ReciverAudio.h>.h>
+#include <ReciverVideo.h>.h>
 #include <Session.h>
 #include <TransmiterAudio.h>
 #include <TransmiterVideo.h>
@@ -30,13 +32,21 @@ private:
     CustomData data;
 
 public slots:
-    void startVideoSession(const QString &local_ip);
+    void onStartVideoSession(const QString &local_ip, const QString &ip6);
 
-    void startAudioSession(const QString &local_ip);
+    void onStartAudioSession(const QString &local_ip);
 
-    void killVideoSession(const QString &local_ip);
+    void onKillVideoSession(const QString &local_ip);
 
-    void killAudioSession(const QString &local_ip);
+    void onKillAudioSession(const QString &local_ip);
+
+    void onStartVideoReciver(const QString &local_ip);
+
+    void onStartAudioReciver(const QString &local_ip);
+
+    void onKillVideoReciver(const QString &local_ip);
+
+    void onKillAudioReciver(const QString &local_ip);
 
 signals:
     // All used to notify MainWindow about SessionManager events.
@@ -49,4 +59,8 @@ signals:
     void sendVideoSessionKilled();
 
     void sendAudioSessionKilled();
+
+    void sendStartReciver(const QString &local_ip6, const QString &session_type);
+
+    //void sendStartAudioReciver(const QString &local_ip6);
 };

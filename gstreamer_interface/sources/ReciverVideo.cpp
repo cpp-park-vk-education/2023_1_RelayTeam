@@ -7,6 +7,8 @@ ReciverVideo::ReciverVideo(QString port_to_reciving)
     port = port_to_reciving;
     /* Initialize our data structure */
     qDebug() << "port for transmitter:" << this->port;
+
+    //ReciverVideo::run();
 }
 
 int ReciverVideo::start_reciver()
@@ -21,7 +23,7 @@ void ReciverVideo::run()
     ReciverVideo::start_reciver();
 }
 
-gboolean ReciverVideo::bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
+static gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
 {
     GMainLoop *loop = (GMainLoop *) data;
 
@@ -230,13 +232,7 @@ void ReciverVideo::startReceive()
 
     data.bus = gst_element_get_bus(data.pipeline);
 
-    //gst_bus_add_watch(data.bus, (GstBusFunc)bus_callback, data.loop);
-    //    gst_bus_add_watch(data.bus,
-    //                      (GstBusFunc) Reciver::bus_callback(data.bus, data.msg, (gpointer) data.loop),
-    //                      data.loop);
-    //    gst_bus_add_watch(data.bus,
-    //                      (GstBusFunc) Reciver::bus_callback(data.bus, data.msg, (gpointer) data.loop),
-    //                      NULL);
+    gst_bus_add_watch(data.bus, reinterpret_cast<GstBusFunc>(bus_callback), data.loop);
 
     gst_object_unref(data.bus);
 
