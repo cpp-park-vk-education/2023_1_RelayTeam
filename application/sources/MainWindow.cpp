@@ -37,10 +37,7 @@ MainWindow::MainWindow(QWidget* parent)
 	devices_layout = new QVBoxLayout();	 // Creating devices layout with scroll area.
 	data_base.getDevices(devices_layout, options->getScale());
 	for (size_t i = 0; i < devices_layout->count(); ++i) {
-		connect(static_cast<DeviceWidget*>(devices_layout->itemAt(i)), &DeviceWidget::sendStartVideoSession, &streaming_session_manager,
-				&SessionManager::onStartVideoSession);
-		connect(static_cast<DeviceWidget*>(devices_layout->itemAt(i)), &DeviceWidget::sendStartAudioSession, &streaming_session_manager,
-				&SessionManager::onStartAudioSession);
+		makeDeviceConnections(static_cast<DeviceWidget*>(devices_layout->itemAt(i)));
 	}
 	devices_layout->setContentsMargins(0, 0, 0, 0);
 	devices_widget = new QWidget();
@@ -73,6 +70,13 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(publisher_widget, &Publisher::sendStartReceivingSession, &streaming_session_manager, &SessionManager::onStartReceivingSession);
 
 	main_widget->show();
+}
+
+void MainWindow::makeDeviceConnections(DeviceWidget* device) {
+	connect(device, &DeviceWidget::sendStartVideoSession, &streaming_session_manager, &SessionManager::onStartVideoSession);
+	connect(device, &DeviceWidget::sendStopVideoSession, &streaming_session_manager, &SessionManager::onKillVideoSession);
+	connect(device, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
+	connect(device, &DeviceWidget::sendStopAudioSession, &streaming_session_manager, &SessionManager::onKillAudioSession);
 }
 
 void MainWindow::onSettingsButtonPressed() {
@@ -122,8 +126,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 void MainWindow::onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address) {
 	qDebug() << "Adding device: " << name;
 	DeviceWidget* device_widget = new DeviceWidget(mac_address, name, ipv6_address, 50, options->getScale(), local_ip);
-	connect(device_widget, &DeviceWidget::sendStartVideoSession, &streaming_session_manager, &SessionManager::onStartVideoSession);
-	connect(device_widget, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
+	makeDeviceConnections(device_widget);
 	devices_layout->addLayout(device_widget);
 	data_base.addDevice(device_widget);
 	device_ids.insert(mac_address);

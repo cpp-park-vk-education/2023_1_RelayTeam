@@ -50,5 +50,9 @@ private slots:
 signals:
 	void sendStartVideoSession(QString local_ip, QString ipv6_address);
 
+	void sendStopVideoSession(QString local_ip);
+
 	void sendStartAudioSession(QString local_ip, QString ipv6_address);
+
+	void sendStopAudioSession(QString local_ip);
 };

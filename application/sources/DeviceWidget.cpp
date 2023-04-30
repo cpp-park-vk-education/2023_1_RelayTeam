@@ -56,6 +56,7 @@ DeviceWidget::DeviceWidget(QString ID_, QString&& name_, QString ipv6_address_, 
 void DeviceWidget::onAudioPressed() {
 	if (audio_state) {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio-disabled.png")));
+		emit sendStopAudioSession(local_ip);
 	} else {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio.png")));
 		emit sendStartAudioSession(local_ip, ipv6_address);
@@ -66,6 +67,7 @@ void DeviceWidget::onAudioPressed() {
 void DeviceWidget::onCastPressed() {
 	if (cast_state) {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
+		emit sendStopVideoSession(local_ip);
 	} else {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
 		emit sendStartVideoSession(local_ip, ipv6_address);

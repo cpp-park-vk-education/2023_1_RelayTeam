@@ -74,5 +74,4 @@ CMakeLists.txt.user*
 
 # configured files
 general_use/include/variables.h
-
 puml/

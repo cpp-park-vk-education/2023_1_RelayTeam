@@ -51,6 +51,8 @@ private:
 
 	void getDeviceIds();
 
+	void makeDeviceConnections(DeviceWidget* device);
+
 public:
 	explicit MainWindow(QWidget* parent = nullptr);
 
