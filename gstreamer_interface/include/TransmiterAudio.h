@@ -8,24 +8,18 @@
 class TransmiterAudio : public Session
 {
 private:
-    gboolean onBusMessage(GstBus *bus, GstMessage *message, gpointer user_data);
-
-    void addLinkVideo();
+    static gboolean onBusMessage(GstBus *bus, GstMessage *message, gpointer user_data);
 
     void addLinkAudio();
 
     void startSend();
 
 public:
-    // constructor
-    // set name using initializer
-    explicit TransmiterAudio(const QString &local_ip4, const QString &ip6);
+    explicit TransmiterAudio(const QHostAddress &local_ip6_, const qint16 &audio_port_);
+
     ~TransmiterAudio();
 
-    // overriding the QThread's run() method
-    void run();
-
-    int startTransmit();
+    void startTransmit();
 
 public slots:
     void onStartAudioSession();

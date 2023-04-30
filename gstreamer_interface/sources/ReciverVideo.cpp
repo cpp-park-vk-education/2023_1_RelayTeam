@@ -1,24 +1,22 @@
 #include "ReciverVideo.h"
 #include <QDebug>
 
-ReciverVideo::ReciverVideo(QString port_to_reciving)
-    : Session()
+ReciverVideo::ReciverVideo(const qint16 &video_port, const qint16 &audio_port)
+    : Session(video_port, audio_port)
 {
-    port_to_transmitter = port_to_reciving.toInt();
-    qDebug() << "port for transmitter:" << this->port_to_transmitter;
 }
 
-int ReciverVideo::startReciver()
+void ReciverVideo::startReciver()
 {
     onStartVideoSession();
 }
 
-void ReciverVideo::run()
+/*void ReciverVideo::run()
 {
     startReciver();
-}
+}*/
 
-static gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
+gboolean ReciverVideo::bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
 {
     GMainLoop *loop = (GMainLoop *) data;
 
@@ -53,6 +51,7 @@ static gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data)
     case GST_MESSAGE_EOS:
         g_print("End-Of-Stream reached.\n");
         g_main_loop_quit(loop);
+        //sendVideoSessionKilled();
 
         break;
 
@@ -123,7 +122,7 @@ void ReciverVideo::addLinkVideo()
         return;
     }
 
-    g_object_set(udpsrc1, "port", 5001, NULL);
+    g_object_set(udpsrc1, "port", video_port, NULL);
 }
 
 void ReciverVideo::addLinkAudio()
@@ -198,7 +197,7 @@ void ReciverVideo::addLinkAudio()
         g_printerr("Could not link all elements. Exiting.\n");
         return;
     }
-    g_object_set(udpsrc2, "port", 5000, NULL);
+    g_object_set(udpsrc2, "port", audio_port, NULL);
 }
 
 void ReciverVideo::onStartVideoSession()

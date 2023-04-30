@@ -9,11 +9,10 @@
 class ReciverAudio : public Session
 {
 public:
-    explicit ReciverAudio(QString port_to_reciving);
+    explicit ReciverAudio(const qint16 &audio_port);
     ~ReciverAudio();
 
-    void run();
-    int startReciver();
+    void startReciver();
 
 public slots:
     void onStartAudioSession();
@@ -32,5 +31,5 @@ private:
 
     void startReceive();
 
-    gboolean busCallback(GstBus *bus, GstMessage *msg, gpointer data);
+    static gboolean busCallback(GstBus *bus, GstMessage *msg, gpointer data);
 };

@@ -1,30 +1,20 @@
 #include "TransmiterVideo.h"
+#include "QtNetwork/qhostaddress.h"
 
-TransmiterVideo::TransmiterVideo(const QString &local_ip4, const QString &ip6)
-    : Session()
-{
-    this->local_ip4 = local_ip4;
-    this->local_ip6 = ip6;
-    qDebug() << "port for transmitter:" << this->port_to_transmitter;
-
-    //run();
-}
+TransmiterVideo::TransmiterVideo(const QHostAddress &local_ip6_,
+                                 const qint16 &video_port_,
+                                 const qint16 &audio_port_)
+    : Session(local_ip6_, video_port_, audio_port_)
+{}
 
 TransmiterVideo::~TransmiterVideo() {}
 
-void TransmiterVideo::run()
-{
-    // this->start_transmit();
-    startTransmit();
-}
-
-int TransmiterVideo::startTransmit()
+void TransmiterVideo::startTransmit()
 {
     onStartVideoSession();
-    //onKillVideoSession();
 }
 
-static gboolean bus_message(GstBus *bus, GstMessage *message, gpointer user_data)
+gboolean TransmiterVideo::bus_message(GstBus *bus, GstMessage *message, gpointer user_data)
 {
     GError *error = NULL;
     gchar *debug_info = NULL;
@@ -66,10 +56,6 @@ void TransmiterVideo::addLinkVideo()
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
-    //    if (!GST_IS_BUS(data.pipeline)) {
-    //        //        qDebug() << "Date:";
-    //        qDebug() << "GST_IS_BUS not is data.pipeline ";
-    //    }
 
     ximagesrc = gst_element_factory_make("ximagesrc", "ximagesrc");
     capsfilter1 = gst_element_factory_make("capsfilter", "capsfilter1");
@@ -142,7 +128,14 @@ void TransmiterVideo::addLinkVideo()
         return;
     }
 
-    g_object_set(udpsink1, "sync", FALSE, "host", local_ip4.toStdString().c_str(), "port", 5001, NULL);
+    g_object_set(udpsink1,
+                 "sync",
+                 FALSE,
+                 "host",
+                 local_ip6.toString().toLocal8Bit().constData(),
+                 "port",
+                 video_port,
+                 NULL);
     g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2200, NULL);
 }
 
@@ -185,7 +178,14 @@ void TransmiterVideo::addLinkAudio()
         return;
     }
 
-    g_object_set(udpsink2, "sync", FALSE, "host", local_ip4.toStdString().c_str(), "port", 5000, NULL);
+    g_object_set(udpsink2,
+                 "sync",
+                 FALSE,
+                 "host",
+                 local_ip6.toString().toLocal8Bit().constData(),
+                 "port",
+                 audio_port,
+                 NULL);
 }
 
 void TransmiterVideo::onStartVideoSession()
@@ -205,7 +205,7 @@ void TransmiterVideo::startSend()
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered(data.bus,
                                GST_CLOCK_TIME_NONE,
-                               (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+                               static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
 
 void TransmiterVideo::onKillVideoSession()

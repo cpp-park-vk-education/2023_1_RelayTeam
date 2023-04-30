@@ -1,15 +1,14 @@
 #pragma once
 
-#include <QThread>
 #include <QString>
+#include <QThread>
+#include "QtNetwork/qhostaddress.h"
 #include <gst/gst.h>
 
-
-class Session : public QThread
+class Session : public QObject
 {
+    Q_OBJECT
 public:
-    void run() = 0;
-
 protected:
     typedef struct _CustomData
     {
@@ -20,8 +19,14 @@ protected:
         GstMessage *msg;
     } CustomData;
 
+    Session(const QHostAddress &local_ip6_, const qint16 &video_port_, const qint16 &audio_port_);
+    Session(const QHostAddress &local_ip6_, const qint16 &audio_port_);
+    Session(const qint16 &video_port_, const qint16 &audio_port_);
+    Session(const qint16 &audio_port_);
+
     CustomData data;
-    QString local_ip4;
-    QString local_ip6;
-    qint16 port_to_transmitter;
+    QHostAddress local_ip6;
+    qint16 video_port;
+    qint16 audio_port;
+    QThread *thread;
 };

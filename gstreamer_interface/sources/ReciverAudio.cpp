@@ -6,23 +6,20 @@ ReciverAudio::~ReciverAudio()
 {
 }
 
-ReciverAudio::ReciverAudio(QString port_to_reciving)
-    : Session()
-{
-    port_to_transmitter = port_to_reciving.toInt();
-    qDebug() << "port for transmitter:" << this->port_to_transmitter;
-}
+ReciverAudio::ReciverAudio(const qint16 &audio_port)
+    : Session(audio_port)
+{}
 
-int ReciverAudio::startReciver()
+void ReciverAudio::startReciver()
 {
     onStartAudioSession();
-    onKillAudioSession();
+    //onKillAudioSession();
 }
 
-void ReciverAudio::run()
+/*void ReciverAudio::run()
 {
     startReciver();
-}
+}*/
 
 gboolean ReciverAudio::busCallback(GstBus *bus, GstMessage *msg, gpointer data)
 {
@@ -128,7 +125,7 @@ void ReciverAudio::addLinkVideo()
         return;
     }
 
-    g_object_set(udpsrc1, "port", 5001, NULL);
+    g_object_set(udpsrc1, "port", video_port, NULL);
 }
 
 void ReciverAudio::addLinkAudio()
@@ -201,7 +198,7 @@ void ReciverAudio::addLinkAudio()
         g_printerr("Could not link all elements. Exiting.\n");
         return;
     }
-    g_object_set(udpsrc2, "port", 5000, NULL);
+    g_object_set(udpsrc2, "port", audio_port, NULL);
 }
 
 void ReciverAudio::onStartAudioSession()

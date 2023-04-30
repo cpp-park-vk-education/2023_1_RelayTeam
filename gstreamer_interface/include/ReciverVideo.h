@@ -9,11 +9,9 @@
 class ReciverVideo : public Session
 {
 public:
-    explicit ReciverVideo(QString port_to_reciving);
-    //~ReciverVideo();
+    explicit ReciverVideo(const qint16 &video_port, const qint16 &audio_port);
 
-    void run();
-    int startReciver();
+    void startReciver();
 
 public slots:
     void onStartVideoSession();
@@ -31,4 +29,6 @@ private:
     void addLinkAudio();
 
     void startReceive();
+
+    static gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data);
 };

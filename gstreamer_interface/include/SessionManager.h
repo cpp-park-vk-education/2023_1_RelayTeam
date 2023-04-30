@@ -2,6 +2,7 @@
 
 #include <QMap>
 #include <QObject>
+#include "QtNetwork/qhostaddress.h"
 #include <ReciverAudio.h>
 #include <ReciverVideo.h>
 #include <TransmiterAudio.h>
@@ -12,25 +13,36 @@ class SessionManager : public QObject
 {
 private:
     Q_OBJECT
-    QMap<QPair<QString, QString>, std::shared_ptr<Session>> live_sessions; // map<session_id, session>
-	// void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
+    QHash<QPair<QHostAddress, QString>, std::shared_ptr<Session>>
+        live_sessions; // map<session_id, session>
+    // void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
 public:
 	SessionManager();
 
 public slots:
-	void onStartVideoSession(const QString &local_ip, const QString &ip6);
+    void onStartVideoSession(const QHostAddress &local_ip6);
 
-	void onStartAudioSession(const QString &local_ip, const QString &ip6);
+    void onStartAudioSession(const QHostAddress &local_ip6);
 
-	void onKillVideoSession(const QString &local_ip);
+    void onKillVideoSession(const QHostAddress &local_ip6);
 
-	void onKillAudioSession(const QString &local_ip);
+    void onKillAudioSession(const QHostAddress &local_ip6);
 
-	void onStartReceivingSession(const QString &session_type);
+    void onStartReceivingSession(const qint16 &video_port,
+                                 const qint16 &audio_port,
+                                 const QString &session_type);
 
-	void onKillVideoReciver(const QString &local_ip);
+    void onKillVideoReciver(const QHostAddress &local_ip6);
 
-	void onKillAudioReciver(const QString &local_ip);
+    void onKillAudioReciver(const QHostAddress &local_ip6);
+
+    void onSetVideoPortsTransmiter(const QHostAddress &local_ip6,
+                                   const qint16 &video_port,
+                                   const qint16 &audio_port);
+
+    void onSetAudioPortsTransmiter(const QHostAddress &local_ip6,
+                                   const qint16 &video_port,
+                                   const qint16 &audio_port);
 
 signals:
     // All used to notify MainWindow about SessionManager events.
@@ -44,7 +56,7 @@ signals:
 
     void sendAudioSessionKilled();
 
-    void sendStartReciver(const QString &local_ip6, const QString &session_type);
+    void sendStartReciver(const QHostAddress &local_ip6, const QString &session_type);
 
     //void sendStartAudioReciver(const QString &local_ip6);
 };

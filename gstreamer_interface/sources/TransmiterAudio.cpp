@@ -2,12 +2,9 @@
 
 #include <QDebug>
 
-TransmiterAudio::TransmiterAudio(const QString &local_ip4, const QString &ip6)
+TransmiterAudio::TransmiterAudio(const QHostAddress &local_ip6_, const qint16 &audio_port_)
+    : Session(local_ip6_, audio_port_)
 {
-    this->local_ip4 = local_ip4;
-    this->local_ip6 = ip6;
-
-    qDebug() << "port for transmitter:" << this->port_to_transmitter;
 }
 
 TransmiterAudio::~TransmiterAudio()
@@ -17,26 +14,9 @@ TransmiterAudio::~TransmiterAudio()
     // gst_object_unref(data.pipeline);
 }
 
-/*
-TransmiterAudio::TransmiterAudio(const QString local_ip4, const QString ip6)
-    : Session()
-{
-    this->local_ip4 = local_ip4;
-    this->ip6 = ip6;
-
-    qDebug() << "port for transmitter:" << this->port;
-}
-*/
-void TransmiterAudio::run()
-{
-    this->startTransmit();
-    //start_transmit();
-}
-
-int TransmiterAudio::startTransmit()
+void TransmiterAudio::startTransmit()
 {
     onStartAudioSession();
-    //onKillAudioSession();
 }
 
 gboolean TransmiterAudio::onBusMessage(GstBus *bus, GstMessage *message, gpointer user_data)
@@ -68,97 +48,6 @@ gboolean TransmiterAudio::onBusMessage(GstBus *bus, GstMessage *message, gpointe
     }
 
     return TRUE;
-}
-
-void TransmiterAudio::addLinkVideo()
-{
-    GstElement *ximagesrc, *videoscale, *videoconvert, *x264enc, *h264parse, *rtph264pay, *udpsink1,
-        *capsfilter1, *capsfilter2;
-    GstCaps *caps1, *caps2;
-
-    //    gst_init(nullptr, nullptr);
-
-    if (data.pipeline == NULL) {
-        data.pipeline = gst_pipeline_new("pipeline");
-    }
-    //    if (!GST_IS_BUS(data.pipeline)) {
-    //        //        qDebug() << "Date:";
-    //        qDebug() << "GST_IS_BUS not is data.pipeline ";
-    //    }
-
-    ximagesrc = gst_element_factory_make("ximagesrc", "ximagesrc");
-    capsfilter1 = gst_element_factory_make("capsfilter", "capsfilter1");
-    videoscale = gst_element_factory_make("videoscale", "videoscale");
-    videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-    x264enc = gst_element_factory_make("x264enc", "x264enc");
-    capsfilter2 = gst_element_factory_make("capsfilter", "capsfilter2");
-    h264parse = gst_element_factory_make("h264parse", "h264parse");
-    rtph264pay = gst_element_factory_make("rtph264pay", "rtph264pay");
-    udpsink1 = gst_element_factory_make("udpsink", "udpsink1");
-
-    if (!data.pipeline || !h264parse || !ximagesrc || !capsfilter1 || !capsfilter2 || !videoscale
-        || !videoconvert || !x264enc || !rtph264pay || !udpsink1) {
-        g_printerr("Not all elements could be created\n");
-        return;
-    }
-
-    caps1 = gst_caps_new_simple("video/x-raw",
-                                "framerate",
-                                GST_TYPE_FRACTION,
-                                30,
-                                1,
-
-                                NULL);
-
-    caps2 = gst_caps_new_simple("video/x-h264",
-                                "profile",
-                                G_TYPE_STRING,
-                                "main",
-                                "width",
-                                G_TYPE_INT,
-                                1024,
-                                "height",
-                                G_TYPE_INT,
-                                600,
-                                NULL);
-
-    g_object_set(G_OBJECT(capsfilter1), "caps", caps1, NULL);
-    g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
-
-    gst_caps_unref(caps1);
-    gst_caps_unref(caps2);
-
-    gst_bin_add_many(GST_BIN(data.pipeline),
-                     ximagesrc,
-                     capsfilter1,
-                     videoscale,
-                     videoconvert,
-                     x264enc,
-                     capsfilter2,
-                     h264parse,
-                     rtph264pay,
-                     udpsink1,
-                     NULL);
-
-    if (gst_element_link_many(ximagesrc,
-                              capsfilter1,
-                              videoscale,
-                              videoconvert,
-                              x264enc,
-                              capsfilter2,
-                              h264parse,
-                              rtph264pay,
-                              udpsink1,
-                              NULL)
-        != TRUE) {
-        g_printerr("Failed to link elements: ximagesrc -> videoscale -> videoconvert -> x264enc -> "
-                   "rtph264pay -> udpsink1\n");
-        gst_object_unref(data.pipeline);
-        return;
-    }
-
-    g_object_set(udpsink1, "sync", FALSE, "host", "127.0.0.1", "port", 5001, NULL);
-    g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2200, NULL);
 }
 
 void TransmiterAudio::addLinkAudio()
@@ -200,7 +89,14 @@ void TransmiterAudio::addLinkAudio()
         return;
     }
 
-    g_object_set(udpsink2, "sync", FALSE, "host", local_ip4.toStdString().c_str(), "port", 5000, NULL);
+    g_object_set(udpsink2,
+                 "sync",
+                 FALSE,
+                 "host",
+                 local_ip6.toString().toLocal8Bit().constData(),
+                 "port",
+                 audio_port,
+                 NULL);
 }
 void TransmiterAudio::onStartAudioSession()
 {
@@ -216,7 +112,7 @@ void TransmiterAudio::startSend()
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
     gst_bus_timed_pop_filtered(data.bus,
                                GST_CLOCK_TIME_NONE,
-                               (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+                               static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
 
 void TransmiterAudio::onKillAudioSession()
