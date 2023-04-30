@@ -9,6 +9,7 @@
 #include <QSlider>
 #include <QSpinBox>
 #include <QString>
+#include <QtNetwork/QHostAddress>
 
 class DeviceWidget : public QHBoxLayout {
 private:
@@ -29,14 +30,12 @@ public:
 	const QString ID;
 	qint16 volume;
 	QString name;
-	QString ipv6_address;
-	QString local_ip;
+	QHostAddress ipv6_address;
 
-	explicit DeviceWidget(QString ID_, QString& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_ = "",
+	explicit DeviceWidget(QString ID_, const QString& name_, const QHostAddress& ipv6_address_, qint16 volume_, qreal scale,
 						  QWidget* parent = nullptr);
 
-	explicit DeviceWidget(QString ID_, QString&& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_ = "",
-						  QWidget* parent = nullptr);
+	explicit DeviceWidget(QString ID_, QString&& name_, const QHostAddress&, qint16 volume_, qreal scale, QWidget* parent = nullptr);
 
 private slots:
 	void onAudioPressed();
@@ -48,11 +47,11 @@ private slots:
 	void onVolumeChanged(qint16 volume_);
 
 signals:
-	void sendStartVideoSession(QString local_ip, QString ipv6_address);
+	void sendStartVideoSession(QHostAddress ipv6_address);
 
-	void sendStopVideoSession(QString local_ip);
+	void sendStopVideoSession(QHostAddress ipv6_address);
 
-	void sendStartAudioSession(QString local_ip, QString ipv6_address);
+	void sendStartAudioSession(QHostAddress ipv6_address);
 
-	void sendStopAudioSession(QString local_ip);
+	void sendStopAudioSession(QHostAddress ipv6_address);
 };

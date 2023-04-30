@@ -36,17 +36,14 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) 
 	if (message_received.transactionId() != 1264) {
 		return;
 	}
-	if (queries.front().name() == "mrelay-request-local-ip.") {
+	if (queries.front().name() == "mrelay-request-mac-address.") {
 		qDebug() << "mrelay-request-local-ip. query recieved";
 		QMdnsEngine::Message message;
 		QMdnsEngine::Query query;
-		query.setName("mrelay-answer-local-ip");
+		query.setName("mrelay-answer-mac-address");
 		query.setType(2222);
 		message.addQuery(query);
 		query.setName(queries.back().name());
-		query.setType(2222);
-		message.addQuery(query);
-		query.setName(getLocalIP().toUtf8());
 		query.setType(2222);
 		message.addQuery(query);
 		query.setName(getMacAddress().toUtf8());

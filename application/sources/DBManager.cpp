@@ -100,7 +100,7 @@ void DBManager::addDevice(DeviceWidget* device) {  // change to "DeviceWidget* d
 		"VALUES(:ID, :name, :ipv6_address, :volume);");
 	query.bindValue(":ID", device->ID);
 	query.bindValue(":name", device->name);
-	query.bindValue(":ipv6_address", device->ipv6_address);
+	query.bindValue(":ipv6_address", device->ipv6_address.toString());
 	query.bindValue(":volume", device->volume);
 	if (!query.exec()) {
 		qDebug() << "Error adding Device to data base." << sql_data_base.lastError().text();
@@ -111,8 +111,9 @@ void DBManager::getDevices(QVBoxLayout* device_layout, qreal scale) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Device")) {
 		while (query.next()) {
-			DeviceWidget* current_device = new DeviceWidget(query.value("ID").toString(), query.value("name").toString(),
-															query.value("ipv6_address").toString(), query.value("volume").toInt(), scale);
+			DeviceWidget* current_device =
+				new DeviceWidget(query.value("ID").toString(), query.value("name").toString(),
+								 QHostAddress(query.value("ipv6_address").toString()), query.value("volume").toInt(), scale);
 			device_layout->addLayout(current_device);
 		}
 	} else {
@@ -133,7 +134,7 @@ void DBManager::saveDeviceChanges(DeviceWidget* device) {
 
 void DBManager::addTestEntries() {
 	for (size_t i = 0; i < 8; ++i) {
-		DeviceWidget* new_device = new DeviceWidget(QString::number(i), QString("device"), QString("undefined"), 50, 100);
+		DeviceWidget* new_device = new DeviceWidget(QString::number(i), QString("device"), QHostAddress(""), 50, 100);
 		addDevice(new_device);
 	}
 }

@@ -41,25 +41,24 @@ void DeviceWidget::defineWdgets(qreal scale) {
 	this->addWidget(settings_button);
 }
 
-DeviceWidget::DeviceWidget(QString ID_, QString& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_,
+DeviceWidget::DeviceWidget(QString ID_, const QString& name_, const QHostAddress& ipv6_address_, qint16 volume_, qreal scale,
 						   QWidget* parent)
-	: ID(ID_), name(name_), volume(volume_), ipv6_address(ipv6_address_), local_ip(local_ip_), QHBoxLayout(parent) {
+	: ID(ID_), name(name_), volume(volume_), ipv6_address(ipv6_address_), QHBoxLayout(parent) {
 	defineWdgets(scale);
 }
 
-DeviceWidget::DeviceWidget(QString ID_, QString&& name_, QString ipv6_address_, qint16 volume_, qreal scale, QString local_ip_,
-						   QWidget* parent)
-	: ID(ID_), name(std::move(name_)), volume(volume_), ipv6_address(ipv6_address_), local_ip(local_ip_), QHBoxLayout(parent) {
+DeviceWidget::DeviceWidget(QString ID_, QString&& name_, const QHostAddress& ipv6_address_, qint16 volume_, qreal scale, QWidget* parent)
+	: ID(ID_), name(std::move(name_)), volume(volume_), ipv6_address(ipv6_address_), QHBoxLayout(parent) {
 	defineWdgets(scale);
 }
 
 void DeviceWidget::onAudioPressed() {
 	if (audio_state) {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio-disabled.png")));
-		emit sendStopAudioSession(local_ip);
+		emit sendStopAudioSession(ipv6_address);
 	} else {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio.png")));
-		emit sendStartAudioSession(local_ip, ipv6_address);
+		emit sendStartAudioSession(ipv6_address);
 	}
 	audio_state = !audio_state;
 }
@@ -67,10 +66,10 @@ void DeviceWidget::onAudioPressed() {
 void DeviceWidget::onCastPressed() {
 	if (cast_state) {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
-		emit sendStopVideoSession(local_ip);
+		emit sendStopVideoSession(ipv6_address);
 	} else {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
-		emit sendStartVideoSession(local_ip, ipv6_address);
+		emit sendStartVideoSession(ipv6_address);
 	}
 	cast_state = !cast_state;
 }

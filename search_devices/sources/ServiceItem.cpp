@@ -2,8 +2,7 @@
 #include "variables.h"
 #include <UITools.h>
 
-ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale)
-	: service(service_), local_ip(""), is_added(false), is_resolved(false) {
+ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale) : service(service_), is_added(false), is_resolved(false) {
 	main_widget = new QWidget();
 	main_layout = new QHBoxLayout();  // Creating layout.
 	main_widget->setLayout(main_layout);

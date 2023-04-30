@@ -2,6 +2,7 @@
 
 #include "DeviceWidget.h"
 #include "Options.h"
+#include <QtNetwork/QHostAddress>
 #include <QtSql>
 #include <QVBoxLayout>
 

@@ -22,13 +22,12 @@ private:
 	QVBoxLayout* name_layout;
 	QPushButton* add_button;
 	QWidget* main_widget;
-	QMdnsEngine::Service service;
 
+	QMdnsEngine::Service service;
 	bool is_added;
 	bool is_resolved;
-	QString local_ip;
 	QString mac_address;
-	QHostAddress address;
+	QHostAddress ipv6_address;
 
 public:
 	ServiceItem(const QMdnsEngine::Service& service_, qreal scale);
@@ -47,15 +46,15 @@ public:
 
 	inline void setResolved(const QHostAddress& address_) {
 		is_resolved = true;
-		address = address_;
-		address_label = new QLabel(address.toString());
+		ipv6_address = address_;
+		address_label = new QLabel(ipv6_address.toString());
 		address_label->setTextInteractionFlags(Qt::TextSelectableByMouse);
 		name_layout->addWidget(address_label);
 		connection_status_icon->setStyleSheet("QLabel {background-color : yellow}");
 	}
 
-	inline QString getAddress() {
-		return address.toString();
+	inline QHostAddress getIPv6Address() {
+		return ipv6_address;
 	}
 
 	inline bool getResolved() {
@@ -71,20 +70,12 @@ public:
 		return is_added;
 	}
 
-	inline void setLocalIP(const QString& local_ip_) {
-		local_ip = local_ip_;
+	inline void setMacAddress(const QString& mac_address_) {
+		mac_address = mac_address_;
 		connection_status_icon->setStyleSheet("QLabel {background-color : green}");
 	}
 
-	inline QString getLocalIP() {
-		return local_ip;
-	}
-
-	inline void setMac(const QString& mac_address_) {
-		mac_address = mac_address_;
-	}
-
-	inline QString getMac() {
-		return mac_address;
+	inline QString getMacAddress() {
+		return ipv6_address.toString();
 	}
 };

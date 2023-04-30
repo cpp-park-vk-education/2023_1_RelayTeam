@@ -16,6 +16,7 @@
 #include <QScrollArea>
 #include <QSet>
 #include <QTextEdit>
+#include <QtNetwork/QHostAddress>
 
 class MainWindow : public QMainWindow {
 private:
@@ -25,6 +26,7 @@ private:
 	QHBoxLayout* main_layout;		   // min widget layout
 	QVBoxLayout* devices_layout;	   // layout with device widgets
 	QVBoxLayout* left_bar;
+	QVBoxLayout* right_bar;
 	QHBoxLayout* button_layout;
 	QScrollArea* devices_scroll_area;  // scroll area for devices
 	QPushButton* settings_button;
@@ -56,15 +58,17 @@ private:
 public:
 	explicit MainWindow(QWidget* parent = nullptr);
 
+	~MainWindow();
+
 private slots:
 	void onSettingsButtonPressed();
 
 	void onScanNetworkButtonPressed();
 
 public slots:
-	void onDevicePreparedToAdd(QString name, QString ipv6_address, QString local_ip, QString mac_address);
+	void onDevicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
 
-	void onUpdateAddress(QString mac_address, QString local_ip);
+	void onUpdateAddress(QString mac_address, QHostAddress ipv6_address);
 
 signals:
 	void sendDeviceIdsUpdated(QSet<QString> device_ids);
