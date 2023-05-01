@@ -1,10 +1,7 @@
 #include "ReciverVideo.h"
 #include <QDebug>
 
-ReciverVideo::ReciverVideo(const qint16 &video_port, const qint16 &audio_port)
-    : Session(video_port, audio_port)
-{
-}
+ReciverVideo::ReciverVideo(const qint16 video_port, const qint16 audio_port) : Session(video_port, audio_port) {}
 
 void ReciverVideo::startReciver()
 {

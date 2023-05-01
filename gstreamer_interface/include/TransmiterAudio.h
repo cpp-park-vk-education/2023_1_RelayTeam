@@ -1,23 +1,25 @@
 #pragma once
 
+#include <gst/gst.h>
 #include <QString>
 #include <QThread>
+#include <QtNetwork/QHostAddress>
 #include <Session.h>
-#include <gst/gst.h>
 
-class TransmiterAudio : public Session
-{
+class TransmiterAudio : public Session {
 private:
-    static gboolean onBusMessage(GstBus *bus, GstMessage *message, gpointer user_data);
+	Q_OBJECT
 
-    void addLinkAudio();
+	static gboolean onBusMessage(GstBus *bus, GstMessage *message, gpointer user_data);
+
+	void addLinkAudio();
 
     void startSend();
 
 public:
-    explicit TransmiterAudio(const QHostAddress &local_ip6_, const qint16 &audio_port_);
+	explicit TransmiterAudio(const QHostAddress &local_ip6_, const qint16 audio_port_);
 
-    ~TransmiterAudio();
+	~TransmiterAudio();
 
     void startTransmit();
 

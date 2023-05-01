@@ -2,10 +2,7 @@
 
 #include <QDebug>
 
-TransmiterAudio::TransmiterAudio(const QHostAddress &local_ip6_, const qint16 &audio_port_)
-    : Session(local_ip6_, audio_port_)
-{
-}
+TransmiterAudio::TransmiterAudio(const QHostAddress &local_ip6_, const qint16 audio_port_) : Session(local_ip6_, audio_port_) {}
 
 TransmiterAudio::~TransmiterAudio()
 {

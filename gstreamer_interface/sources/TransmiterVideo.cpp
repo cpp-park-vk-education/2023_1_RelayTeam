@@ -1,11 +1,8 @@
 #include "TransmiterVideo.h"
 #include "QtNetwork/qhostaddress.h"
 
-TransmiterVideo::TransmiterVideo(const QHostAddress &local_ip6_,
-                                 const qint16 &video_port_,
-                                 const qint16 &audio_port_)
-    : Session(local_ip6_, video_port_, audio_port_)
-{}
+TransmiterVideo::TransmiterVideo(const QHostAddress &local_ip6_, const qint16 video_port_, const qint16 audio_port_)
+	: Session(local_ip6_, video_port_, audio_port_) {}
 
 TransmiterVideo::~TransmiterVideo() {}
 

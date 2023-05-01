@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include <iostream>
+#include <qmdnsengine/message.h>
 #include <QMessageBox>
 #include <QSlider>
 #include <UITools.h>
@@ -60,7 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
 	search_widget->hide();
 	left_bar->addWidget(search_widget);
 	connect(add_button, &QPushButton::clicked, search_widget, &SearchWidget::onAddButtonCLicked);
-	//	connect(&streaming_session_manager, &SessionManager::sendStartReciver, search_widget, &SearchWidget::onStartReciver);
+	connect(&streaming_session_manager, &SessionManager::sendStartReciver, search_widget, &SearchWidget::onStartReciver);
 	connect(search_widget, &SearchWidget::devicePreparedToAdd, this, &MainWindow::onDevicePreparedToAdd);
 	connect(search_widget, &SearchWidget::sendUpdateAddress, this, &MainWindow::onUpdateAddress);
 	publisher_widget = new Publisher(options->device_name, this);
@@ -68,6 +69,8 @@ MainWindow::MainWindow(QWidget* parent)
 	getDeviceIds();
 	connect(settings_widget, &SettingsWidget::sendChangeServiceName, publisher_widget, &Publisher::onChangeServiceName);
 	connect(publisher_widget, &Publisher::sendStartReceivingSession, &streaming_session_manager, &SessionManager::onStartReceivingSession);
+	connect(&streaming_session_manager, &SessionManager::sendSetPorts, publisher_widget, &Publisher::onSendPorts);
+	connect(search_widget, &SearchWidget::sendReceivedPorts, &streaming_session_manager, &SessionManager::onReceivedPorts);
 
 	main_layout->addLayout(left_bar);
 	main_layout->addLayout(right_bar);
@@ -79,10 +82,10 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::makeDeviceConnections(DeviceWidget* device) {
-	//	connect(device, &DeviceWidget::sendStartVideoSession, &streaming_session_manager, &SessionManager::onStartVideoSession);
-	//	connect(device, &DeviceWidget::sendStopVideoSession, &streaming_session_manager, &SessionManager::onKillVideoSession);
-	//	connect(device, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
-	//	connect(device, &DeviceWidget::sendStopAudioSession, &streaming_session_manager, &SessionManager::onKillAudioSession);
+	connect(device, &DeviceWidget::sendStartVideoSession, &streaming_session_manager, &SessionManager::onStartVideoSession);
+	connect(device, &DeviceWidget::sendStopVideoSession, &streaming_session_manager, &SessionManager::onKillVideoSession);
+	connect(device, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
+	connect(device, &DeviceWidget::sendStopAudioSession, &streaming_session_manager, &SessionManager::onKillAudioSession);
 }
 
 void MainWindow::onSettingsButtonPressed() {

@@ -6,18 +6,18 @@
 #include <gst/gst.h>
 #include <string.h>
 
-class ReciverAudio : public Session
-{
+class ReciverAudio : public Session {
+	Q_OBJECT
 public:
-    explicit ReciverAudio(const qint16 &audio_port);
-    ~ReciverAudio();
+	explicit ReciverAudio(const qint16 audio_port);
+	~ReciverAudio();
 
     void startReciver();
 
 public slots:
-    void onStartAudioSession();
+	void onStartAudioSession();
 
-    void onKillAudioSession();
+	void onKillAudioSession();
 
 signals:
     void sendAudioSessionStarted();

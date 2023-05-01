@@ -6,17 +6,17 @@
 #include <gst/gst.h>
 #include <string.h>
 
-class ReciverVideo : public Session
-{
+class ReciverVideo : public Session {
+	Q_OBJECT
 public:
-    explicit ReciverVideo(const qint16 &video_port, const qint16 &audio_port);
+	explicit ReciverVideo(const qint16 video_port, const qint16 audio_port);
 
-    void startReciver();
+	void startReciver();
 
 public slots:
-    void onStartVideoSession();
+	void onStartVideoSession();
 
-    void onKillVideoSession();
+	void onKillVideoSession();
 
 signals:
     void sendVideoSessionStarted();

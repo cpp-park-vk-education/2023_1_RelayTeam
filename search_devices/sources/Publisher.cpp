@@ -6,7 +6,7 @@ Publisher::Publisher(const QString& device_name, QWidget* parent)
 	: QObject(parent), server(), hostname(&server), provider(&server, &hostname), service() {
 	service.setType("_mrelay-connect._tcp.local.");
 	service.setName(device_name.toUtf8());
-	service.setPort(1234);
+	service.setPort(5353);
 	QMap<QByteArray, QByteArray> attributes;
 	attributes["OS_type"] = QSysInfo::kernelType().toLower().toUtf8();
 	//	attributes["mID"] = QSysInfo::machineUniqueId();
@@ -28,7 +28,7 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) 
 			QString session_type = queries[1].name().left(queries[1].name().size() - 1);
 			qDebug() << "received request for receiving session from" << message_received.address().toString()
 					 << "\n session type is: " << session_type;
-			emit sendStartReceivingSession(session_type);
+			emit sendStartReceivingSession(message_received, session_type);
 		}
 		return;
 	}
@@ -37,7 +37,7 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) 
 		return;
 	}
 	if (queries.front().name() == "mrelay-request-mac-address.") {
-		qDebug() << "mrelay-request-local-ip. query recieved";
+		qDebug() << "mrelay-request-mac-address. query recieved";
 		QMdnsEngine::Message message;
 		QMdnsEngine::Query query;
 		query.setName("mrelay-answer-mac-address");
@@ -59,4 +59,22 @@ void Publisher::onChangeServiceName(const QString& service_name) {
 	qDebug() << "changing service name to: " << service_name;
 	service.setName(service_name.toUtf8());
 	provider.update(service);
+}
+
+void Publisher::onSendPorts(const QMdnsEngine::Message& message_received, qint16 video_port, qint16 audio_port) {
+	qDebug() << "sending ports: " << video_port << "  " << audio_port << "to: " << message_received.address();
+	QMdnsEngine::Message message;
+	QMdnsEngine::Query query;
+	query.setName("mrelay-ports-responce");
+	query.setType(2222);
+	message.addQuery(query);
+	query.setName("type value");
+	query.setType(video_port);
+	message.addQuery(query);
+	query.setName("type value");
+	query.setType(audio_port);
+	message.addQuery(query);
+	message.reply(message_received);
+	message.setTransactionId(2435);
+	server.sendMessage(message);
 }

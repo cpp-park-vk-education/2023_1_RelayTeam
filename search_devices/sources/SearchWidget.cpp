@@ -89,10 +89,20 @@ void SearchWidget::onSelected(QListWidgetItem* item_) {
 }
 
 void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_received) {
-	if (message_received.transactionId() != 3663) {
+	QList<QMdnsEngine::Query> queries = message_received.queries();
+	if (message_received.transactionId() == 2435) {
+		if (queries[0].name() == "mrelay-ports-responce.") {
+			qint16 video_port = queries[1].type();
+			qint16 audio_port = queries[2].type();
+			qDebug() << "got port responce from: " << message_received.address().toString() << "which contains video port: " << video_port
+					 << " audio port:" << audio_port;
+
+			emit sendReceivedPorts(QHostAddress(message_received.address()), video_port, audio_port);
+		}
+	}
+	if (message_received.transactionId() != 3663 || queries.size() != 3) {
 		return;
 	}
-	QList<QMdnsEngine::Query> queries = message_received.queries();
 	if (queries[0].name() == "mrelay-answer-mac-address.") {
 		QString service_name = queries[1].name().left(queries[1].name().size() - 1);
 		QString mac_address = queries[2].name().left(queries[2].name().size() - 1);

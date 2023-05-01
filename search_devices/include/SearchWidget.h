@@ -61,4 +61,6 @@ signals:
 	void devicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
 
 	void sendUpdateAddress(QString mac_address, QHostAddress ipv6_address);
+
+	void sendReceivedPorts(const QHostAddress& ipv6_address, qint16 video_port, qint16 audio_port);
 };

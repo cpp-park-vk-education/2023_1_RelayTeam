@@ -1,6 +1,11 @@
 project(gstreamer_interface VERSION 0.1 LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt5 REQUIRED COMPONENTS
+	Core
+	Network
+)
+
+find_library(qmdnsengine 0.2.0 CONFIG)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
@@ -16,11 +21,15 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Core
+		Qt5::Network
         ${GSTREAMER_LIBRARIES}
+		qmdnsengine
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${GSTREAMER_INCLUDE_DIRS}
+		${QMDNSENGINE_INCLUDE_DIRS}
+
 )
 

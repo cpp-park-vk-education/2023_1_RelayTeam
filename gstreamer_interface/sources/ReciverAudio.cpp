@@ -6,9 +6,7 @@ ReciverAudio::~ReciverAudio()
 {
 }
 
-ReciverAudio::ReciverAudio(const qint16 &audio_port)
-    : Session(audio_port)
-{}
+ReciverAudio::ReciverAudio(const qint16 audio_port) : Session(audio_port) {}
 
 void ReciverAudio::startReciver()
 {
