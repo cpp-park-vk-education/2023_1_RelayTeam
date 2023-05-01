@@ -1,8 +1,9 @@
 #include "SearchWidget.h"
 
-#include <networkTools.h>
-#include <QScrollBar>
 #include <UITools.h>
+#include <networkTools.h>
+
+#include <QScrollBar>
 
 SearchWidget::SearchWidget(qreal scale_, QWidget* parent)
 	: QListWidget(parent),
@@ -48,7 +49,7 @@ void SearchWidget::onServiceRemoved(const QMdnsEngine::Service& service) {
 }
 
 void SearchWidget::onServiceUpdated(
-	const QMdnsEngine::Service& service) {	// No updated signals for some reason. Handling with discovered and removed currently.
+	const QMdnsEngine::Service& service) {  // No updated signals for some reason. Handling with discovered and removed currently.
 	if (QString(service.type()) != QString("_mrelay-connect._tcp.local.")) {
 		return;
 	}
@@ -119,7 +120,7 @@ void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_receive
 }
 
 void SearchWidget::onAddButtonCLicked() {
-	QList<QListWidgetItem*> selected_items = this->selectedItems();	 // Only one can actually be selected at a time.
+	QList<QListWidgetItem*> selected_items = this->selectedItems();  // Only one can actually be selected at a time.
 	if (selected_items.empty()) {
 		qDebug() << "Can't add device. Device selection empty.";
 		return;
@@ -129,7 +130,7 @@ void SearchWidget::onAddButtonCLicked() {
 		qDebug() << "Can't add device. Not yet resolved.";
 		return;
 	}
-	if (service_item->getAdded()) {	 // still can add if service name changed.
+	if (service_item->getAdded()) {  // still can add if service name changed.
 		qDebug() << "Can't add device. Device already added.";
 		return;
 	}

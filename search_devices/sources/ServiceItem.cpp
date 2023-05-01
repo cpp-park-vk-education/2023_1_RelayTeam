@@ -1,6 +1,8 @@
 #include "ServiceItem.h"
-#include "variables.h"
+
 #include <UITools.h>
+
+#include "variables.h"
 
 ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale) : service(service_), is_added(false), is_resolved(false) {
 	main_widget = new QWidget();
@@ -14,7 +16,7 @@ ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale) : se
 	main_layout->addWidget(connection_status_icon);
 	QPixmap icon_pixmap;  // Creating up OS icon.
 	QStringList os_types;
-	os_types << "linux"	   // 0
+	os_types << "linux"    // 0
 			 << "windows"  // 1
 			 << "android"  // 2
 			 << "darwin";  // 3
@@ -42,7 +44,7 @@ ServiceItem::ServiceItem(const QMdnsEngine::Service& service_, qreal scale) : se
 	main_layout->addLayout(name_layout);
 	service_name_label = new QLabel(service.name());  // creating name label
 	name_layout->addWidget(static_cast<QWidget*>(service_name_label));
-	this->setSizeHint(main_widget->sizeHint());	 // setting item to fit content
+	this->setSizeHint(main_widget->sizeHint());  // setting item to fit content
 }
 
 void ServiceItem::update(const QMdnsEngine::Service& service_) {

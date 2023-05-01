@@ -4,9 +4,9 @@
 #include <QListWidget>
 #include <QMap>
 #include <QString>
+#include <QWidget>
 #include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QHostAddress>
-#include <QWidget>
 // qmdnsengine
 #include <qmdnsengine/browser.h>
 #include <qmdnsengine/cache.h>

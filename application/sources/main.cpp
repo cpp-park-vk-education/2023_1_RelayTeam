@@ -1,10 +1,10 @@
-#include "MainWindow.h"
-#include "variables.h"
-// #include <example_gstreamer.h>
 #include <QApplication>
 #include <QtDebug>
 
-int main(int argc, char *argv[]) {
+#include "MainWindow.h"
+#include "variables.h"
+
+int main(int argc, char* argv[]) {
 	qDebug() << "Application started.";
 	QApplication a(argc, argv);
 	a.setApplicationDisplayName("MultiRelay");

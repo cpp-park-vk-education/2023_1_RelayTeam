@@ -1,9 +1,11 @@
 #include "MainWindow.h"
-#include <iostream>
+
+#include <UITools.h>
 #include <qmdnsengine/message.h>
+
 #include <QMessageBox>
 #include <QSlider>
-#include <UITools.h>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false), streaming_session_manager() {
@@ -17,18 +19,18 @@ MainWindow::MainWindow(QWidget* parent)
 	main_widget->setLayout(main_layout);
 	main_widget->setMinimumSize(920 * options->getScale(), 400 * options->getScale());
 	this->setCentralWidget(main_widget);
-	right_bar = new QVBoxLayout();					// Creating right bar.
-	settings_button = new QPushButton("Settings");	// Creating settings button.
+	right_bar = new QVBoxLayout();                  // Creating right bar.
+	settings_button = new QPushButton("Settings");  // Creating settings button.
 	settings_button->setFixedHeight(60 * options->getScale());
 	connect(settings_button, &QPushButton::clicked, this, &MainWindow::onSettingsButtonPressed);
 	right_bar->addWidget(settings_button);
-	devices_layout = new QVBoxLayout();	 // Creating devices layout with scroll area.
+	devices_layout = new QVBoxLayout();  // Creating devices layout with scroll area.
 	data_base.getDevices(devices_layout, options->getScale());
 	for (size_t i = 0; i < devices_layout->count(); ++i) {
 		makeDeviceConnections(static_cast<DeviceWidget*>(devices_layout->itemAt(i)));
 	}
 	devices_layout->setContentsMargins(0, 0, 0, 0);
-	devices_widget = new QWidget();	 // Creating widget for devices layout
+	devices_widget = new QWidget();  // Creating widget for devices layout
 	devices_widget->sizeHint();
 	devices_widget->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Maximum);
 	devices_widget->setLayout(devices_layout);
@@ -40,13 +42,13 @@ MainWindow::MainWindow(QWidget* parent)
 	devices_scroll_area->setMaximumWidth(700 * options->getScale());
 	devices_scroll_area->setWidget(devices_widget);
 	right_bar->addWidget(devices_scroll_area);
-	settings_widget = new SettingsWidget(options);	// Creating settings widget.
+	settings_widget = new SettingsWidget(options);  // Creating settings widget.
 	settings_widget->setFixedWidth(570 * options->getScale());
 	settings_widget->hide();
 	right_bar->addWidget(settings_widget);
 	left_bar = new QVBoxLayout();  // creating left bar
 	left_bar->setAlignment(Qt::AlignLeft);
-	button_layout = new QHBoxLayout();					  // Creating button layout.
+	button_layout = new QHBoxLayout();                    // Creating button layout.
 	scan_network_button = new QPushButton("Scan local");  // Creating scan local button.
 	scan_network_button->setFixedHeight(60 * options->getScale());
 	connect(scan_network_button, &QPushButton::clicked, this, &MainWindow::onScanNetworkButtonPressed);
@@ -55,9 +57,9 @@ MainWindow::MainWindow(QWidget* parent)
 	add_button->setFixedHeight(60 * options->getScale());
 	button_layout->addWidget(add_button);
 	left_bar->addLayout(button_layout);
-	input_box = new QTextEdit("Text box");	// Creating input box.
+	input_box = new QTextEdit("Text box");  // Creating input box.
 	left_bar->addWidget(input_box);
-	search_widget = new SearchWidget(options->getScale());	// Creating network widgets.
+	search_widget = new SearchWidget(options->getScale());  // Creating network widgets.
 	search_widget->hide();
 	left_bar->addWidget(search_widget);
 	connect(add_button, &QPushButton::clicked, search_widget, &SearchWidget::onAddButtonCLicked);
@@ -113,8 +115,11 @@ void MainWindow::onScanNetworkButtonPressed() {
 	}
 	current_search_widget_is_manual = !current_search_widget_is_manual;
 }
+void MainWindow::saveAllChanges()
 
-void MainWindow::saveAllChanges() {
+
+
+{
 	for (size_t i = 0; i < devices_layout->count(); ++i) {
 		data_base.saveDeviceChanges(static_cast<DeviceWidget*>(devices_layout->itemAt(i)));
 	}

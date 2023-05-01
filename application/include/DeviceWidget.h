@@ -1,6 +1,5 @@
 #pragma once
 
-#include "variables.h"
 #include <QDir>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -10,6 +9,8 @@
 #include <QSpinBox>
 #include <QString>
 #include <QtNetwork/QHostAddress>
+
+#include "variables.h"
 
 class DeviceWidget : public QHBoxLayout {
 private:

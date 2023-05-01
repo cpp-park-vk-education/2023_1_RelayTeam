@@ -1,9 +1,5 @@
 #pragma once
 
-#include "DBManager.h"
-#include "DeviceWidget.h"
-#include "Options.h"
-#include "SettingsWidget.h"
 #include <Publisher.h>
 #include <SearchWidget.h>
 #include <SessionManager.h>
@@ -18,13 +14,18 @@
 #include <QTextEdit>
 #include <QtNetwork/QHostAddress>
 
+#include "DBManager.h"
+#include "DeviceWidget.h"
+#include "Options.h"
+#include "SettingsWidget.h"
+
 class MainWindow : public QMainWindow {
 private:
 	Q_OBJECT
 	// Widgets
-	QWidget* main_widget;			   // main  widget
-	QHBoxLayout* main_layout;		   // min widget layout
-	QVBoxLayout* devices_layout;	   // layout with device widgets
+	QWidget* main_widget;         // main  widget
+	QHBoxLayout* main_layout;     // min widget layout
+	QVBoxLayout* devices_layout;  // layout with device widgets
 	QVBoxLayout* left_bar;
 	QVBoxLayout* right_bar;
 	QHBoxLayout* button_layout;

@@ -8,8 +8,7 @@
 class Session : public QObject {
 	Q_OBJECT
 protected:
-    typedef struct _CustomData
-    {
+	typedef struct _CustomData {
         gboolean is_live;
         GstElement *pipeline = NULL;
         GMainLoop *loop;

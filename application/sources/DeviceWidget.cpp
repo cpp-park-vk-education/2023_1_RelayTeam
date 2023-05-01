@@ -1,4 +1,5 @@
 #include "DeviceWidget.h"
+
 #include <QDebug>
 #include <QtMath>
 

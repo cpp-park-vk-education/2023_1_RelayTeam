@@ -1,7 +1,8 @@
 #include "SettingsWidget.h"
 
-#include <QtMath>
 #include <UITools.h>
+
+#include <QtMath>
 
 SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(parrent), options(options_) {
 	QFont font = this->font();
@@ -29,12 +30,12 @@ SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(pa
 	main_layout->addLayout(change_scale_layout);
 	scaling_label = new QLabel("UI scaling: ");
 	change_scale_layout->addWidget(scaling_label);
-	scale_slider = new QSlider(Qt::Horizontal);	 // Creating scale slider.
+	scale_slider = new QSlider(Qt::Horizontal);  // Creating scale slider.
 	scale_slider->setFixedWidth(160 * scale);
 	scale_slider->setMaximum(200);
 	scale_slider->setMinimum(50);
 	change_scale_layout->addWidget(scale_slider);
-	scale_box = new QSpinBox();	 // Creating scale label.
+	scale_box = new QSpinBox();  // Creating scale label.
 	scale_box->setFixedSize(70 * scale, 50 * scale);
 	scale_box->setMaximum(200);
 	scale_box->setMinimum(50);
@@ -43,7 +44,8 @@ SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(pa
 	scaling_warning_label->setStyleSheet("QLabel { color : grey; }");
 	scaling_warning_label->setFont(font);
 	change_scale_layout->addWidget(scaling_warning_label);
-	connect(scale_slider, &QSlider::valueChanged, scale_box, &QSpinBox::setValue);	// Connecting slider and label
+	connect(scale_slider, &QSlider::valueChanged, scale_box,
+			&QSpinBox::setValue);  // Connecting slider and label
 	connect(scale_slider, &QSlider::valueChanged, this, &SettingsWidget::onScaleChanged);
 	connect(scale_box, qOverload<int>(&QSpinBox::valueChanged), scale_slider, &QSlider::setValue);
 	scale_box->setValue(options->scale_factor);

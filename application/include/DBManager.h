@@ -1,10 +1,11 @@
 #pragma once
 
-#include "DeviceWidget.h"
-#include "Options.h"
+#include <QVBoxLayout>
 #include <QtNetwork/QHostAddress>
 #include <QtSql>
-#include <QVBoxLayout>
+
+#include "DeviceWidget.h"
+#include "Options.h"
 
 class DBManager {
 private:

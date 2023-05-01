@@ -2,8 +2,8 @@
 // Qt basic libraries.
 #include <QList>
 #include <QString>
-#include <QtNetwork/QHostInfo>
 #include <QWidget>
+#include <QtNetwork/QHostInfo>
 // qmdnsengine
 #include <qmdnsengine/hostname.h>
 #include <qmdnsengine/message.h>

@@ -9,6 +9,7 @@ struct Options {
 	qreal scale_factor_new;
 
 	Options() : ID(-1), device_name("Undefined"), scale_factor(1) {}
+
 	Options(qint32 ID_, QString device_name_, qreal scale_factor_) : ID(ID_), device_name(device_name_), scale_factor(scale_factor_) {}
 
 	inline void update(qint32 ID_, const QString& device_name_, qreal scale_factor_) {

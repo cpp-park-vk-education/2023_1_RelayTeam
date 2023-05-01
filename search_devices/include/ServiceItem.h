@@ -6,9 +6,9 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QString>
-#include <QtNetwork/QHostAddress>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtNetwork/QHostAddress>
 // qmdnsengine
 #include <qmdnsengine/service.h>
 

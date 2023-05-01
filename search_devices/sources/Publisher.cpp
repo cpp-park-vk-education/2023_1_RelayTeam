@@ -1,5 +1,7 @@
 #include "Publisher.h"
+
 #include <networkTools.h>
+
 #include <QtNetwork/QNetworkInterface>
 
 Publisher::Publisher(const QString& device_name, QWidget* parent)
@@ -28,6 +30,8 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) 
 			QString session_type = queries[1].name().left(queries[1].name().size() - 1);
 			qDebug() << "received request for receiving session from" << message_received.address().toString()
 					 << "\n session type is: " << session_type;
+			qDebug() << "CURRENT RECEIVED MESSAGE port: " << message_received.port() << "address: " << message_received.address()
+					 << "trankated: " << message_received.isTruncated();
 			emit sendStartReceivingSession(message_received, session_type);
 		}
 		return;
@@ -76,5 +80,7 @@ void Publisher::onSendPorts(const QMdnsEngine::Message& message_received, qint16
 	message.addQuery(query);
 	message.reply(message_received);
 	message.setTransactionId(2435);
+	qDebug() << "CURRENT SENDING MESSAGE port: " << message.port() << "address: " << message.address()
+			 << "trankated: " << message.isTruncated();
 	server.sendMessage(message);
 }
