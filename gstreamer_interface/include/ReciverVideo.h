@@ -1,22 +1,24 @@
 #pragma once
 
-#include <QString>
-#include <QThread>
-#include <Session.h>
 #include <gst/gst.h>
 #include <string.h>
+
+#include <QString>
+#include <QThread>
+
+#include "Session.h"
 
 class ReciverVideo : public Session {
 	Q_OBJECT
 public:
 	explicit ReciverVideo(const qint16 video_port, const qint16 audio_port);
 
-	void startReciver();
+	~ReciverVideo();
 
 public slots:
-	void onStartVideoSession();
+	void onStartSession() override;
 
-	void onKillVideoSession();
+	void onKillSession() override;
 
 signals:
     void sendVideoSessionStarted();
@@ -30,5 +32,5 @@ private:
 
     void startReceive();
 
-    static gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data);
+	static gboolean busCallback(GstBus* bus, GstMessage* msg, gpointer data);
 };

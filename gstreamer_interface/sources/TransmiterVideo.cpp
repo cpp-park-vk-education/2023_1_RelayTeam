@@ -6,12 +6,7 @@ TransmiterVideo::TransmiterVideo(const QHostAddress& local_ip6_, const qint16 vi
 	: Session(local_ip6_, video_port_, audio_port_) {}
 
 TransmiterVideo::~TransmiterVideo() {}
-
-void TransmiterVideo::startTransmit() {
-    onStartVideoSession();
-}
-
-gboolean TransmiterVideo::bus_message(GstBus* bus, GstMessage* message, gpointer user_data) {
+gboolean TransmiterVideo::onBusMessage(GstBus* bus, GstMessage* message, gpointer user_data) {
 	GError* error = NULL;
 	gchar* debug_info = NULL;
 
@@ -125,7 +120,8 @@ void TransmiterVideo::addLinkAudio() {
 	g_object_set(udpsink2, "sync", FALSE, "host", local_ip6.toString().toLocal8Bit().constData(), "port", audio_port, NULL);
 }
 
-void TransmiterVideo::onStartVideoSession() {
+void TransmiterVideo::onStartSession() {
+	qDebug() << "Starting video transmition";
     gst_init(nullptr, nullptr);
     addLinkVideo();
     addLinkAudio();
@@ -136,12 +132,12 @@ void TransmiterVideo::startSend() {
     data.bus = gst_element_get_bus(data.pipeline);
     qDebug() << data.pipeline;
 
-    gst_bus_add_watch(data.bus, reinterpret_cast<GstBusFunc>(bus_message), data.loop);
+	gst_bus_add_watch(data.bus, reinterpret_cast<GstBusFunc>(onBusMessage), data.loop);
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
 	gst_bus_timed_pop_filtered(data.bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
 
-void TransmiterVideo::onKillVideoSession() {
+void TransmiterVideo::onKillSession() {
     gst_object_unref(data.bus);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);

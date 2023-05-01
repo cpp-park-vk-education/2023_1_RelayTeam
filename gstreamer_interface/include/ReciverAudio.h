@@ -1,23 +1,24 @@
 #pragma once
 
-#include <QString>
-#include <QThread>
-#include <Session.h>
 #include <gst/gst.h>
 #include <string.h>
+
+#include <QString>
+#include <QThread>
+
+#include "Session.h"
 
 class ReciverAudio : public Session {
 	Q_OBJECT
 public:
 	explicit ReciverAudio(const qint16 audio_port);
+
 	~ReciverAudio();
 
-    void startReciver();
-
 public slots:
-	void onStartAudioSession();
+	void onStartSession() override;
 
-	void onKillAudioSession();
+	void onKillSession() override;
 
 signals:
     void sendAudioSessionStarted();
@@ -31,5 +32,5 @@ private:
 
     void startReceive();
 
-    static gboolean busCallback(GstBus *bus, GstMessage *msg, gpointer data);
+	static gboolean busCallback(GstBus* bus, GstMessage* msg, gpointer data);
 };

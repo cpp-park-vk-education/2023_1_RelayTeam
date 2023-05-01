@@ -2,16 +2,12 @@
 
 #include <QDebug>
 
-TransmiterAudio::TransmiterAudio(const QHostAddress& local_ip6_, const qint16 audio_port_) : Session(local_ip6_, audio_port_) {}
+TransmiterAudio::TransmiterAudio(const QHostAddress& local_ip6_, const qint16 audio_port_) : Session(local_ip6_, -1, audio_port_) {}
 
 TransmiterAudio::~TransmiterAudio() {
     // gst_object_unref(data.bus);
     // gst_element_set_state(data.pipeline, GST_STATE_NULL);
     // gst_object_unref(data.pipeline);
-}
-
-void TransmiterAudio::startTransmit() {
-	onStartAudioSession();
 }
 
 gboolean TransmiterAudio::onBusMessage(GstBus* bus, GstMessage* message, gpointer user_data) {
@@ -72,7 +68,9 @@ void TransmiterAudio::addLinkAudio() {
 
 	g_object_set(udpsink2, "sync", FALSE, "host", local_ip6.toString().toLocal8Bit().constData(), "port", audio_port, NULL);
 }
-void TransmiterAudio::onStartAudioSession() {
+
+void TransmiterAudio::onStartSession() {
+	qDebug() << "Starting audio transmition";
     addLinkAudio();
     startSend();
 }
@@ -85,7 +83,7 @@ void TransmiterAudio::startSend() {
 	gst_bus_timed_pop_filtered(data.bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
 
-void TransmiterAudio::onKillAudioSession() {
+void TransmiterAudio::onKillSession() {
     gst_object_unref(data.bus);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);

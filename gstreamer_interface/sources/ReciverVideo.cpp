@@ -2,18 +2,11 @@
 
 #include <QDebug>
 
-ReciverVideo::ReciverVideo(const qint16 video_port, const qint16 audio_port) : Session(video_port, audio_port) {}
+ReciverVideo::ReciverVideo(const qint16 video_port, const qint16 audio_port) : Session(QHostAddress(), video_port, audio_port) {}
 
-void ReciverVideo::startReciver() {
-	onStartVideoSession();
-}
+ReciverVideo::~ReciverVideo() {}
 
-/*void ReciverVideo::run()
-{
-    startReciver();
-}*/
-
-gboolean ReciverVideo::bus_callback(GstBus* bus, GstMessage* msg, gpointer data) {
+gboolean ReciverVideo::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
 	GMainLoop* loop = (GMainLoop*)data;
 
     switch (GST_MESSAGE_TYPE(msg)) {
@@ -135,15 +128,15 @@ void ReciverVideo::addLinkAudio() {
     g_object_set(udpsrc2, "port", audio_port, NULL);
 }
 
-void ReciverVideo::onStartVideoSession() {
+void ReciverVideo::onStartSession() {
+	qDebug() << "Starting video receiver";
     gst_init(0, nullptr);
     addLinkVideo();
     addLinkAudio();
-
     startReceive();
 }
 
-void ReciverVideo::onKillVideoSession() {
+void ReciverVideo::onKillSession() {
     g_main_loop_unref(data.loop);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);
@@ -156,7 +149,7 @@ void ReciverVideo::startReceive() {
 
     data.bus = gst_element_get_bus(data.pipeline);
 
-    gst_bus_add_watch(data.bus, reinterpret_cast<GstBusFunc>(bus_callback), data.loop);
+	gst_bus_add_watch(data.bus, reinterpret_cast<GstBusFunc>(busCallback), data.loop);
 
     gst_object_unref(data.bus);
 

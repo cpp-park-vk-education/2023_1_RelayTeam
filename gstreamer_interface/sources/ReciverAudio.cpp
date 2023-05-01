@@ -2,19 +2,9 @@
 
 #include <QDebug>
 
+ReciverAudio::ReciverAudio(const qint16 audio_port) : Session(QHostAddress(), -1, audio_port) {}
+
 ReciverAudio::~ReciverAudio() {}
-
-ReciverAudio::ReciverAudio(const qint16 audio_port) : Session(audio_port) {}
-
-void ReciverAudio::startReciver() {
-    onStartAudioSession();
-	// onKillAudioSession();
-}
-
-/*void ReciverAudio::run()
-{
-    startReciver();
-}*/
 
 gboolean ReciverAudio::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
 	GMainLoop* loop = (GMainLoop*)data;
@@ -134,9 +124,9 @@ void ReciverAudio::addLinkAudio() {
     g_object_set(udpsrc2, "port", audio_port, NULL);
 }
 
-void ReciverAudio::onStartAudioSession() {
+void ReciverAudio::onStartSession() {
+	qDebug() << "Starting audio receiver";
     addLinkAudio();
-
     startReceive();
 }
 
@@ -152,7 +142,7 @@ void ReciverAudio::startReceive() {
     g_main_loop_run(data.loop);
 }
 
-void ReciverAudio::onKillAudioSession() {
+void ReciverAudio::onKillSession() {
     g_main_loop_unref(data.loop);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);

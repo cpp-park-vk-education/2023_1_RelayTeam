@@ -6,7 +6,7 @@ diagrams:
     glob:
       - application/sources/main.cpp
     include:
-      context:
+      elements:
         - MainWindow
         - DeviceWidget
         - DBManager
@@ -16,3 +16,11 @@ diagrams:
         - Publisher
         - SearchWidget
         - ServiceItem
+
+        - SessionManager
+        - Session
+        - ReciverAudio
+        - TransmiterVideo
+        - TransmiterAudio
+        - ReciverVideo
+        - ReciverAudio

@@ -1,14 +1,15 @@
 #pragma once
 
 #include <gst/gst.h>
+
 #include <QDebug>
 #include <QString>
 #include <QThread>
 #include <QtNetwork/QHostAddress>
-#include <Session.h>
 
-class TransmiterVideo : public Session
-{
+#include "Session.h"
+
+class TransmiterVideo : public Session {
 private:
 	Q_OBJECT
 
@@ -18,19 +19,17 @@ private:
 
     void startSend();
 
-    static gboolean bus_message(GstBus *bus, GstMessage *message, gpointer user_data);
+	static gboolean onBusMessage(GstBus* bus, GstMessage* message, gpointer user_data);
 
 public:
-	explicit TransmiterVideo(const QHostAddress &local_ip6_, const qint16 video_port_, const qint16 audio_port_);
+	explicit TransmiterVideo(const QHostAddress& local_ip6_, const qint16 video_port_, const qint16 audio_port_);
+
 	~TransmiterVideo();
 
-	//void run();
-    void startTransmit();
-
 public slots:
-    void onStartVideoSession();
+	void onStartSession() override;
 
-    void onKillVideoSession();
+	void onKillSession() override;
 
 signals:
     void sendVideoSessionStarted();

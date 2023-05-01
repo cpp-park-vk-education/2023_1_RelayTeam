@@ -1,22 +1,24 @@
 #pragma once
 
-#include <cstring>
-#include <QMap>
-#include <qmdnsengine/message.h>
-#include <QObject>
-#include <QtNetwork/QHostAddress>
 #include <ReciverAudio.h>
 #include <ReciverVideo.h>
 #include <TransmiterAudio.h>
 #include <TransmiterVideo.h>
+#include <qmdnsengine/message.h>
 
-class SessionManager : public QObject
-{
+#include <QMap>
+#include <QObject>
+#include <QtNetwork/QHostAddress>
+#include <cstring>
+
+class SessionManager : public QObject {
 private:
     Q_OBJECT
-    QHash<QPair<QHostAddress, QString>, std::shared_ptr<Session>>
-        live_sessions; // map<session_id, session>
+	QHash<QPair<QHostAddress, QString>, std::shared_ptr<Session>> live_sessions;  // map<session_id, session>
     // void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
+
+	void startThread(Session* session);
+
 public:
 	SessionManager();
 
@@ -38,7 +40,6 @@ public slots:
 	void onReceivedPorts(const QHostAddress local_ip6, qint16 video_port, qint16 audio_port);
 
 signals:
-	// All used to notify MainWindow about SessionManager events.
 	void sendErrorOccured(const QString error_string);
 
 	void sendVideoSessionStarted();
@@ -52,6 +53,4 @@ signals:
 	void sendStartReciver(const QHostAddress local_ip6, const QString session_type);
 
 	void sendSetPorts(const QMdnsEngine::Message message_received, qint16 video_port, qint16 audio_port);
-
-	// void sendStartAudioReciver(const QString &local_ip6);
 };
