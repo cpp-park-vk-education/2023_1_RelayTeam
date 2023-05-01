@@ -5,8 +5,12 @@
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QNetworkInterface>
 
-QString getLocalIP();
+QHostAddress getLocalIP();
+
+QHostAddress getLocalIPv6();
 
 QString getMacAddress();
 
-QString getIPv6();
+QHostAddress getIPv6();
+
+QString processIPv6(const QHostAddress& ipv6_address);

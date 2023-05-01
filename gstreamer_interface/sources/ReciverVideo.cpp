@@ -1,59 +1,19 @@
 #include "ReciverVideo.h"
 
+#include <networkTools.h>
+
 #include <QDebug>
 
 ReciverVideo::ReciverVideo(const qint16 video_port, const qint16 audio_port) : Session(QHostAddress(), video_port, audio_port) {}
 
 ReciverVideo::~ReciverVideo() {}
 
-gboolean ReciverVideo::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
-	GMainLoop* loop = (GMainLoop*)data;
-
-    switch (GST_MESSAGE_TYPE(msg)) {
-		case GST_MESSAGE_ERROR: {
-			GError* error;
-			gchar* debug_info;
-
-			gst_message_parse_error(msg, &error, &debug_info);
-			g_printerr("Error received from element %s: %s\n", GST_OBJECT_NAME(msg->src), error->message);
-			g_printerr("Debugging information: %s\n", debug_info ? debug_info : "none");
-			g_clear_error(&error);
-			g_free(debug_info);
-			g_main_loop_quit(loop);
-			break;
-		}
-		case GST_MESSAGE_WARNING: {
-			GError* error;
-			gchar* debug_info;
-
-			gst_message_parse_warning(msg, &error, &debug_info);
-			g_printerr("Warning received from element %s: %s\n", GST_OBJECT_NAME(msg->src), error->message);
-			g_printerr("Debugging information: %s\n", debug_info ? debug_info : "none");
-			g_clear_error(&error);
-			g_free(debug_info);
-			break;
-		}
-		case GST_MESSAGE_EOS:
-			g_print("End-Of-Stream reached.\n");
-			g_main_loop_quit(loop);
-			// sendVideoSessionKilled();
-
-			break;
-
-		default:
-			break;
-    }
-    return TRUE;
-}
-
 void ReciverVideo::addLinkVideo() {
 	GstElement *udpsrc1, *queue1, *capsfilter1, *depay1, *parse1, *decode1, *convert1, *autovideosink1;
 	GstCaps* caps1;
-
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
-
     udpsrc1 = gst_element_factory_make("udpsrc", "udpsrc1");
     queue1 = gst_element_factory_make("queue", "buffer1");
     capsfilter1 = gst_element_factory_make("capsfilter", "capsfilter1");
@@ -82,19 +42,15 @@ void ReciverVideo::addLinkVideo() {
         return;
     }
 
-    g_object_set(udpsrc1, "port", video_port, NULL);
+	g_object_set(udpsrc1, "port", video_port, NULL);
 }
 
 void ReciverVideo::addLinkAudio() {
 	GstElement *udpsrc2, *depay2, *parse2, *decode2, *convert2, *autovideosink2, *audioresample, *capsfilter2, *queue2;
 	GstCaps* caps2;
-
-    //    gst_init(0, nullptr);
-
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
-
     udpsrc2 = gst_element_factory_make("udpsrc", "udpsrc2");
     queue2 = gst_element_factory_make("queue", "buffer2");
     capsfilter2 = gst_element_factory_make("capsfilter", "capsfilter2");
@@ -125,12 +81,15 @@ void ReciverVideo::addLinkAudio() {
         g_printerr("Could not link all elements. Exiting.\n");
         return;
     }
-    g_object_set(udpsrc2, "port", audio_port, NULL);
+	g_object_set(udpsrc2, "port", audio_port, NULL);
 }
 
 void ReciverVideo::onStartSession() {
 	qDebug() << "Starting video receiver";
-    gst_init(0, nullptr);
+	//	while (true) {
+	//		qDebug() << "video receiver loop";
+	//	}
+	gst_init(0, nullptr);
     addLinkVideo();
     addLinkAudio();
     startReceive();

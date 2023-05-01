@@ -10,40 +10,11 @@ TransmiterAudio::~TransmiterAudio() {
     // gst_object_unref(data.pipeline);
 }
 
-gboolean TransmiterAudio::onBusMessage(GstBus* bus, GstMessage* message, gpointer user_data) {
-	GError* error = NULL;
-	gchar* debug_info = NULL;
-
-    switch (GST_MESSAGE_TYPE(message)) {
-		case GST_MESSAGE_ERROR:
-			gst_message_parse_error(message, &error, &debug_info);
-			g_printerr("Error received from element %s: %s\n", GST_OBJECT_NAME(message->src), error->message);
-			g_printerr("Debugging information: %s\n", debug_info ? debug_info : "none");
-			g_clear_error(&error);
-			g_free(debug_info);
-			break;
-		case GST_MESSAGE_WARNING:
-			gst_message_parse_warning(message, &error, &debug_info);
-			g_printerr("Warning received from element %s: %s\n", GST_OBJECT_NAME(message->src), error->message);
-			g_printerr("Debugging information: %s\n", debug_info ? debug_info : "none");
-			g_clear_error(&error);
-			g_free(debug_info);
-			break;
-		default:
-			break;
-    }
-
-    return TRUE;
-}
-
 void TransmiterAudio::addLinkAudio() {
     GstElement *alsasrc, *audioconvert, *audioresample, *opusenc, *rtpopuspay, *udpsink2;
-
-    gst_init(0, nullptr);
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
-
     alsasrc = gst_element_factory_make("alsasrc", "alsasrc");
     audioconvert = gst_element_factory_make("audioconvert", "audioconvert");
     audioresample = gst_element_factory_make("audioresample", "audioresample");
@@ -71,6 +42,7 @@ void TransmiterAudio::addLinkAudio() {
 
 void TransmiterAudio::onStartSession() {
 	qDebug() << "Starting audio transmition";
+	gst_init(0, nullptr);
     addLinkAudio();
     startSend();
 }

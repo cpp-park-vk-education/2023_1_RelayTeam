@@ -11,6 +11,8 @@ private:
 	Q_OBJECT
 
 protected:
+	static gboolean busCallback(GstBus* bus, GstMessage* msg, gpointer data);
+
 	typedef struct _CustomData {
 		gboolean is_live;
 		GstElement* pipeline = NULL;

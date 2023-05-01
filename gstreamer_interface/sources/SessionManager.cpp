@@ -1,5 +1,7 @@
 #include "SessionManager.h"
 
+#include <networkTools.h>
+
 SessionManager::SessionManager() {}
 
 SessionManager::~SessionManager() {
@@ -45,11 +47,12 @@ void SessionManager::onKillAudioSession(const QHostAddress local_ip6) {
 }
 
 void SessionManager::onStartReceivingSession(const QMdnsEngine::Message message_received, const QString session_type) {
+	qDebug() << "Starting receiving session" << message_received.address() << " " << session_type;
 	const qint16& video_port = 5228;
 	const qint16& audio_port = 5229;
 
 	if (session_type == "audio") {
-		QPair<QHostAddress, QString> key = qMakePair(QHostAddress("local_ip"), QString("ReciverVideo"));
+		QPair<QHostAddress, QString> key = qMakePair(message_received.address(), QString("ReciverVideo"));
 		auto it = std::make_unique<ReciverAudio>(audio_port);
 		startThread(it.get());
 		live_sessions.insert(key, std::move(it));
@@ -57,7 +60,7 @@ void SessionManager::onStartReceivingSession(const QMdnsEngine::Message message_
 	}
 
 	if (session_type == "video") {
-		QPair<QHostAddress, QString> key = qMakePair(QHostAddress("local_ip"), QString("ReciverAudio"));
+		QPair<QHostAddress, QString> key = qMakePair(message_received.address(), QString("ReciverAudio"));
 		auto it = std::make_unique<ReciverVideo>(video_port, audio_port);
 		startThread(it.get());
 		live_sessions.insert(key, std::move(it));
@@ -84,6 +87,7 @@ void SessionManager::onKillAudioReciver(const QHostAddress local_ip6) {
 }
 
 void SessionManager::onReceivedPorts(const QHostAddress local_ip6, qint16 video_port, qint16 audio_port) {
+	qDebug() << "Starting transmittion session" << local_ip6.toString() << " " << video_port << " " << audio_port;
 	if (video_port > -1 && audio_port > -1) {
 		QPair<QHostAddress, QString> key = qMakePair(QHostAddress(local_ip6), QString("TransmiterVideo"));
 		auto it = std::make_unique<TransmiterVideo>(local_ip6, video_port, audio_port);

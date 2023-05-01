@@ -24,6 +24,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 		Qt5::Network
         ${GSTREAMER_LIBRARIES}
 		qmdnsengine
+		general_use
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

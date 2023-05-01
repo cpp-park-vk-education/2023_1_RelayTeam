@@ -18,8 +18,6 @@ private:
 
 	void startReceive();
 
-	static gboolean busCallback(GstBus* bus, GstMessage* msg, gpointer data);
-
 public:
 	explicit ReciverVideo(const qint16 video_port, const qint16 audio_port);
 

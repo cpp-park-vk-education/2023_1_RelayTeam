@@ -17,9 +17,7 @@ private:
 
     void addLinkAudio();
 
-    void startSend();
-
-	static gboolean onBusMessage(GstBus* bus, GstMessage* message, gpointer user_data);
+	void startSend();
 
 public:
 	explicit TransmiterVideo(const QHostAddress& local_ip6_, const qint16 video_port_, const qint16 audio_port_);
