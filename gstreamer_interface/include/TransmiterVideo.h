@@ -30,9 +30,4 @@ public slots:
 	void onStartSession() override;
 
 	void onKillSession() override;
-
-signals:
-    void sendVideoSessionStarted();
-
-    void sendVideoSessionKilled();
 };

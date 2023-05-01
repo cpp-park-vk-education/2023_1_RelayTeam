@@ -27,9 +27,4 @@ public slots:
 	void onStartSession() override;
 
 	void onKillSession() override;
-
-signals:
-    void sendAudioSessionStarted();
-
-    void sendAudioSessionKilled();
 };

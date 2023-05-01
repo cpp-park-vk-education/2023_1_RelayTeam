@@ -7,20 +7,17 @@
 #include <QtNetwork/QHostAddress>
 
 class Session : public QObject {
+private:
 	Q_OBJECT
-public slots:
-	virtual void onStartSession() = 0;
-
-	virtual void onKillSession() = 0;
 
 protected:
 	typedef struct _CustomData {
-        gboolean is_live;
+		gboolean is_live;
 		GstElement* pipeline = NULL;
 		GMainLoop* loop;
 		GstBus* bus;
 		GstMessage* msg;
-    } CustomData;
+	} CustomData;
 
 	Session(const QHostAddress& local_ip6_, const qint16 video_port_, const qint16 audio_port_);
 
@@ -28,4 +25,14 @@ protected:
 	QHostAddress local_ip6;
 	qint16 video_port;
 	qint16 audio_port;
+
+public slots:
+	virtual void onStartSession() = 0;
+
+	virtual void onKillSession() = 0;
+
+signals:
+	void sendSessionStarted();
+
+	void sendSessionKilled();
 };

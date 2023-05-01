@@ -2,13 +2,18 @@
 
 SessionManager::SessionManager() {}
 
+SessionManager::~SessionManager() {
+	emit sendKillAll();
+}
+
 void SessionManager::startThread(Session* session) {  // ensure thread and object deletion later.
 	QThread* thread = new QThread();
 	session->moveToThread(thread);
-
 	connect(thread, &QThread::started, session, &Session::onStartSession);
-
 	connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+	connect(session, &Session::sendSessionKilled, thread, &QThread::quit);
+	connect(session, &Session::sendSessionKilled, session, &Session::deleteLater);
+	connect(this, &SessionManager::sendKillAll, session, &Session::deleteLater);
 
 	thread->start();
 }

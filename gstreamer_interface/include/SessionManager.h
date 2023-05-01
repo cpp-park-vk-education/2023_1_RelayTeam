@@ -22,6 +22,8 @@ private:
 public:
 	SessionManager();
 
+	~SessionManager();
+
 public slots:
 	void onStartVideoSession(const QHostAddress local_ip6);
 
@@ -49,6 +51,8 @@ signals:
 	void sendVideoSessionKilled();
 
 	void sendAudioSessionKilled();
+
+	void sendKillAll();
 
 	void sendStartReciver(const QHostAddress local_ip6, const QString session_type);
 
