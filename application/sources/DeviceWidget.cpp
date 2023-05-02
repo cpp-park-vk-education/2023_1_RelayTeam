@@ -42,24 +42,25 @@ void DeviceWidget::defineWdgets(qreal scale) {
 	this->addWidget(settings_button);
 }
 
-DeviceWidget::DeviceWidget(QString ID_, const QString& name_, const QHostAddress& ipv6_address_, qint16 volume_, qreal scale,
+DeviceWidget::DeviceWidget(QString ID_, const QString& name_, const QHostAddress& local_ipv4_address_, qint16 volume_, qreal scale,
 						   QWidget* parent)
-	: ID(ID_), name(name_), volume(volume_), ipv6_address(ipv6_address_), QHBoxLayout(parent) {
+	: ID(ID_), name(name_), volume(volume_), local_ipv4_address(local_ipv4_address_), QHBoxLayout(parent) {
 	defineWdgets(scale);
 }
 
-DeviceWidget::DeviceWidget(QString ID_, QString&& name_, const QHostAddress& ipv6_address_, qint16 volume_, qreal scale, QWidget* parent)
-	: ID(ID_), name(std::move(name_)), volume(volume_), ipv6_address(ipv6_address_), QHBoxLayout(parent) {
+DeviceWidget::DeviceWidget(QString ID_, QString&& name_, const QHostAddress& local_ipv4_address_, qint16 volume_, qreal scale,
+						   QWidget* parent)
+	: ID(ID_), name(std::move(name_)), volume(volume_), local_ipv4_address(local_ipv4_address_), QHBoxLayout(parent) {
 	defineWdgets(scale);
 }
 
 void DeviceWidget::onAudioPressed() {
 	if (audio_state) {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio-disabled.png")));
-		emit sendStopAudioSession(ipv6_address);
+		emit sendStopAudioSession(local_ipv4_address);
 	} else {
 		audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio.png")));
-		emit sendStartAudioSession(ipv6_address);
+		emit sendStartAudioSession(local_ipv4_address);
 	}
 	audio_state = !audio_state;
 }
@@ -67,10 +68,10 @@ void DeviceWidget::onAudioPressed() {
 void DeviceWidget::onCastPressed() {
 	if (cast_state) {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
-		emit sendStopVideoSession(ipv6_address);
+		emit sendStopVideoSession(local_ipv4_address);
 	} else {
 		cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
-		emit sendStartVideoSession(ipv6_address);
+		emit sendStartVideoSession(local_ipv4_address);
 	}
 	cast_state = !cast_state;
 }

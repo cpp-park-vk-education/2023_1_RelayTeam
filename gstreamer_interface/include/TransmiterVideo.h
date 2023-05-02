@@ -20,7 +20,7 @@ private:
 	void startSend();
 
 public:
-	explicit TransmiterVideo(const QHostAddress& local_ip6_, const qint16 video_port_, const qint16 audio_port_);
+	explicit TransmiterVideo(const QHostAddress& ip_address_, const qint16 video_port_, const qint16 audio_port_);
 
 	~TransmiterVideo();
 

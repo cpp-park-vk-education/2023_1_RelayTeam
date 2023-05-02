@@ -20,29 +20,29 @@ void SessionManager::startThread(Session* session) {  // ensure thread and objec
 	thread->start();
 }
 
-void SessionManager::onStartVideoSession(const QHostAddress local_ip6) {
-	emit sendStartReciver(local_ip6, "video");
+void SessionManager::onStartVideoSession(const QHostAddress ip_address) {
+	emit sendStartReciver(ip_address, "video");
 }
 
-void SessionManager::onStartAudioSession(const QHostAddress local_ip6) {
-	emit sendStartReciver(local_ip6, "audio");
+void SessionManager::onStartAudioSession(const QHostAddress ip_address) {
+	emit sendStartReciver(ip_address, "audio");
 }
 
-void SessionManager::onKillVideoSession(const QHostAddress local_ip6) {
+void SessionManager::onKillVideoSession(const QHostAddress ip_address) {
 	QString key = "TransmiterVideo";
-	if (live_sessions.contains(qMakePair(local_ip6, key))) {
-		auto it = live_sessions[qMakePair(local_ip6, key)];
+	if (live_sessions.contains(qMakePair(ip_address, key))) {
+		auto it = live_sessions[qMakePair(ip_address, key)];
 		QMetaObject::invokeMethod(it.get(), "onKillSession", Qt::QueuedConnection);
-		live_sessions.remove(qMakePair(local_ip6, key));
+		live_sessions.remove(qMakePair(ip_address, key));
 	}
 }
 
-void SessionManager::onKillAudioSession(const QHostAddress local_ip6) {
+void SessionManager::onKillAudioSession(const QHostAddress ip_address) {
 	QString key = "TransmiterAudio";
-	if (live_sessions.contains(qMakePair(local_ip6, key))) {
-		auto it = live_sessions[qMakePair(local_ip6, key)];
+	if (live_sessions.contains(qMakePair(ip_address, key))) {
+		auto it = live_sessions[qMakePair(ip_address, key)];
 		QMetaObject::invokeMethod(it.get(), "onKillSession", Qt::QueuedConnection);
-		live_sessions.remove(qMakePair(local_ip6, key));
+		live_sessions.remove(qMakePair(ip_address, key));
 	}
 }
 
@@ -68,29 +68,29 @@ void SessionManager::onStartReceivingSession(const QMdnsEngine::Message message_
 	}
 }
 
-void SessionManager::onKillVideoReciver(const QHostAddress local_ip6) {
+void SessionManager::onKillVideoReciver(const QHostAddress ip_address) {
 	QString key = "ReciverVideo";
-	if (live_sessions.contains(qMakePair(local_ip6, key))) {
-		auto it = live_sessions[qMakePair(local_ip6, key)];
+	if (live_sessions.contains(qMakePair(ip_address, key))) {
+		auto it = live_sessions[qMakePair(ip_address, key)];
 		// it->quit();
-		live_sessions.remove(qMakePair(local_ip6, key));
+		live_sessions.remove(qMakePair(ip_address, key));
 	}
 }
 
-void SessionManager::onKillAudioReciver(const QHostAddress local_ip6) {
+void SessionManager::onKillAudioReciver(const QHostAddress ip_address) {
 	QString key = "ReciverAudio";
-	if (live_sessions.contains(qMakePair(local_ip6, key))) {
-		auto it = live_sessions[qMakePair(local_ip6, key)];
+	if (live_sessions.contains(qMakePair(ip_address, key))) {
+		auto it = live_sessions[qMakePair(ip_address, key)];
 		// it->quit();
-		live_sessions.remove(qMakePair(local_ip6, key));
+		live_sessions.remove(qMakePair(ip_address, key));
 	}
 }
 
-void SessionManager::onReceivedPorts(const QHostAddress local_ip6, qint16 video_port, qint16 audio_port) {
-	qDebug() << "Starting transmittion session" << local_ip6.toString() << " " << video_port << " " << audio_port;
+void SessionManager::onReceivedPorts(const QHostAddress ip_address, qint16 video_port, qint16 audio_port) {
+	qDebug() << "Starting transmittion session" << ip_address.toString() << " " << video_port << " " << audio_port;
 	if (video_port > -1 && audio_port > -1) {
-		QPair<QHostAddress, QString> key = qMakePair(QHostAddress(local_ip6), QString("TransmiterVideo"));
-		auto it = std::make_unique<TransmiterVideo>(local_ip6, video_port, audio_port);
+		QPair<QHostAddress, QString> key = qMakePair(QHostAddress(ip_address), QString("TransmiterVideo"));
+		auto it = std::make_unique<TransmiterVideo>(ip_address, video_port, audio_port);
 		startThread(it.get());
 		live_sessions.insert(key, std::move(it));
 		return;
@@ -100,8 +100,8 @@ void SessionManager::onReceivedPorts(const QHostAddress local_ip6, qint16 video_
 		return;
 	}
 	if (audio_port > -1) {
-		QPair<QHostAddress, QString> key = qMakePair(QHostAddress(local_ip6), QString("TransmiterAudio"));
-		auto it = std::make_unique<TransmiterAudio>(local_ip6, 5000);
+		QPair<QHostAddress, QString> key = qMakePair(QHostAddress(ip_address), QString("TransmiterAudio"));
+		auto it = std::make_unique<TransmiterAudio>(ip_address, 5000);
 		startThread(it.get());
 		live_sessions.insert(key, std::move(it));
 		return;

@@ -2,8 +2,8 @@
 
 #include "TransmiterVideo.h"
 
-Session::Session(const QHostAddress& local_ip6_, const qint16 video_port_, const qint16 audio_port_)
-	: local_ip6(local_ip6_), video_port(video_port_), audio_port(audio_port_) {}
+Session::Session(const QHostAddress& ip_address_, const qint16 video_port_, const qint16 audio_port_)
+	: ip_address(ip_address_), video_port(video_port_), audio_port(audio_port_) {}
 
 gboolean Session::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
 	GMainLoop* loop = (GMainLoop*)data;
@@ -43,4 +43,17 @@ gboolean Session::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
 			break;
 	}
 	return TRUE;
+}
+
+const char* Session::representIP(const QHostAddress& ext_ip_address) {
+	char* ip_char_string = nullptr;
+	if (ext_ip_address.protocol() == QAbstractSocket::IPv4Protocol) {
+		ip_char_string = new char[ext_ip_address.toString().size()];
+		strcpy(ip_char_string, ext_ip_address.toString().toStdString().c_str());
+	}
+	if (ext_ip_address.protocol() == QAbstractSocket::IPv6Protocol) {  // needs processing
+		ip_char_string = new char[ext_ip_address.toString().size()];
+		strcpy(ip_char_string, ext_ip_address.toString().toStdString().c_str());
+	}
+	return ip_char_string;
 }

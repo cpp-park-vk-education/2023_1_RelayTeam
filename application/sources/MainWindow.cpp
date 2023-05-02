@@ -117,8 +117,6 @@ void MainWindow::onScanNetworkButtonPressed() {
 }
 void MainWindow::saveAllChanges()
 
-
-
 {
 	for (size_t i = 0; i < devices_layout->count(); ++i) {
 		data_base.saveDeviceChanges(static_cast<DeviceWidget*>(devices_layout->itemAt(i)));
@@ -137,9 +135,9 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	}
 }
 
-void MainWindow::onDevicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address) {
+void MainWindow::onDevicePreparedToAdd(QString name, QHostAddress local_ipv4_address, QString mac_address) {
 	qDebug() << "Adding device: " << name;
-	DeviceWidget* device_widget = new DeviceWidget(mac_address, name, ipv6_address, 50, options->getScale());
+	DeviceWidget* device_widget = new DeviceWidget(mac_address, name, local_ipv4_address, 50, options->getScale());
 	makeDeviceConnections(device_widget);
 	devices_layout->addLayout(device_widget);
 	data_base.addDevice(device_widget);
@@ -154,11 +152,11 @@ void MainWindow::getDeviceIds() {
 	emit sendDeviceIdsUpdated(device_ids);
 }
 
-void MainWindow::onUpdateAddress(QString mac_address, QHostAddress ipv6_address) {
+void MainWindow::onUpdateAddress(QString mac_address, QHostAddress local_ipv4_address) {
 	for (size_t i = 0; i < devices_layout->count(); ++i) {
 		if (static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID == mac_address) {
-			qDebug() << "Updating ipv6 for" << static_cast<DeviceWidget*>(devices_layout->itemAt(i))->name;
-			static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ipv6_address = ipv6_address;
+			qDebug() << "Updating local ipv4 for" << static_cast<DeviceWidget*>(devices_layout->itemAt(i))->name;
+			static_cast<DeviceWidget*>(devices_layout->itemAt(i))->local_ipv4_address = local_ipv4_address;
 			return;
 		}
 	}

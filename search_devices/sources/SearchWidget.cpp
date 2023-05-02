@@ -25,20 +25,18 @@ SearchWidget::SearchWidget(qreal scale_, QWidget* parent)
 	connect(this, &QListWidget::itemClicked, this, &SearchWidget::onSelected);
 }
 
-void SearchWidget::onDiscovered(const QMdnsEngine::Service& service) {
+void SearchWidget::onDiscovered(const QMdnsEngine::Service service) {
 	qDebug() << service.name() << "discovered!";
 	if (QString(service.type()) != QString("_mrelay-connect._tcp.local.") || service_item_map.contains(getServiceName(service))) {
 		return;
 	}
-
 	ServiceItem* service_item = new ServiceItem(service, scale);
 	service_item_map[getServiceName(service)] = service_item;
 	this->addItem(service_item);
 	this->setItemWidget(service_item, service_item->getWidget());
-	//	connect(service_item->getAddButton(), QPushButton::clicked(), this, &SearchWidget::onAddButtonClicked);
 }
 
-void SearchWidget::onServiceRemoved(const QMdnsEngine::Service& service) {
+void SearchWidget::onServiceRemoved(const QMdnsEngine::Service service) {
 	if (QString(service.type()) != QString("_mrelay-connect._tcp.local.") || !service_item_map.contains(getServiceName(service))) {
 		return;
 	}
@@ -47,9 +45,8 @@ void SearchWidget::onServiceRemoved(const QMdnsEngine::Service& service) {
 	service_item_map.remove(getServiceName(service));
 	delete service_item;
 }
-
-void SearchWidget::onServiceUpdated(
-	const QMdnsEngine::Service& service) {  // No updated signals for some reason. Handling with discovered and removed currently.
+// No updated signals for some reason. Handling with discovered and removed currently.
+void SearchWidget::onServiceUpdated(QMdnsEngine::Service service) {
 	if (QString(service.type()) != QString("_mrelay-connect._tcp.local.")) {
 		return;
 	}
@@ -76,7 +73,7 @@ void SearchWidget::onSelected(QListWidgetItem* item_) {
 		service_item->setResolved(address);
 		QMdnsEngine::Message message;
 		QMdnsEngine::Query query;
-		query.setName("mrelay-request-mac-address");
+		query.setName("mrelay-request-initialization");
 		query.setType(2222);
 		message.addQuery(query);
 		query.setName(getServiceName(service_item->getService()).toUtf8());
@@ -89,31 +86,26 @@ void SearchWidget::onSelected(QListWidgetItem* item_) {
 	});
 }
 
-void SearchWidget::onMessageReceived(const QMdnsEngine::Message& message_received) {
+void SearchWidget::onMessageReceived(const QMdnsEngine::Message message_received) {
 	QList<QMdnsEngine::Query> queries = message_received.queries();
-	if (message_received.transactionId() == 2435) {
-		if (queries[0].name() == "mrelay-ports-responce.") {
-			qint16 video_port = queries[1].type();
-			qint16 audio_port = queries[2].type();
-			qDebug() << "got port responce from: " << message_received.address().toString() << "which contains video port: " << video_port
-					 << " audio port:" << audio_port;
-
-			emit sendReceivedPorts(QHostAddress(message_received.address()), video_port, audio_port);
-		}
+	if (message_received.transactionId() == 2435 && queries[0].name() == "mrelay-ports-response.") {  // prcesses port request response
+		qint16 video_port = queries[1].type();
+		qint16 audio_port = queries[2].type();
+		qDebug() << "got port responce from: " << message_received.address().toString() << "which contains video port: " << video_port
+				 << " audio port:" << audio_port;
+		emit sendReceivedPorts(QHostAddress(message_received.address()), video_port, audio_port);
 	}
-	if (message_received.transactionId() != 3663 || queries.size() != 3) {
-		return;
-	}
-	if (queries[0].name() == "mrelay-answer-mac-address.") {
+	if (message_received.transactionId() == 3663 && queries[0].name() == "mrelay-answer-initialization.") {
 		QString service_name = queries[1].name().left(queries[1].name().size() - 1);
 		QString mac_address = queries[2].name().left(queries[2].name().size() - 1);
+		QHostAddress local_ipv4_address = QHostAddress(QString(queries[3].name().left(queries[3].name().size() - 1)));
 		ServiceItem* service_item = service_item_map[service_name];
 		qDebug() << "got requested mac address from: " << service_name << "which is: " << mac_address;
-		service_item->setMacAddress(mac_address);
+		service_item->setInitialised(mac_address, local_ipv4_address);
 		if (device_ids.contains(mac_address)) {
 			qDebug() << "Service item already added. Updating address.";
 			service_item->setAlreadyAdded();
-			emit sendUpdateAddress(mac_address, message_received.address());
+			emit sendUpdateAddress(mac_address, local_ipv4_address);
 			return;
 		}
 	}
@@ -134,26 +126,25 @@ void SearchWidget::onAddButtonCLicked() {
 		qDebug() << "Can't add device. Device already added.";
 		return;
 	}
-
 	service_item->setAlreadyAdded();
-	emit devicePreparedToAdd(service_item->getService().name(), service_item->getIPv6Address(), service_item->getMacAddress());
+	emit devicePreparedToAdd(service_item->getService().name(), service_item->getLocalIPv4Address(), service_item->getMacAddress());
 }
 
 void SearchWidget::onDeviceIdsUpdated(QSet<QString> device_ids_) {
 	device_ids = std::move(device_ids_);
 }
 
-void SearchWidget::onStartReciver(const QHostAddress& local_ip6, const QString& session_type) {
-	qDebug() << "sending receive request to: " << QHostAddress(local_ip6).toString() << " from: " << getIPv6();
+void SearchWidget::onStartReciver(const QHostAddress ip_address, const QString session_type) {
+	qDebug() << "sending receive request to: " << QHostAddress(ip_address).toString() << " from: " << getIPv6();
 	QMdnsEngine::Message message;
 	QMdnsEngine::Query query;
-	query.setName("mrelay-start-receiving-session");
+	query.setName("mrelay-request-start-receiving-session");
 	query.setType(7575);
 	message.addQuery(query);
 	query.setName(session_type.toUtf8());
 	query.setType(7575);
 	message.addQuery(query);
-	message.setAddress(local_ip6);
+	message.setAddress(ip_address);
 	message.setPort(5353);
 	message.setTransactionId(3645);
 	server.sendMessage(message);

@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-TransmiterAudio::TransmiterAudio(const QHostAddress& local_ip6_, const qint16 audio_port_) : Session(local_ip6_, -1, audio_port_) {}
+TransmiterAudio::TransmiterAudio(const QHostAddress& ip_address_, const qint16 audio_port_) : Session(ip_address_, -1, audio_port_) {}
 
 TransmiterAudio::~TransmiterAudio() {
     // gst_object_unref(data.bus);
@@ -37,7 +37,7 @@ void TransmiterAudio::addLinkAudio() {
         return;
     }
 
-	g_object_set(udpsink2, "sync", FALSE, "host", local_ip6.toString().toLocal8Bit().constData(), "port", audio_port, NULL);
+	g_object_set(udpsink2, "sync", FALSE, "host", representIP(ip_address), "port", audio_port, NULL);
 }
 
 void TransmiterAudio::onStartSession() {

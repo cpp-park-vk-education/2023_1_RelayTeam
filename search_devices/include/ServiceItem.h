@@ -28,6 +28,7 @@ private:
 	bool is_resolved;
 	QString mac_address;
 	QHostAddress ipv6_address;
+	QHostAddress local_ipv4_address;
 
 public:
 	ServiceItem(const QMdnsEngine::Service& service_, qreal scale);
@@ -57,6 +58,10 @@ public:
 		return ipv6_address;
 	}
 
+	inline QHostAddress getLocalIPv4Address() {
+		return local_ipv4_address;
+	}
+
 	inline bool getResolved() {
 		return is_resolved;
 	}
@@ -70,7 +75,8 @@ public:
 		return is_added;
 	}
 
-	inline void setMacAddress(const QString& mac_address_) {
+	inline void setInitialised(const QString& mac_address_, const QHostAddress& local_ipv4_address_) {
+		local_ipv4_address = local_ipv4_address_;
 		mac_address = mac_address_;
 		connection_status_icon->setStyleSheet("QLabel {background-color : green}");
 	}

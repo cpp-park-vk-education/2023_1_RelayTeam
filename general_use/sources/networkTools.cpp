@@ -1,6 +1,6 @@
 #include "networkTools.h"
 
-QHostAddress getLocalIP() {
+QHostAddress getLocalIPv4() {
 	QHostAddress local_ip;
 	QHostInfo info = QHostInfo::fromName(QHostInfo::localHostName());
 	// Iterate through all the IP addresses and print them
@@ -48,9 +48,18 @@ QHostAddress getIPv6() {
 	return local_ipv6;
 }
 
+void addressList() {
+	const QHostAddress& localhost = QHostAddress(QHostAddress::LocalHost);
+	qDebug() << "++++";
+	for (const QHostAddress& address : QNetworkInterface::allAddresses()) {
+		qDebug() << address.toString();
+	}
+	qDebug() << "----";
+}
+
 QString processIPv6(const QHostAddress& ipv6_address) {
-	QString ipv6_string = ipv6_address.toString();
+	//	QString ipv6_string = ipv6_address.toString();
+	//	ipv6_string = ipv6_string.left(24) + QString("%wlan0");
 	//	ipv6_string = QString("[") + ipv6_string + QString("]");
-	qDebug() << ipv6_string;
-	return ipv6_string;
+	return ipv6_address.toString();
 }

@@ -17,7 +17,7 @@ private:
 	void startSend();
 
 public:
-	explicit TransmiterAudio(const QHostAddress& local_ip6_, const qint16 audio_port_);
+	explicit TransmiterAudio(const QHostAddress& ip_address_, const qint16 audio_port_);
 
 	~TransmiterAudio();
 

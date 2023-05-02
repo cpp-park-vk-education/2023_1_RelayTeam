@@ -2,10 +2,10 @@
 
 #include <networkTools.h>
 
-#include "QtNetwork/qhostaddress.h"
+#include "QtNetwork/QHostAddress"
 
-TransmiterVideo::TransmiterVideo(const QHostAddress& local_ip6_, const qint16 video_port_, const qint16 audio_port_)
-	: Session(local_ip6_, video_port_, audio_port_) {}
+TransmiterVideo::TransmiterVideo(const QHostAddress& ip_address_, const qint16 video_port_, const qint16 audio_port_)
+	: Session(ip_address_, video_port_, audio_port_) {}
 
 TransmiterVideo::~TransmiterVideo() {}
 
@@ -56,8 +56,7 @@ void TransmiterVideo::addLinkVideo() {
         return;
 	}
 
-	//	g_object_set(udpsink1, "sync", FALSE, "host", processIPv6(local_ip6).toStdString().c_str(), "port", video_port, NULL);
-	g_object_set(udpsink1, "sync", FALSE, "host", getLocalIP().toString().toStdString().c_str(), "port", video_port, NULL);
+	g_object_set(udpsink1, "sync", FALSE, "host", representIP(ip_address), "port", video_port, NULL);
     g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2200, NULL);
 }
 
@@ -89,8 +88,7 @@ void TransmiterVideo::addLinkAudio() {
         return;
     }
 
-	//	g_object_set(udpsink2, "sync", FALSE, "host", processIPv6(local_ip6).toStdString().c_str(), "port", audio_port, NULL);
-	g_object_set(udpsink2, "sync", FALSE, "host", getLocalIP().toString().toStdString().c_str(), "port", audio_port, NULL);
+	g_object_set(udpsink2, "sync", FALSE, "host", representIP(ip_address), "port", audio_port, NULL);
 }
 
 void TransmiterVideo::onStartSession() {
@@ -98,6 +96,7 @@ void TransmiterVideo::onStartSession() {
 	//	while (true) {
 	//		qDebug() << "video transmitter loop";
 	//	}
+
     gst_init(nullptr, nullptr);
     addLinkVideo();
     addLinkAudio();

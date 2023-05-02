@@ -10,7 +10,7 @@ void DBManager::createDB() {
 		"create table Device("
 		"ID VARCHAR(17) primary key,"
 		"name VARCHAR(20),"
-		"ipv6_address VARCHAR(39),"
+		"local_ipv4_address VARCHAR(39),"
 		"volume integer)");
 	if (!query.exec()) {
 		qDebug() << "Error adding Device table to database: " << sql_data_base.lastError().text();
@@ -95,12 +95,12 @@ void DBManager::addDevice(DeviceWidget* device) {  // change to "DeviceWidget* d
 		"INSERT INTO Device("
 		"ID,"
 		"name,"
-		"ipv6_address,"
+		"local_ipv4_address,"
 		"volume)"
-		"VALUES(:ID, :name, :ipv6_address, :volume);");
+		"VALUES(:ID, :name, :local_ipv4_address, :volume);");
 	query.bindValue(":ID", device->ID);
 	query.bindValue(":name", device->name);
-	query.bindValue(":ipv6_address", device->ipv6_address.toString());
+	query.bindValue(":local_ipv4_address", device->local_ipv4_address.toString());
 	query.bindValue(":volume", device->volume);
 	if (!query.exec()) {
 		qDebug() << "Error adding Device to data base." << sql_data_base.lastError().text();
@@ -113,7 +113,7 @@ void DBManager::getDevices(QVBoxLayout* device_layout, qreal scale) {
 		while (query.next()) {
 			DeviceWidget* current_device =
 				new DeviceWidget(query.value("ID").toString(), query.value("name").toString(),
-								 QHostAddress(query.value("ipv6_address").toString()), query.value("volume").toInt(), scale);
+								 QHostAddress(query.value("local_ipv4_address").toString()), query.value("volume").toInt(), scale);
 			device_layout->addLayout(current_device);
 		}
 	} else {

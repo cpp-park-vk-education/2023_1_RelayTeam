@@ -4,7 +4,9 @@
 
 #include <QString>
 #include <QThread>
+#include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QHostAddress>
+#include <string>
 
 class Session : public QObject {
 private:
@@ -21,12 +23,15 @@ protected:
 		GstMessage* msg;
 	} CustomData;
 
-	Session(const QHostAddress& local_ip6_, const qint16 video_port_, const qint16 audio_port_);
+	Session(const QHostAddress& ip_address_, const qint16 video_port_, const qint16 audio_port_);
 
 	CustomData data;
-	QHostAddress local_ip6;
+	QHostAddress ip_address;
 	qint16 video_port;
 	qint16 audio_port;
+
+public:
+	const static char* representIP(const QHostAddress& ext_ip_address);
 
 public slots:
 	virtual void onStartSession() = 0;

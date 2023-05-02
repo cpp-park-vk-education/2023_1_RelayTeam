@@ -40,27 +40,27 @@ public:
 	SearchWidget(qreal scale_, QWidget* parent = nullptr);
 
 private slots:
-	void onDiscovered(const QMdnsEngine::Service& service);
+	void onDiscovered(QMdnsEngine::Service service);
 
-	void onServiceRemoved(const QMdnsEngine::Service& service);
+	void onServiceRemoved(QMdnsEngine::Service service);
 
-	void onServiceUpdated(const QMdnsEngine::Service& service);
+	void onServiceUpdated(QMdnsEngine::Service service);
 
 	void onSelected(QListWidgetItem* item);
 
-	void onMessageReceived(const QMdnsEngine::Message& message_received);
+	void onMessageReceived(QMdnsEngine::Message message_received);
 
 public slots:
 	void onAddButtonCLicked();
 
 	void onDeviceIdsUpdated(QSet<QString> device_ids_);
 
-	void onStartReciver(const QHostAddress& local_ip6, const QString& session_type);
+	void onStartReciver(const QHostAddress ip_address, const QString session_type);
 
 signals:
 	void devicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
 
-	void sendUpdateAddress(QString mac_address, QHostAddress ipv6_address);
+	void sendUpdateAddress(QString mac_address, QHostAddress local_ipv4_address);
 
-	void sendReceivedPorts(const QHostAddress& ipv6_address, qint16 video_port, qint16 audio_port);
+	void sendReceivedPorts(const QHostAddress ipv6_address, qint16 video_port, qint16 audio_port);
 };

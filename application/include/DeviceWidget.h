@@ -31,12 +31,13 @@ public:
 	const QString ID;
 	qint16 volume;
 	QString name;
-	QHostAddress ipv6_address;
+	QHostAddress local_ipv4_address;
 
-	explicit DeviceWidget(QString ID_, const QString& name_, const QHostAddress& ipv6_address_, qint16 volume_, qreal scale,
+	explicit DeviceWidget(QString ID_, const QString& name_, const QHostAddress& local_ipv4_address_, qint16 volume_, qreal scale,
 						  QWidget* parent = nullptr);
 
-	explicit DeviceWidget(QString ID_, QString&& name_, const QHostAddress&, qint16 volume_, qreal scale, QWidget* parent = nullptr);
+	explicit DeviceWidget(QString ID_, QString&& name_, const QHostAddress& local_ipv4_address_, qint16 volume_, qreal scale,
+						  QWidget* parent = nullptr);
 
 private slots:
 	void onAudioPressed();

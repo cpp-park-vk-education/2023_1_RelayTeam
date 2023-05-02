@@ -5,7 +5,7 @@
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QNetworkInterface>
 
-QHostAddress getLocalIP();
+QHostAddress getLocalIPv4();
 
 QHostAddress getLocalIPv6();
 

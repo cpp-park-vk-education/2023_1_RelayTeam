@@ -25,21 +25,21 @@ public:
 	~SessionManager();
 
 public slots:
-	void onStartVideoSession(const QHostAddress local_ip6);
+	void onStartVideoSession(const QHostAddress ip_address);
 
-	void onStartAudioSession(const QHostAddress local_ip6);
+	void onStartAudioSession(const QHostAddress ip_address);
 
-	void onKillVideoSession(const QHostAddress local_ip6);
+	void onKillVideoSession(const QHostAddress ip_address);
 
-	void onKillAudioSession(const QHostAddress local_ip6);
+	void onKillAudioSession(const QHostAddress ip_address);
 
 	void onStartReceivingSession(const QMdnsEngine::Message message_received, const QString session_type);
 
-	void onKillVideoReciver(const QHostAddress local_ip6);
+	void onKillVideoReciver(const QHostAddress ip_address);
 
-	void onKillAudioReciver(const QHostAddress local_ip6);
+	void onKillAudioReciver(const QHostAddress ip_address);
 
-	void onReceivedPorts(const QHostAddress local_ip6, qint16 video_port, qint16 audio_port);
+	void onReceivedPorts(const QHostAddress ip_address, qint16 video_port, qint16 audio_port);
 
 signals:
 	void sendErrorOccured(const QString error_string);

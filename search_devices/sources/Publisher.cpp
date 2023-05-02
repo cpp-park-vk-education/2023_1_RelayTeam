@@ -19,32 +19,26 @@ Publisher::Publisher(const QString& device_name, QWidget* parent)
 	qDebug() << device_name << " published";
 }
 
-void Publisher::onHostnameChanged(const QByteArray& hostname) {
-	qDebug() << QString("Hostname changed to ") + (QString(hostname));
+void Publisher::onHostnameChanged(const QByteArray hostname) {
+	qDebug() << QString("Hostname changed to: ") + (QString(hostname));
 }
 
-void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) {
+void Publisher::onMessageReceived(const QMdnsEngine::Message message_received) {
 	QList<QMdnsEngine::Query> queries = message_received.queries();
-	if (message_received.transactionId() == 3645) {
-		if (queries.front().name() == "mrelay-start-receiving-session.") {
-			QString session_type = queries[1].name().left(queries[1].name().size() - 1);
-			qDebug() << "received request for receiving session from" << message_received.address().toString()
-					 << "\n session type is: " << session_type;
-			qDebug() << "CURRENT RECEIVED MESSAGE port: " << message_received.port() << "address: " << message_received.address()
-					 << "trankated: " << message_received.isTruncated();
-			emit sendStartReceivingSession(message_received, session_type);
-		}
+	if (message_received.transactionId() == 3645 && queries.front().name() == "mrelay-request-start-receiving-session.") {
+		QString session_type = queries[1].name().left(queries[1].name().size() - 1);
+		qDebug() << "received request for receiving session from" << message_received.address().toString()
+				 << "\n session type is: " << session_type;
+		qDebug() << "CURRENT RECEIVED MESSAGE port: " << message_received.port() << "address: " << message_received.address()
+				 << "trankated: " << message_received.isTruncated();
+		emit sendStartReceivingSession(message_received, session_type);
 		return;
 	}
-
-	if (message_received.transactionId() != 1264) {
-		return;
-	}
-	if (queries.front().name() == "mrelay-request-mac-address.") {
-		qDebug() << "mrelay-request-mac-address. query recieved";
+	if (message_received.transactionId() == 1264 && queries.front().name() == "mrelay-request-initialization.") {
+		qDebug() << "mrelay-request-initialization. query recieved";
 		QMdnsEngine::Message message;
 		QMdnsEngine::Query query;
-		query.setName("mrelay-answer-mac-address");
+		query.setName("mrelay-answer-initialization");
 		query.setType(2222);
 		message.addQuery(query);
 		query.setName(queries.back().name());
@@ -53,23 +47,26 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message& message_received) 
 		query.setName(getMacAddress().toUtf8());
 		query.setType(2222);
 		message.addQuery(query);
+		query.setName(getLocalIPv4().toString().toUtf8());
+		query.setType(2222);
+		message.addQuery(query);
 		message.reply(message_received);
 		message.setTransactionId(3663);
 		server.sendMessage(message);
 	}
 }
 
-void Publisher::onChangeServiceName(const QString& service_name) {
+void Publisher::onChangeServiceName(const QString service_name) {
 	qDebug() << "changing service name to: " << service_name;
 	service.setName(service_name.toUtf8());
 	provider.update(service);
 }
 
-void Publisher::onSendPorts(const QMdnsEngine::Message& message_received, qint16 video_port, qint16 audio_port) {
+void Publisher::onSendPorts(const QMdnsEngine::Message message_received, qint16 video_port, qint16 audio_port) {
 	qDebug() << "sending ports: " << video_port << "  " << audio_port << "to: " << message_received.address();
 	QMdnsEngine::Message message;
 	QMdnsEngine::Query query;
-	query.setName("mrelay-ports-responce");
+	query.setName("mrelay-ports-response");
 	query.setType(2222);
 	message.addQuery(query);
 	query.setName("type value");
