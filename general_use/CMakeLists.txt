@@ -30,3 +30,18 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include
 )
 
+if(BUILD_TESTS)
+	find_package(GTest REQUIRED)
+	add_executable(general_use_tests
+		${CMAKE_CURRENT_LIST_DIR}/tests/tests.cpp
+	)
+    target_link_libraries(general_use_tests
+		GTest::gtest
+		GTest::gtest_main
+		${PROJECT_NAME}
+		Qt5::Widgets
+		Qt5::Network
+	)
+    enable_testing()
+	add_test(NAME unit_tests COMMAND tests)
+endif()

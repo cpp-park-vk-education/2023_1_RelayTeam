@@ -17,6 +17,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(BUILD_TESTS "Build tests" ON)
+option(BUILD_DOCS "Build documentation" ON)
+option(BUILD_COVERAGE "Build code coverage" OFF)
+
 set(QT_DEBUG_PLUGINS 1)
 
 add_subdirectory(general_use)
@@ -25,13 +29,5 @@ add_subdirectory(gstreamer_interface)
 add_subdirectory(bluetooth)
 add_subdirectory(application)
 
-if(BUILD_DOCS)
-  set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/_docs)
-#  set(DOXYGEN_EXAMPLE_PATH examples)
-  set(DOXYGEN_GENERATE_HTML NO)
-  set(DOXYGEN_GENERATE_MAN YES)
-  find_package(Doxygen)
-  doxygen_add_docs(docs include)
-  install(DIRECTORY ${DOXYGEN_OUTPUT_DIRECTORY}/man DESTINATION share)
-  # add_dependencies(install docs) need to call target docs before install or package
-endif()
+
+

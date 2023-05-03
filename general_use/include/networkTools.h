@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QAbstractSocket>
 #include <QString>
+#include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QNetworkInterface>
 
