@@ -46,25 +46,25 @@ void SessionManager::onKillAudioSession(const QHostAddress ip_address) {
 	}
 }
 
-void SessionManager::onStartReceivingSession(const QMdnsEngine::Message message_received, const QString session_type) {
-	qDebug() << "Starting receiving session" << message_received.address() << " " << session_type;
+void SessionManager::onStartReceivingSession(const QHostAddress ip_address, const QString session_type) {
+	qDebug() << "Starting receiving session" << ip_address << " " << session_type;
 	const qint16& video_port = 5228;
 	const qint16& audio_port = 5229;
 
 	if (session_type == "audio") {
-		QPair<QHostAddress, QString> key = qMakePair(message_received.address(), QString("ReciverVideo"));
+		QPair<QHostAddress, QString> key = qMakePair(ip_address, QString("ReciverVideo"));
 		auto it = std::make_unique<ReciverAudio>(audio_port);
 		startThread(it.get());
 		live_sessions.insert(key, std::move(it));
-		emit sendSetPorts(message_received, -1, audio_port);  // use -1 for unused ports
+		emit sendSetPorts(ip_address, -1, audio_port);  // use -1 for unused ports
 	}
 
 	if (session_type == "video") {
-		QPair<QHostAddress, QString> key = qMakePair(message_received.address(), QString("ReciverAudio"));
+		QPair<QHostAddress, QString> key = qMakePair(ip_address, QString("ReciverAudio"));
 		auto it = std::make_unique<ReciverVideo>(video_port, audio_port);
 		startThread(it.get());
 		live_sessions.insert(key, std::move(it));
-		emit sendSetPorts(message_received, video_port, audio_port);  // use -1 for unused ports
+		emit sendSetPorts(ip_address, video_port, audio_port);  // use -1 for unused ports
 	}
 }
 
@@ -86,7 +86,7 @@ void SessionManager::onKillAudioReciver(const QHostAddress ip_address) {
 	}
 }
 
-void SessionManager::onReceivedPorts(const QHostAddress ip_address, qint16 video_port, qint16 audio_port) {
+void SessionManager::onReceivedPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port) {
 	qDebug() << "Starting transmittion session" << ip_address.toString() << " " << video_port << " " << audio_port;
 	if (video_port > -1 && audio_port > -1) {
 		QPair<QHostAddress, QString> key = qMakePair(QHostAddress(ip_address), QString("TransmiterVideo"));

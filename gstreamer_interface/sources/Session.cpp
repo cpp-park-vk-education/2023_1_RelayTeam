@@ -2,7 +2,7 @@
 
 #include "TransmiterVideo.h"
 
-Session::Session(const QHostAddress& ip_address_, const qint16 video_port_, const qint16 audio_port_)
+Session::Session(const QHostAddress& ip_address_, const qint32 video_port_, const qint32 audio_port_)
 	: ip_address(ip_address_), video_port(video_port_), audio_port(audio_port_) {}
 
 gboolean Session::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {

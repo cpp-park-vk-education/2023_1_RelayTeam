@@ -89,18 +89,19 @@ void SearchWidget::onSelected(QListWidgetItem* item_) {
 void SearchWidget::onMessageReceived(const QMdnsEngine::Message message_received) {
 	QList<QMdnsEngine::Query> queries = message_received.queries();
 	if (message_received.transactionId() == 2435 && queries[0].name() == "mrelay-ports-response.") {  // prcesses port request response
-		qint16 video_port = queries[1].type();
-		qint16 audio_port = queries[2].type();
-		qDebug() << "got port responce from: " << message_received.address().toString() << "which contains video port: " << video_port
+		qint32 video_port = queries[1].type();
+		qint32 audio_port = queries[2].type();
+		QHostAddress localipv4_address = QHostAddress(QString(queries[3].name().left(queries[3].name().size() - 1)));
+		qDebug() << "got port responce from: " << localipv4_address.toString() << "which contains video port: " << video_port
 				 << " audio port:" << audio_port;
-		emit sendReceivedPorts(QHostAddress(message_received.address()), video_port, audio_port);
+		emit sendReceivedPorts(localipv4_address, video_port, audio_port);
 	}
 	if (message_received.transactionId() == 3663 && queries[0].name() == "mrelay-answer-initialization.") {
 		QString service_name = queries[1].name().left(queries[1].name().size() - 1);
 		QString mac_address = queries[2].name().left(queries[2].name().size() - 1);
 		QHostAddress local_ipv4_address = QHostAddress(QString(queries[3].name().left(queries[3].name().size() - 1)));
 		ServiceItem* service_item = service_item_map[service_name];
-		qDebug() << "got requested mac address from: " << service_name << "which is: " << mac_address;
+		qDebug() << "got mrelay-answer-initialization from: " << service_name;
 		service_item->setInitialised(mac_address, local_ipv4_address);
 		if (device_ids.contains(mac_address)) {
 			qDebug() << "Service item already added. Updating address.";
@@ -135,13 +136,16 @@ void SearchWidget::onDeviceIdsUpdated(QSet<QString> device_ids_) {
 }
 
 void SearchWidget::onStartReciver(const QHostAddress ip_address, const QString session_type) {
-	qDebug() << "sending receive request to: " << QHostAddress(ip_address).toString() << " from: " << getIPv6();
+	qDebug() << "sending receive request to: " << ip_address.toString() << " from: " << getLocalIPv4();
 	QMdnsEngine::Message message;
 	QMdnsEngine::Query query;
 	query.setName("mrelay-request-start-receiving-session");
 	query.setType(7575);
 	message.addQuery(query);
 	query.setName(session_type.toUtf8());
+	query.setType(7575);
+	message.addQuery(query);
+	query.setName(getLocalIPv4().toString().toUtf8());
 	query.setType(7575);
 	message.addQuery(query);
 	message.setAddress(ip_address);

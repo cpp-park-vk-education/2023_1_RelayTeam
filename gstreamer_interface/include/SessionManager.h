@@ -33,13 +33,13 @@ public slots:
 
 	void onKillAudioSession(const QHostAddress ip_address);
 
-	void onStartReceivingSession(const QMdnsEngine::Message message_received, const QString session_type);
+	void onStartReceivingSession(const QHostAddress ip_address, const QString session_type);
 
 	void onKillVideoReciver(const QHostAddress ip_address);
 
 	void onKillAudioReciver(const QHostAddress ip_address);
 
-	void onReceivedPorts(const QHostAddress ip_address, qint16 video_port, qint16 audio_port);
+	void onReceivedPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
 
 signals:
 	void sendErrorOccured(const QString error_string);
@@ -56,5 +56,5 @@ signals:
 
 	void sendStartReciver(const QHostAddress local_ip6, const QString session_type);
 
-	void sendSetPorts(const QMdnsEngine::Message message_received, qint16 video_port, qint16 audio_port);
+	void sendSetPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
 };

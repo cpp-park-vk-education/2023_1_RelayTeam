@@ -2,13 +2,13 @@
 
 QHostAddress getLocalIPv4() {
 	QHostAddress local_ip;
-	QHostInfo info = QHostInfo::fromName(QHostInfo::localHostName());
-	// Iterate through all the IP addresses and print them
-	foreach (const QHostAddress& address, info.addresses()) {
-		if (address.protocol() == QAbstractSocket::IPv4Protocol) {
+	const QHostAddress& localhost = QHostAddress(QHostAddress::LocalHost);
+	for (const QHostAddress& address : QNetworkInterface::allAddresses()) {
+		if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost) {
 			local_ip = address;
 		}
 	}
+	qDebug() << "Your local ipv4 is: " << local_ip.toString();
 	return local_ip;
 }
 

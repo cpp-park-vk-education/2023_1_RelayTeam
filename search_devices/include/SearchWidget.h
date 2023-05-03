@@ -62,5 +62,5 @@ signals:
 
 	void sendUpdateAddress(QString mac_address, QHostAddress local_ipv4_address);
 
-	void sendReceivedPorts(const QHostAddress ipv6_address, qint16 video_port, qint16 audio_port);
+	void sendReceivedPorts(const QHostAddress ipv6_address, qint32 video_port, qint32 audio_port);
 };
