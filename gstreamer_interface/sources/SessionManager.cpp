@@ -2,28 +2,6 @@
 
 #include <networkTools.h>
 
-bool SessionManager::portIsBusy(QString ip, qint16 port) {
-    QTcpSocket* socket = new QTcpSocket(this);
-    socket->connectToHost(ip, port);
-    qint8 msecs_delay_time = 100;
-    if (socket->waitForConnected(msecs_delay_time)) {
-        socket->disconnectFromHost();
-        return true;
-    } else {
-        return false;
-    }
-}
-
-qint16 SessionManager::getPort() {
-    qint16 startRangeSearch = 4000;
-    qint16 stopRangeSearch = 5000;
-    for (qint16 i = startRangeSearch; i < stopRangeSearch; i++) {
-        if (!this->portIsBusy("localhost", i)) {
-            return i;
-        };
-    }
-}
-
 SessionManager::SessionManager() {}
 
 SessionManager::~SessionManager() {
