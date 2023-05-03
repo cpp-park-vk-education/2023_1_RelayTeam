@@ -36,7 +36,6 @@ if(BUILD_TESTS)
 		${CMAKE_CURRENT_LIST_DIR}/tests/tests.cpp
 	)
     target_link_libraries(general_use_tests
-		GTest::gtest
 		GTest::gtest_main
 		${PROJECT_NAME}
 		Qt5::Widgets

@@ -34,20 +34,6 @@ QString getMacAddress() {
 	return QString();
 }
 
-QHostAddress getIPv6() {
-	QHostAddress local_ipv6;
-	QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-	foreach (QNetworkInterface interface, interfaces) {
-		QList<QNetworkAddressEntry> entries = interface.addressEntries();
-		foreach (QNetworkAddressEntry entry, entries) {
-			if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol) {
-				local_ipv6 = entry.ip();
-			}
-		}
-	}
-	return local_ipv6;
-}
-
 void addressList() {
 	const QHostAddress& localhost = QHostAddress(QHostAddress::LocalHost);
 	qDebug() << "++++";
@@ -55,11 +41,4 @@ void addressList() {
 		qDebug() << address.toString();
 	}
 	qDebug() << "----";
-}
-
-QString processIPv6(const QHostAddress& ipv6_address) {
-	//	QString ipv6_string = ipv6_address.toString();
-	//	ipv6_string = ipv6_string.left(24) + QString("%wlan0");
-	//	ipv6_string = QString("[") + ipv6_string + QString("]");
-	return ipv6_address.toString();
 }

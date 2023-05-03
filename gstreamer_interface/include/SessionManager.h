@@ -4,7 +4,6 @@
 #include <ReciverVideo.h>
 #include <TransmiterAudio.h>
 #include <TransmiterVideo.h>
-#include <qmdnsengine/message.h>
 
 #include <QMap>
 #include <QObject>
