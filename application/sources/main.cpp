@@ -2,7 +2,8 @@
 #include <QtDebug>
 
 #include "MainWindow.h"
-#include "PortScaner.h"
+// #include "PortScaner.h"
+#include "networkTools.h"
 #include "variables.h"
 
 int main(int argc, char* argv[]) {
@@ -14,7 +15,7 @@ int main(int argc, char* argv[]) {
     //	w.show();
 
     //	return a.exec();
-    PortScaner Scaner;
+    //    PortScaner Scaner;
 
-    qDebug() << Scaner.getPort(4000, 5000);
+    qDebug() << getPort(4000, 5000);
 }
