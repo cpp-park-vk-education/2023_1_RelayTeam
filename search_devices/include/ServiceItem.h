@@ -82,6 +82,6 @@ public:
 	}
 
 	inline QString getMacAddress() {
-		return ipv6_address.toString();
+		return mac_address;
 	}
 };
