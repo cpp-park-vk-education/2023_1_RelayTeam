@@ -15,8 +15,6 @@ int main(int argc, char* argv[]) {
 
     //	return a.exec();
     PortScaner Scaner;
-    //    127.0.0.54:53
-    //    qDebug() << Scaner.portIsBusy("127.0.0.54", 53);
-    //    qDebug() << Scaner.portIsBusy("localhost", 631);
-    qDebug() << Scaner.getPort();
+
+    qDebug() << Scaner.getPort(4000, 5000);
 }
