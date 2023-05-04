@@ -23,12 +23,11 @@ option(BUILD_TESTS "Build tests" ON)
 option(BUILD_DOCS "Build documentation" ON)
 option(BUILD_COVERAGE "Build code coverage" OFF)
 
-
 add_subdirectory(general_use)
 add_subdirectory(search_devices)
+add_subdirectory(ssh_server)
 add_subdirectory(gstreamer_interface)
 add_subdirectory(bluetooth)
-add_subdirectory(mr_server)
 add_subdirectory(application)
 
 

@@ -29,3 +29,25 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${GSTREAMER_INCLUDE_DIRS}
 )
 
+if(BUILD_TESTS)
+	file(GLOB TEST_FILES
+		${CMAKE_CURRENT_LIST_DIR}/tests/*.cpp
+	)
+
+    find_package(GTest REQUIRED)
+	add_executable(gstreamer_interface_tests
+		${TEST_FILES}
+	)
+
+    target_link_libraries(gstreamer_interface_tests
+		GTest::Main
+		${PROJECT_NAME}
+		Qt5::Core
+		Qt5::Network
+		general_use
+		${GSTREAMER_LIBRARIES}
+	)
+
+    enable_testing()
+	add_test(NAME unit_tests COMMAND tests)
+endif()

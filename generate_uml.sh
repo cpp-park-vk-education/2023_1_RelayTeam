@@ -17,4 +17,8 @@ plantuml search_devices_class_diagram.puml -tsvg
 [ -e application_class_diagram.svg ] && rm application_class_diagram.svg
 plantuml application_class_diagram.puml
 plantuml application_class_diagram.puml -tsvg
+[ -e MultiRelay_prototype_class_diagram.png ] && rm MultiRelay_prototype_class_diagram.png
+[ -e MultiRelay_prototype_class_diagram.svg ] && rm MultiRelay_prototype_class_diagram.svg
+plantuml MultiRelay_prototype_class_diagram.puml
+plantuml MultiRelay_prototype_class_diagram.puml -tsvg
 cd ..
