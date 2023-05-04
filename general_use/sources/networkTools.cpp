@@ -84,6 +84,9 @@ qint32 getPort(qint32 startRangeSearch, qint32 stopRangeSearch, QHostAddress ip_
                 if (!portIsBusy(ip_host_address, i)) {
                         return i;
                 };
+                if (i - startRangeSearch >= 10) {
+                        qDebug() << "Too many time spended to scanning ports - fix it";
+                };
         }
         return -1;
 }
