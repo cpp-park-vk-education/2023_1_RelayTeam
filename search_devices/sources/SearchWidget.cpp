@@ -34,6 +34,30 @@ void SearchWidget::onDiscovered(const QMdnsEngine::Service service) {
 	service_item_map[getServiceName(service)] = service_item;
 	this->addItem(service_item);
 	this->setItemWidget(service_item, service_item->getWidget());
+	QMdnsEngine::Resolver* resolver = new QMdnsEngine::Resolver(&server, service_item->getService().hostname(), &cache, this);
+	connect(resolver, &QMdnsEngine::Resolver::resolved, this, [this, service_item, resolver](const QHostAddress& address) {
+		if (address.protocol() != QAbstractSocket::IPv6Protocol) {
+			return;
+		}
+		if (service_item->getResolved()) {
+			return;
+		}
+		qDebug() << "resolved address: " << address.toString();
+		service_item->setResolved(address);
+		QMdnsEngine::Message message;
+		QMdnsEngine::Query query;
+		query.setName("mrelay-request-initialization");
+		query.setType(2222);
+		message.addQuery(query);
+		query.setName(getServiceName(service_item->getService()).toUtf8());
+		query.setType(2222);
+		message.addQuery(query);
+		message.setAddress(address);
+		message.setPort(5353);
+		message.setTransactionId(1264);
+		server.sendMessage(message);
+		delete resolver;
+	});
 }
 
 void SearchWidget::onServiceRemoved(const QMdnsEngine::Service service) {
@@ -55,36 +79,7 @@ void SearchWidget::onServiceUpdated(QMdnsEngine::Service service) {
 	qDebug() << service.name() << "updated!";
 }
 
-void SearchWidget::onSelected(QListWidgetItem* item_) {
-	ServiceItem* service_item = dynamic_cast<ServiceItem*>(item_);
-	if (resolver) {
-		delete resolver;
-		resolver = nullptr;
-	}
-	resolver = new QMdnsEngine::Resolver(&server, service_item->getService().hostname(), &cache, this);
-	connect(resolver, &QMdnsEngine::Resolver::resolved, this, [this, service_item](const QHostAddress& address) {
-		if (address.protocol() != QAbstractSocket::IPv6Protocol) {
-			return;
-		}
-		if (service_item->getResolved()) {
-			return;
-		}
-		qDebug() << "resolved address: " << address.toString();
-		service_item->setResolved(address);
-		QMdnsEngine::Message message;
-		QMdnsEngine::Query query;
-		query.setName("mrelay-request-initialization");
-		query.setType(2222);
-		message.addQuery(query);
-		query.setName(getServiceName(service_item->getService()).toUtf8());
-		query.setType(2222);
-		message.addQuery(query);
-		message.setAddress(address);
-		message.setPort(5353);
-		message.setTransactionId(1264);
-		server.sendMessage(message);
-	});
-}
+void SearchWidget::onSelected(QListWidgetItem* item_) {}
 
 void SearchWidget::onMessageReceived(const QMdnsEngine::Message message_received) {
 	QList<QMdnsEngine::Query> queries = message_received.queries();
