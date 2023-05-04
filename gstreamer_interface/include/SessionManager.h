@@ -8,8 +8,6 @@
 
 #include <QMap>
 #include <QObject>
-#include <QTcpSocket>
-#include <QtNetwork/QHostAddress>
 #include <cstring>
 
 class SessionManager : public QObject {
@@ -21,9 +19,6 @@ private:
     void startThread(Session* session);
 
 public:
-    bool portIsBusy(QString ip, qint16 port);
-    qint16 getPort();
-
     SessionManager();
 
     ~SessionManager();

@@ -64,11 +64,11 @@ QString processIPv6(const QHostAddress& ipv6_address) {
 	return ipv6_address.toString();
 }
 
-bool portIsBusy(QString ip, qint32 port) {
-        assert(port >= 1024);
-        assert(port <= 49151);
+bool portIsBusy(const QHostAddress& ipv4_address, qint32 port) {
+        Q_ASSERT(port >= 1024);
+        Q_ASSERT(port <= 49151);
         QTcpSocket* socket = new QTcpSocket();
-        socket->connectToHost(ip, port);
+        socket->connectToHost(ipv4_address, port);
         qint8 msecs_delay_time = 10;
         if (socket->waitForConnected(msecs_delay_time)) {
                 socket->disconnectFromHost();
@@ -78,10 +78,10 @@ bool portIsBusy(QString ip, qint32 port) {
         }
 }
 
-qint32 getPort(qint32 startRangeSearch, qint32 stopRangeSearch, QString ip) {
-        assert(startRangeSearch < stopRangeSearch);
+qint32 getPort(qint32 startRangeSearch, qint32 stopRangeSearch, QHostAddress ip_host_address) {
+        Q_ASSERT(startRangeSearch < stopRangeSearch);
         for (qint32 i = startRangeSearch; i < stopRangeSearch; i++) {
-                if (!portIsBusy(ip, i)) {
+                if (!portIsBusy(ip_host_address, i)) {
                         return i;
                 };
         }

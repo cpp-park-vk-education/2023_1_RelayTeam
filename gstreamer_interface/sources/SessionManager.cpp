@@ -1,7 +1,5 @@
 #include "SessionManager.h"
 
-#include <networkTools.h>
-
 SessionManager::SessionManager() {}
 
 SessionManager::~SessionManager() {
