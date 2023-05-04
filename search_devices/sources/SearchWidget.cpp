@@ -56,7 +56,7 @@ void SearchWidget::onDiscovered(const QMdnsEngine::Service service) {
 		message.setPort(5353);
 		message.setTransactionId(1264);
 		server.sendMessage(message);
-		delete resolver;
+		QMetaObject::invokeMethod(resolver, &QMdnsEngine::Resolver::deleteLater);
 	});
 }
 

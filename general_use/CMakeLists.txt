@@ -30,10 +30,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include
 )
 
+file(GLOB TEST_FILES
+	${CMAKE_CURRENT_LIST_DIR}/tests/*.cpp
+)
+
 if(BUILD_TESTS)
 	find_package(GTest REQUIRED)
 	add_executable(general_use_tests
-		${CMAKE_CURRENT_LIST_DIR}/tests/tests.cpp
+		${TEST_FILES}
 	)
     target_link_libraries(general_use_tests
 		GTest::gtest_main
