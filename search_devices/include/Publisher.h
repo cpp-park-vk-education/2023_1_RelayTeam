@@ -2,8 +2,8 @@
 // Qt basic libraries.
 #include <QList>
 #include <QString>
-#include <QtNetwork/QHostInfo>
 #include <QWidget>
+#include <QtNetwork/QHostInfo>
 // qmdnsengine
 #include <qmdnsengine/hostname.h>
 #include <qmdnsengine/message.h>
@@ -21,13 +21,19 @@ private:
 	QMdnsEngine::Provider provider;
 	QMdnsEngine::Service service;
 
-	QString getLocalIP();
-
 public:
 	Publisher(const QString& device_name, QWidget* parent = nullptr);
 
 private slots:
-	void onHostnameChanged(const QByteArray& hostname);
+	void onHostnameChanged(QByteArray hostname);
 
-	void onMessageReceived(const QMdnsEngine::Message& message_received);
+	void onMessageReceived(QMdnsEngine::Message message_received);
+
+public slots:
+	void onChangeServiceName(QString service_name);
+
+	void onSendPorts(QHostAddress ip_address, qint32 video_port, qint32 audio_port);
+
+signals:
+	void sendStartReceivingSession(QHostAddress ip_address, QString session_type);
 };

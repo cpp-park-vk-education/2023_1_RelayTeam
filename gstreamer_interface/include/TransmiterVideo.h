@@ -1,13 +1,18 @@
 #pragma once
 
-#include <QString>
-#include <QThread>
-#include <Session.h>
 #include <gst/gst.h>
 
-class TransmiterVideo : public Session
-{
+#include <QDebug>
+#include <QString>
+#include <QThread>
+#include <QtNetwork/QHostAddress>
+
+#include "Session.h"
+
+class TransmiterVideo : public Session {
 private:
+    Q_OBJECT
+
     void addLinkVideo();
 
     void addLinkAudio();
@@ -15,34 +20,12 @@ private:
     void startSend();
 
 public:
-    explicit TransmiterVideo(const QString &local_ip4, const QString &ip6);
+    explicit TransmiterVideo(const QHostAddress& ip_address_, const qint32 video_port_, const qint32 audio_port_);
+
     ~TransmiterVideo();
 
-    void run();
-
-    int start_transmit();
-
 public slots:
-    void onStartVideoSession();
+	void onStartSession() override;
 
-    void onKillVideoSession();
-
-signals:
-    void sendVideoSessionStarted();
-
-    void sendVideoSessionKilled();
-
-    typedef struct _CustomData
-    {
-        gboolean is_live;
-        GstElement *pipeline = NULL;
-        GMainLoop *loop;
-        GstBus *bus;
-        GstMessage *msg;
-    } CustomData;
-
-    CustomData data;
-    QString local_ip4;
-    QString ip6;
-    QString port;
+	void onKillSession() override;
 };

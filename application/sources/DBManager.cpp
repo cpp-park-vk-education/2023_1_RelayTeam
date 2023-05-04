@@ -8,8 +8,9 @@ void DBManager::createDB() {
 	QSqlQuery query;
 	query.prepare(
 		"create table Device("
-		"ID integer primary key,"
+		"ID VARCHAR(17) primary key,"
 		"name VARCHAR(20),"
+		"local_ipv4_address VARCHAR(39),"
 		"volume integer)");
 	if (!query.exec()) {
 		qDebug() << "Error adding Device table to database: " << sql_data_base.lastError().text();
@@ -17,14 +18,15 @@ void DBManager::createDB() {
 	query.prepare(
 		"create table Options("
 		"ID integer primary key,"
-		"device_name VARCHAR(20)"
+		"device_name VARCHAR(20),"
+		"scale integer"
 		")");
 	if (!query.exec()) {
 		qDebug() << "Error adding Options table to database: " << sql_data_base.lastError().text();
 	}
 
 	createDefualtOptions();
-	addTestEntries();  // TEMP
+	//	addTestEntries();  // TEMP
 }
 
 void DBManager::createDefualtOptions() {
@@ -32,30 +34,33 @@ void DBManager::createDefualtOptions() {
 	query.prepare(
 		"INSERT INTO Options("
 		"ID,"
-		"device_name)"
-		"VALUES(:ID, :device_name);");
+		"device_name,"
+		"scale)"
+		"VALUES(:ID, :device_name, :scale);");
 	query.bindValue(":ID", 0);
 	query.bindValue(":device_name", QSysInfo::machineHostName());
+	query.bindValue(":scale", 100);
 	if (!query.exec()) {
 		qDebug() << "Error adding default options item to data base." << sql_data_base.lastError().text();
 	}
 }
 
-void DBManager::getOptions(Options& options) {
+void DBManager::getOptions(Options* options) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Options WHERE ID = 0;")) {
 		query.next();
-		options.update(query.value("ID").toUInt(), query.value("device_name").toString());
+		options->update(query.value("ID").toInt(), query.value("device_name").toString(), query.value("scale").toInt());
 	} else {
 		qDebug() << "Error making query to get options: " << sql_data_base.lastError().text();
 	}
 }
 
-void DBManager::saveOptionsChanges(const Options& options) {
+void DBManager::saveOptionsChanges(Options* options) {
 	QSqlQuery query;
-	query.prepare("UPDATE Options SET device_name=:device_name WHERE ID=:ID");
-	query.bindValue(":device_name", options.device_name);
-	query.bindValue(":ID", options.ID);
+	query.prepare("UPDATE Options SET device_name=:device_name, scale=:scale WHERE ID=:ID");
+	query.bindValue(":device_name", options->device_name);
+	query.bindValue(":ID", options->ID);
+	query.bindValue(":scale", options->scale_factor_new);
 	if (!query.exec()) {
 		qDebug() << "Error updating Options in data base." << sql_data_base.lastError().text();
 	}
@@ -84,28 +89,31 @@ DBManager::~DBManager() {
 	instance_exist = false;
 }
 
-void DBManager::addDevice(QString& name, int volume) {	// change to "DeviceWidget* device" later
+void DBManager::addDevice(DeviceWidget* device) {  // change to "DeviceWidget* device" later
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO Device("
 		"ID,"
 		"name,"
+		"local_ipv4_address,"
 		"volume)"
-		"VALUES(:ID, :name, :volume);");
-	query.bindValue(":ID", query.lastInsertId());
-	query.bindValue(":name", name);
-	query.bindValue(":volume", volume);
+		"VALUES(:ID, :name, :local_ipv4_address, :volume);");
+	query.bindValue(":ID", device->ID);
+	query.bindValue(":name", device->name);
+	query.bindValue(":local_ipv4_address", device->local_ipv4_address.toString());
+	query.bindValue(":volume", device->volume);
 	if (!query.exec()) {
 		qDebug() << "Error adding Device to data base." << sql_data_base.lastError().text();
 	}
 }
 
-void DBManager::getDevices(QVBoxLayout* device_layout) {
+void DBManager::getDevices(QVBoxLayout* device_layout, qreal scale) {
 	QSqlQuery query;
 	if (query.exec("SELECT * FROM Device")) {
 		while (query.next()) {
 			DeviceWidget* current_device =
-				new DeviceWidget(query.value("ID").toUInt(), query.value("name").toString(), query.value("volume").toInt());
+				new DeviceWidget(query.value("ID").toString(), query.value("name").toString(),
+								 QHostAddress(query.value("local_ipv4_address").toString()), query.value("volume").toInt(), scale);
 			device_layout->addLayout(current_device);
 		}
 	} else {
@@ -126,8 +134,8 @@ void DBManager::saveDeviceChanges(DeviceWidget* device) {
 
 void DBManager::addTestEntries() {
 	for (size_t i = 0; i < 8; ++i) {
-		QString name = QString("Device ") + QString::number(i);
-		addDevice(name, 0);
+		DeviceWidget* new_device = new DeviceWidget(QString::number(i), QString("device"), QHostAddress(""), 50, 100);
+		addDevice(new_device);
 	}
 }
 

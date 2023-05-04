@@ -1,8 +1,11 @@
 #pragma once
+
+#include <QVBoxLayout>
+#include <QtNetwork/QHostAddress>
+#include <QtSql>
+
 #include "DeviceWidget.h"
 #include "Options.h"
-#include <QtSql>
-#include <QVBoxLayout>
 
 class DBManager {
 private:
@@ -24,13 +27,13 @@ public:
 
 	~DBManager();
 
-	void saveOptionsChanges(const Options& current_options);
+	void saveOptionsChanges(Options* options);
 
-	void getOptions(Options& options);
+	void getOptions(Options* options);
 
-	void addDevice(QString& name, int volume);
+	void addDevice(DeviceWidget* device);
 
-	void getDevices(QVBoxLayout* device_layout);
+	void getDevices(QVBoxLayout* device_layout, qreal scale);
 
 	void saveDeviceChanges(DeviceWidget* device);
 };

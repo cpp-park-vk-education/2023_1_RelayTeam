@@ -33,5 +33,8 @@
  cmake ..
  sudo make install
 ```
-
+ * GTest
+```
+ sudo apt-get install libgtest-dev
+```
 Компиллируется в Qt Creator при помощи CMake.

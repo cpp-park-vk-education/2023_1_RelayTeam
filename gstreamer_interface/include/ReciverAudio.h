@@ -1,47 +1,30 @@
 #pragma once
 
-#include <QString>
-#include <QThread>
-#include <Session.h>
 #include <gst/gst.h>
 #include <string.h>
 
-class ReciverAudio : public Session
-{
-public:
-    explicit ReciverAudio(QString port_to_reciving);
-    ~ReciverAudio();
+#include <QString>
+#include <QThread>
 
-    void run();
-    int start_reciver();
+#include "Session.h"
+
+class ReciverAudio : public Session {
+private:
+	Q_OBJECT
+
+	void addLinkVideo();
+
+	void addLinkAudio();
+
+        void startReceive();
+
+    public:
+        explicit ReciverAudio(const qint16 audio_port);
+
+	~ReciverAudio();
 
 public slots:
-    void onStartAudioSession();
+	void onStartSession() override;
 
-    void onKillAudioSession();
-
-signals:
-    void sendAudioSessionStarted();
-
-    void sendAudioSessionKilled();
-
-private:
-    void addLinkVideo();
-
-    void addLinkAudio();
-
-    void startReceive();
-
-    gboolean bus_callback(GstBus *bus, GstMessage *msg, gpointer data);
-
-    typedef struct _CustomData
-    {
-        gboolean is_live;
-        GstElement *pipeline = NULL;
-        GMainLoop *loop;
-        GstBus *bus;
-        GstMessage *msg;
-    } CustomData;
-
-    CustomData data;
+	void onKillSession() override;
 };

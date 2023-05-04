@@ -3,6 +3,7 @@ project(application VERSION 0.1 LANGUAGES CXX)
 find_package(Qt5 REQUIRED COMPONENTS
 	Widgets
 	Sql
+	Network
 )
 
 file(GLOB SRC_FILES
@@ -25,6 +26,7 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt5::Widgets
 	Qt5::Sql
+	Qt5::Network
 	general_use
 	gstreamer_interface
 	bluetooth

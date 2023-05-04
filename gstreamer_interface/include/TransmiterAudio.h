@@ -1,53 +1,28 @@
 #pragma once
 
-#include <QString>
-#include <QThread>
-#include <Session.h>
 #include <gst/gst.h>
 
-class TransmiterAudio : public Session
-{
+#include <QString>
+#include <QThread>
+#include <QtNetwork/QHostAddress>
+
+#include "Session.h"
+
+class TransmiterAudio : public Session {
 private:
-    gboolean on_bus_message(GstBus *bus, GstMessage *message, gpointer user_data);
+	Q_OBJECT
 
-    void addLinkVideo();
+	void addLinkAudio();
 
-    void addLinkAudio();
+        void startSend();
 
-    void startSend();
+    public:
+        explicit TransmiterAudio(const QHostAddress& ip_address_, const qint32 audio_port_);
 
-public:
-    // constructor
-    // set name using initializer
-    explicit TransmiterAudio(const QString &local_ip4, const QString &ip6);
-    ~TransmiterAudio();
-
-    // overriding the QThread's run() method
-    void run();
-
-    int start_transmit();
+	~TransmiterAudio();
 
 public slots:
-    void onStartAudioSession();
+	void onStartSession() override;
 
-    void onKillAudioSession();
-
-signals:
-    void sendAudioSessionStarted();
-
-    void sendAudioSessionKilled();
-
-    typedef struct _CustomData
-    {
-        gboolean is_live;
-        GstElement *pipeline = NULL;
-        GMainLoop *loop;
-        GstBus *bus;
-        GstMessage *msg;
-    } CustomData;
-
-    CustomData data;
-    QString local_ip4;
-    QString ip6;
-    QString port;
+	void onKillSession() override;
 };
