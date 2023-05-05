@@ -6,6 +6,11 @@ ReciverAudio::ReciverAudio(const qint16 audio_port) : Session(QHostAddress(), -1
 
 ReciverAudio::~ReciverAudio() {}
 
+void ReciverAudio::onSetVolume(const int volume_)
+{
+    g_object_set(G_OBJECT(volume), "volume", volume_, NULL);
+}
+
 void ReciverAudio::addLinkVideo() {
 	GstElement *udpsrc1, *queue1, *capsfilter1, *depay1, *parse1, *decode1, *convert1, *autovideosink1;
 	GstCaps* caps1;
@@ -57,25 +62,58 @@ void ReciverAudio::addLinkAudio() {
     decode2 = gst_element_factory_make("avdec_opus", "decode2");
     convert2 = gst_element_factory_make("audioconvert", "convert2");
     audioresample = gst_element_factory_make("audioresample", "audioresample");
+    volume = gst_element_factory_make("volume", "volume");
     autovideosink2 = gst_element_factory_make("autoaudiosink", "autovideosink2");
 
-	if (!data.pipeline || !udpsrc2 || !depay2 || !parse2 || !decode2 || !convert2 || !autovideosink2 || !audioresample || !capsfilter2 ||
-		!queue2) {
+    if (!data.pipeline || !udpsrc2 || !depay2 || !parse2 || !decode2 || !convert2 || !autovideosink2
+        || !audioresample || !capsfilter2 || !queue2 || !volume) {
         g_printerr("Not all elements could be created. Exiting.\n");
         return;
     }
 
-	caps2 = gst_caps_new_simple("application/x-rtp", "media", G_TYPE_STRING, "audio", "clock-rate", G_TYPE_INT, 48000, "encoding-name",
-								G_TYPE_STRING, "OPUS", "payload", G_TYPE_INT, 96, NULL);
+    caps2 = gst_caps_new_simple("application/x-rtp",
+                                "media",
+                                G_TYPE_STRING,
+                                "audio",
+                                "clock-rate",
+                                G_TYPE_INT,
+                                48000,
+                                "encoding-name",
+                                G_TYPE_STRING,
+                                "OPUS",
+                                "payload",
+                                G_TYPE_INT,
+                                96,
+                                NULL);
 
     g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
 
     gst_caps_unref(caps2);
 
-	gst_bin_add_many(GST_BIN(data.pipeline), udpsrc2, queue2, capsfilter2, depay2, parse2, decode2, convert2, audioresample, autovideosink2,
+    gst_bin_add_many(GST_BIN(data.pipeline),
+                     udpsrc2,
+                     queue2,
+                     capsfilter2,
+                     depay2,
+                     parse2,
+                     decode2,
+                     convert2,
+                     audioresample,
+                     volume,
+                     autovideosink2,
                      NULL);
 
-	if (!gst_element_link_many(udpsrc2, queue2, capsfilter2, depay2, parse2, decode2, convert2, audioresample, autovideosink2, NULL)) {
+    if (!gst_element_link_many(udpsrc2,
+                               queue2,
+                               capsfilter2,
+                               depay2,
+                               parse2,
+                               decode2,
+                               convert2,
+                               audioresample,
+                               volume,
+                               autovideosink2,
+                               NULL)) {
         g_printerr("Could not link all elements. Exiting.\n");
         return;
     }
@@ -105,4 +143,5 @@ void ReciverAudio::onKillSession() {
     g_main_loop_unref(data.loop);
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
     gst_object_unref(data.pipeline);
+    delete volume;
 }

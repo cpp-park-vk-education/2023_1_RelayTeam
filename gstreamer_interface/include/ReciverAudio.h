@@ -16,15 +16,19 @@ private:
 
 	void addLinkAudio();
 
-        void startReceive();
+    void startReceive();
 
-    public:
-        explicit ReciverAudio(const qint16 audio_port);
+    GstElement *volume;
 
-	~ReciverAudio();
+public:
+    explicit ReciverAudio(const qint16 audio_port);
+
+    ~ReciverAudio();
 
 public slots:
-	void onStartSession() override;
+    void onStartSession() override;
 
-	void onKillSession() override;
+    void onKillSession() override;
+
+    void onSetVolume(const int volume_);
 };
