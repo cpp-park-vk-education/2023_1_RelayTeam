@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-TransmiterAudio::TransmiterAudio(const QHostAddress& ip_address_, const qint16 audio_port_) : Session(ip_address_, -1, audio_port_) {}
+TransmiterAudio::TransmiterAudio(const QHostAddress& ip_address_, const qint32 audio_port_) : Session(ip_address_, -1, audio_port_) {}
 
 TransmiterAudio::~TransmiterAudio() {
     // gst_object_unref(data.bus);

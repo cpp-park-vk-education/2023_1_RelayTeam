@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Publisher.h>
+#include <SSHServer.h>
 #include <SearchWidget.h>
 #include <SessionManager.h>
 
@@ -43,6 +44,7 @@ private:
 	Options* options;
 	DBManager data_base;
 	SearchWidget* search_widget;
+	SSHServer* server;
 	Publisher* publisher_widget;
 	SettingsWidget* settings_widget;
 	QSet<QString> device_ids;

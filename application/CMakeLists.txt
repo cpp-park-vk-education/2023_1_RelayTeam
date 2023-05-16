@@ -6,8 +6,6 @@ find_package(Qt5 REQUIRED COMPONENTS
 	Network
 )
 
-find_library(qmdnsengine 0.2.0 CONFIG)
-
 file(GLOB SRC_FILES
 	${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
 	${CMAKE_CURRENT_LIST_DIR}/include/*.h
@@ -33,12 +31,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	gstreamer_interface
 	bluetooth
 	search_devices
-	qmdnsengine
+	ssh_server
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include
-	${QMDNSENGINE_INCLUDE_DIRS}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

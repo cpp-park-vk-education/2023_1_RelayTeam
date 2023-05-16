@@ -27,11 +27,11 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message message_received) {
 	QList<QMdnsEngine::Query> queries = message_received.queries();
 	if (message_received.transactionId() == 3645 && queries.front().name() == "mrelay-request-start-receiving-session.") {
 		QString session_type = queries[1].name().left(queries[1].name().size() - 1);
-		qDebug() << "received request for receiving session from" << message_received.address().toString()
+		QHostAddress local_ipv4_address = QHostAddress(QString(queries[2].name().left(queries[2].name().size() - 1)));
+		qDebug() << "received request for receiving session from" << local_ipv4_address.toString()
 				 << "\n session type is: " << session_type;
-		qDebug() << "CURRENT RECEIVED MESSAGE port: " << message_received.port() << "address: " << message_received.address()
-				 << "trankated: " << message_received.isTruncated();
-		emit sendStartReceivingSession(message_received, session_type);
+		qDebug() << "CURRENT RECEIVED MESSAGE address: " << local_ipv4_address.toString();
+		emit sendStartReceivingSession(local_ipv4_address, session_type);
 		return;
 	}
 	if (message_received.transactionId() == 1264 && queries.front().name() == "mrelay-request-initialization.") {
@@ -51,6 +51,7 @@ void Publisher::onMessageReceived(const QMdnsEngine::Message message_received) {
 		query.setType(2222);
 		message.addQuery(query);
 		message.reply(message_received);
+		qDebug() << "standard port is: " << message.port() << "standard address is: " << message.address();
 		message.setTransactionId(3663);
 		server.sendMessage(message);
 	}
@@ -62,8 +63,8 @@ void Publisher::onChangeServiceName(const QString service_name) {
 	provider.update(service);
 }
 
-void Publisher::onSendPorts(const QMdnsEngine::Message message_received, qint16 video_port, qint16 audio_port) {
-	qDebug() << "sending ports: " << video_port << "  " << audio_port << "to: " << message_received.address();
+void Publisher::onSendPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port) {
+	qDebug() << "sending ports: " << video_port << "  " << audio_port << "to: " << ip_address;
 	QMdnsEngine::Message message;
 	QMdnsEngine::Query query;
 	query.setName("mrelay-ports-response");
@@ -75,9 +76,12 @@ void Publisher::onSendPorts(const QMdnsEngine::Message message_received, qint16 
 	query.setName("type value");
 	query.setType(audio_port);
 	message.addQuery(query);
-	message.reply(message_received);
+	query.setName(getLocalIPv4().toString().toUtf8());
+	query.setType(2222);
+	message.addQuery(query);
+	message.setAddress(QHostAddress("ff02::fb"));
+	message.setPort(5353);
 	message.setTransactionId(2435);
-	qDebug() << "CURRENT SENDING MESSAGE port: " << message.port() << "address: " << message.address()
-			 << "trankated: " << message.isTruncated();
+	qDebug() << "CURRENT SENDING MESSAGE address: " << ip_address;
 	server.sendMessage(message);
 }

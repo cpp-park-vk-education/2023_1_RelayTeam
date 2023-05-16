@@ -23,12 +23,12 @@ protected:
 		GstMessage* msg;
 	} CustomData;
 
-	Session(const QHostAddress& ip_address_, const qint16 video_port_, const qint16 audio_port_);
+	Session(const QHostAddress& ip_address_, const qint32 video_port_, const qint32 audio_port_);
 
 	CustomData data;
 	QHostAddress ip_address;
-	qint16 video_port;
-	qint16 audio_port;
+	qint32 video_port;
+	qint32 audio_port;
 
 public:
 	const static char* representIP(const QHostAddress& ext_ip_address);

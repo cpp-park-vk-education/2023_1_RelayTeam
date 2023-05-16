@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 
 #include <UITools.h>
-#include <qmdnsengine/message.h>
 
 #include <QMessageBox>
 #include <QSlider>

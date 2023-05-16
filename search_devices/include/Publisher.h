@@ -32,8 +32,8 @@ private slots:
 public slots:
 	void onChangeServiceName(QString service_name);
 
-	void onSendPorts(QMdnsEngine::Message message_received, qint16 video_port, qint16 audio_port);
+	void onSendPorts(QHostAddress ip_address, qint32 video_port, qint32 audio_port);
 
 signals:
-	void sendStartReceivingSession(QMdnsEngine::Message message_received, QString session_type);
+	void sendStartReceivingSession(QHostAddress ip_address, QString session_type);
 };

@@ -4,7 +4,7 @@
 
 #include "QtNetwork/QHostAddress"
 
-TransmiterVideo::TransmiterVideo(const QHostAddress& ip_address_, const qint16 video_port_, const qint16 audio_port_)
+TransmiterVideo::TransmiterVideo(const QHostAddress& ip_address_, const qint32 video_port_, const qint32 audio_port_)
 	: Session(ip_address_, video_port_, audio_port_) {}
 
 TransmiterVideo::~TransmiterVideo() {}
