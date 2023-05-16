@@ -21,34 +21,33 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt5::Core
 	Qt5::Network
 	general_use
-	${GSTREAMER_LIBRARIES}
+        ${GSTREAMER_LIBRARIES}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include
-	${GSTREAMER_INCLUDE_DIRS}
+        ${GSTREAMER_INCLUDE_DIRS}
 )
 
 if(BUILD_TESTS)
+	file(GLOB TEST_FILES
+		${CMAKE_CURRENT_LIST_DIR}/tests/*.cpp
+	)
+
     find_package(GTest REQUIRED)
-    file(GLOB TEST_FILES
-            ${CMAKE_CURRENT_LIST_DIR}/tests/*.cpp
-    )
-
-    add_executable(gstreamer_interface_tests
-         ${TEST_FILES}
-     )
-
+	add_executable(gstreamer_interface_tests
+		${TEST_FILES}
+	)
 
     target_link_libraries(gstreamer_interface_tests
-        GTest::Main
-        ${PROJECT_NAME}
-        Qt5::Core
-        Qt5::Network
-        general_use
-        ${GSTREAMER_LIBRARIES}
-    )
+		GTest::Main
+		${PROJECT_NAME}
+                Qt5::Core
+		Qt5::Network
+		general_use
+                ${GSTREAMER_LIBRARIES}
+	)
 
     enable_testing()
-    add_test(NAME unit_tests COMMAND tests)
+	add_test(NAME unit_tests COMMAND tests)
 endif()
