@@ -42,3 +42,37 @@ void addressList() {
 	}
 	qDebug() << "----";
 }
+
+QString processIPv6(const QHostAddress& ipv6_address) {
+	//	QString ipv6_string = ipv6_address.toString();
+	//	ipv6_string = ipv6_string.left(24) + QString("%wlan0");
+	//	ipv6_string = QString("[") + ipv6_string + QString("]");
+	return ipv6_address.toString();
+}
+
+bool portIsBusy(const QHostAddress& ipv4_address, qint32 port) {
+        Q_ASSERT(port >= 1024);
+        Q_ASSERT(port <= 49151);
+        QTcpSocket* socket = new QTcpSocket();
+        socket->connectToHost(ipv4_address, port);
+        qint8 msecs_delay_time = 10;
+        if (socket->waitForConnected(msecs_delay_time)) {
+                socket->disconnectFromHost();
+                return true;
+        } else {
+                return false;
+        }
+}
+
+qint32 getPort(qint32 startRangeSearch, qint32 stopRangeSearch, QHostAddress ip_host_address) {
+        Q_ASSERT(startRangeSearch < stopRangeSearch);
+        for (qint32 i = startRangeSearch; i < stopRangeSearch; i++) {
+                if (!portIsBusy(ip_host_address, i)) {
+                        return i;
+                };
+                if (i - startRangeSearch >= 10) {
+                        qDebug() << "Too many time spended to scanning ports - fix it";
+                };
+        }
+        return -1;
+}
