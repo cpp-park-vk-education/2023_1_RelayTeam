@@ -19,13 +19,22 @@
 ```
  https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c
 ```
- * QtGstreamer 2.8.9 и старше 
-```
- https://github.com/GStreamer/qt-gstreamer
-```
  * Sqlite3
 ```
  sudo apt-get install libsqlite3-dev
 ```
-
+ * qmdnsengine
+```
+ https://github.com/Ant0nL0rd/qmdnsengine-qt5-my-fix
+```
+```
+ mkdir build
+ cd build
+ cmake ..
+ sudo make install
+```
+ * GTest
+```
+ sudo apt-get install libgtest-dev
+```
 Компиллируется в Qt Creator при помощи CMake.
