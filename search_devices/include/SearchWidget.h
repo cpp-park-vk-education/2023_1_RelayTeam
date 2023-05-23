@@ -22,45 +22,41 @@
 
 class SearchWidget : public QListWidget {
 private:
-	Q_OBJECT
-	QMdnsEngine::Server server;
-	QMdnsEngine::Cache cache;
-	QMdnsEngine::Browser mdns_browser;
-	QMdnsEngine::Resolver* resolver;
-	QSet<QString> device_ids;
+    Q_OBJECT
+    QMdnsEngine::Server server;
+    QMdnsEngine::Cache cache;
+    QMdnsEngine::Browser mdns_browser;
+    QMdnsEngine::Resolver* resolver;
+    QSet<QString> device_ids;
 
-	qreal scale;
-	QMap<QString, ServiceItem*> service_item_map;
+    qreal scale;
+    QMap<QString, ServiceItem*> service_item_map;
 
-	inline QString getServiceName(const QMdnsEngine::Service& service) {
-		return service.hostname() + service.name();
-	}
+    inline QString getServiceName(const QMdnsEngine::Service& service) {
+        return service.hostname() + service.name();
+    }
 
 public:
-	SearchWidget(qreal scale_, QWidget* parent = nullptr);
+    SearchWidget(qreal scale_, QWidget* parent = nullptr);
 
 private slots:
-	void onDiscovered(QMdnsEngine::Service service);
+    void onDiscovered(QMdnsEngine::Service service);
 
-	void onServiceRemoved(QMdnsEngine::Service service);
+    void onServiceRemoved(QMdnsEngine::Service service);
 
-	void onServiceUpdated(QMdnsEngine::Service service);
+    void onServiceUpdated(QMdnsEngine::Service service);
 
-	void onSelected(QListWidgetItem* item);
+    void onSelected(QListWidgetItem* item);
 
-	void onMessageReceived(QMdnsEngine::Message message_received);
+    void onMessageReceived(QMdnsEngine::Message message_received);
 
 public slots:
-	void onAddButtonCLicked();
+    void onAddButtonCLicked();
 
-	void onDeviceIdsUpdated(QSet<QString> device_ids_);
-
-	void onStartReciver(const QHostAddress ip_address, const QString session_type);
+    void onDeviceIdsUpdated(QSet<QString> device_ids_);
 
 signals:
-	void devicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
+    void devicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
 
-	void sendUpdateAddress(QString mac_address, QHostAddress local_ipv4_address);
-
-	void sendReceivedPorts(const QHostAddress ipv6_address, qint32 video_port, qint32 audio_port);
+    void sendUpdateAddress(QString mac_address, QHostAddress local_ipv4_address);
 };
