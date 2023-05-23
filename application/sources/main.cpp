@@ -2,6 +2,8 @@
 #include <QtDebug>
 
 #include "MainWindow.h"
+// #include "PortScaner.h"
+#include "networkTools.h"
 #include "variables.h"
 
 int main(int argc, char* argv[]) {
