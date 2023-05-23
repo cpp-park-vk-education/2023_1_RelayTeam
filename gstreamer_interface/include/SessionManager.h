@@ -1,12 +1,11 @@
 #pragma once
 
-#include <ReciverAudio.h>
-#include <ReciverVideo.h>
-#include <TransmiterAudio.h>
-#include <TransmiterVideo.h>
+#include <Reciver.h>
+#include <Transmiter.h>
 
 #include <QMap>
 #include <QObject>
+#include <QtNetwork/QHostAddress>
 #include <cstring>
 
 class SessionManager : public QObject {
@@ -15,7 +14,7 @@ private:
     QHash<QPair<QHostAddress, QString>, std::shared_ptr<Session>> live_sessions;  // map<session_id, session>
     // void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
 
-    void startThread(Session* session);
+    void startThread(Session* session, const QString session_type);
 
 public:
     SessionManager();
@@ -31,28 +30,36 @@ public slots:
 
     void onKillAudioSession(const QHostAddress ip_address);
 
-	  void onStartReceivingSession(const QHostAddress ip_address, const QString session_type);
+    void onStartReceivingSession(const QHostAddress ip_address, const QString session_type);
 
     void onKillVideoReciver(const QHostAddress ip_address);
 
     void onKillAudioReciver(const QHostAddress ip_address);
 
-	  void onReceivedPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
+    void onReceivedPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
+
+    void onSetVolume(const QHostAddress ip_address, const int volume);
+
+    void onSetBitrate(const QHostAddress ip_address, const int bitrate);
 
 signals:
-	void sendErrorOccured(const QString error_string);
+    void sendErrorOccured(const QString error_string);
 
-	void sendVideoSessionStarted();
+    void setVolume(const int volume);
 
-	void sendAudioSessionStarted();
+    void setBitrate(const int bitrate);
 
-	void sendVideoSessionKilled();
+    void sendVideoSessionStarted();
 
-	void sendAudioSessionKilled();
+    void sendAudioSessionStarted();
 
-	void sendKillAll();
+    void sendVideoSessionKilled();
 
-	void sendStartReciver(const QHostAddress local_ip6, const QString session_type);
+    void sendAudioSessionKilled();
 
-	void sendSetPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
+    void sendKillAll();
+
+    void sendStartReciver(const QHostAddress local_ip6, const QString session_type);
+
+    void sendSetPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
 };
