@@ -15,25 +15,20 @@
 
 class Publisher : public QObject {
 private:
-	Q_OBJECT
-	QMdnsEngine::Server server;
-	QMdnsEngine::Hostname hostname;
-	QMdnsEngine::Provider provider;
-	QMdnsEngine::Service service;
+    Q_OBJECT
+    QMdnsEngine::Server server;
+    QMdnsEngine::Hostname hostname;
+    QMdnsEngine::Provider provider;
+    QMdnsEngine::Service service;
 
 public:
-	Publisher(const QString& device_name, QWidget* parent = nullptr);
+    Publisher(const QString& device_name, QWidget* parent = nullptr);
 
 private slots:
-	void onHostnameChanged(QByteArray hostname);
+    void onHostnameChanged(QByteArray hostname);
 
-	void onMessageReceived(QMdnsEngine::Message message_received);
+    void onMessageReceived(QMdnsEngine::Message message_received);
 
 public slots:
-	void onChangeServiceName(QString service_name);
-
-	void onSendPorts(QHostAddress ip_address, qint32 video_port, qint32 audio_port);
-
-signals:
-	void sendStartReceivingSession(QHostAddress ip_address, QString session_type);
+    void onChangeServiceName(QString service_name);
 };

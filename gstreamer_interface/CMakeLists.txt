@@ -1,6 +1,6 @@
 project(gstreamer_interface VERSION 0.1 LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS
+find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Core
 	Network
 )
@@ -18,15 +18,15 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	Qt5::Core
-	Qt5::Network
+	Qt${QT_VERSION}::Core
+	Qt${QT_VERSION}::Network
 	general_use
-        ${GSTREAMER_LIBRARIES}
+	${GSTREAMER_LIBRARIES}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include
-        ${GSTREAMER_INCLUDE_DIRS}
+	${GSTREAMER_INCLUDE_DIRS}
 )
 
 if(BUILD_TESTS)
@@ -42,10 +42,10 @@ if(BUILD_TESTS)
     target_link_libraries(gstreamer_interface_tests
 		GTest::Main
 		${PROJECT_NAME}
-                Qt5::Core
-		Qt5::Network
+		Qt${QT_VERSION}::Core
+		Qt${QT_VERSION}::Network
 		general_use
-                ${GSTREAMER_LIBRARIES}
+		${GSTREAMER_LIBRARIES}
 	)
 
     enable_testing()

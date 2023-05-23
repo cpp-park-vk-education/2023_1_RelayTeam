@@ -1,6 +1,6 @@
 project(search_devices VERSION 0.1 LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS
+find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Widgets
 	Core
 	Network
@@ -18,9 +18,9 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	Qt5::Core
-	Qt5::Widgets
-	Qt5::Network
+	Qt${QT_VERSION}::Core
+	Qt${QT_VERSION}::Widgets
+	Qt${QT_VERSION}::Network
 	qmdnsengine
 #	${QMDNSENGINE_LIBRARIES}
 	general_use

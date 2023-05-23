@@ -34,7 +34,7 @@ protected:
     QHostAddress ip_address;
     qint32 video_port;
     qint32 audio_port;
-    GstElement *volume;
+    GstElement* volume;
     GstElement* vp8enc;
 
 public:

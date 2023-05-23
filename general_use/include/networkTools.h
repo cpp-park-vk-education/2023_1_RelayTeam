@@ -7,6 +7,8 @@
 #include <QString>
 #include <QTcpSocket>
 #include <QtGlobal>
+#include <QString>
+#include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QNetworkInterface>
 

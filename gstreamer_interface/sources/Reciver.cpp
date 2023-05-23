@@ -1,8 +1,8 @@
 #include "Reciver.h"
 
 void Reciver::addLinkVideo() {
-    GstElement *pipeline, *capsfilter1, *capsfilter2, *udpsrc, *queue1, *vp8dec,*rtpvp8depay, *videoconvert, *queue2, *autovideosink;
-    GstCaps* caps, *caps2;
+    GstElement *pipeline, *capsfilter1, *capsfilter2, *udpsrc, *queue1, *vp8dec, *rtpvp8depay, *videoconvert, *queue2, *autovideosink;
+    GstCaps *caps, *caps2;
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
@@ -13,11 +13,11 @@ void Reciver::addLinkVideo() {
     rtpvp8depay = gst_element_factory_make("rtpvp8depay", "rtpvp8depay");
     vp8dec = gst_element_factory_make("vp8dec", "vp8dec");
     videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-    //capsfilter2 = gst_element_factory_make("capsfilter", "capsfilterVideo2");
+    // capsfilter2 = gst_element_factory_make("capsfilter", "capsfilterVideo2");
     queue2 = gst_element_factory_make("queue", "queue2");
     autovideosink = gst_element_factory_make("autovideosink", "videosink");
 
-    if (!data.pipeline || !udpsrc || !rtpvp8depay || !vp8dec || !videoconvert || !autovideosink || !queue1 || !queue2 || !capsfilter1 ) {
+    if (!data.pipeline || !udpsrc || !rtpvp8depay || !vp8dec || !videoconvert || !autovideosink || !queue1 || !queue2 || !capsfilter1) {
         g_printerr("Not all elements could be created. Exiting.\n");
         return;
     }
@@ -25,13 +25,12 @@ void Reciver::addLinkVideo() {
     caps = gst_caps_new_simple("application/x-rtp", "media", G_TYPE_STRING, "video", "clock-rate", G_TYPE_INT, 90000, "encoding-name",
                                G_TYPE_STRING, "VP8", "payload", G_TYPE_INT, 96, NULL);
 
-    caps2 =
-        gst_caps_new_simple("video/x-raw", "width", G_TYPE_INT, 1024, "height", G_TYPE_INT, 600, NULL);
+    caps2 = gst_caps_new_simple("video/x-raw", "width", G_TYPE_INT, 1024, "height", G_TYPE_INT, 600, NULL);
 
     g_object_set(G_OBJECT(capsfilter1), "caps", caps, NULL);
-    //g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
+    // g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
     gst_caps_unref(caps);
-   // gst_caps_unref(caps2);
+    // gst_caps_unref(caps2);
 
     gst_bin_add_many(GST_BIN(data.pipeline), udpsrc, queue1, capsfilter1, rtpvp8depay, vp8dec, videoconvert, queue2, autovideosink, NULL);
 
@@ -44,8 +43,7 @@ void Reciver::addLinkVideo() {
 }
 
 void Reciver::addLinkAudio() {
-    GstElement *udpsrc, *depay, *parse, *decode, *convert, *autovideosink, *audioresample,
-        *capsfilter, *queue;
+    GstElement *udpsrc, *depay, *parse, *decode, *convert, *autovideosink, *audioresample, *capsfilter, *queue;
     GstCaps* caps;
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
@@ -61,8 +59,8 @@ void Reciver::addLinkAudio() {
     volume = gst_element_factory_make("volume", "volumeAudio");
     autovideosink = gst_element_factory_make("autoaudiosink", "autovideosinkAudio");
 
-    if (!data.pipeline || !udpsrc || !depay || !parse || !decode || !convert || !autovideosink
-        || !audioresample || !capsfilter || !queue || !volume) {
+    if (!data.pipeline || !udpsrc || !depay || !parse || !decode || !convert || !autovideosink || !audioresample || !capsfilter || !queue ||
+        !volume) {
         g_printerr("Not all elements could be created. Exiting.\n");
         return;
     }
@@ -73,32 +71,12 @@ void Reciver::addLinkAudio() {
     g_object_set(G_OBJECT(capsfilter), "caps", caps, NULL);
 
     gst_caps_unref(caps);
-    //g_object_set(volume, "volume", 0.5, NULL);
+    // g_object_set(volume, "volume", 0.5, NULL);
 
-    gst_bin_add_many(GST_BIN(data.pipeline),
-                     udpsrc,
-                     queue,
-                     capsfilter,
-                     depay,
-                     parse,
-                     decode,
-                     convert,
-                     audioresample,
-                     volume,
-                     autovideosink,
+    gst_bin_add_many(GST_BIN(data.pipeline), udpsrc, queue, capsfilter, depay, parse, decode, convert, audioresample, volume, autovideosink,
                      NULL);
 
-    if (!gst_element_link_many(udpsrc,
-                               queue,
-                               capsfilter,
-                               depay,
-                               parse,
-                               decode,
-                               convert,
-                               audioresample,
-                               volume,
-                               autovideosink,
-                               NULL)) {
+    if (!gst_element_link_many(udpsrc, queue, capsfilter, depay, parse, decode, convert, audioresample, volume, autovideosink, NULL)) {
         g_printerr("Could not link all elements. Exiting.\n");
         return;
     }
@@ -164,15 +142,11 @@ Reciver::~Reciver() {
     onKillSession();
 }
 
-void Reciver::onSetVolume(float volume_)
-{
-  g_object_set(volume, "volume", volume_, NULL);
+void Reciver::onSetVolume(float volume_) {
+    g_object_set(volume, "volume", volume_, NULL);
 }
 
-void Reciver::onSetBitrate(const int bitrate)
-{
-
-}
+void Reciver::onSetBitrate(const int bitrate) {}
 
 void Reciver::onEnableVideo() {
     if (!data.pipeline) {
@@ -222,9 +196,9 @@ void Reciver::onStartSession() {
 }
 
 void Reciver::onKillSession() {
-  removeVideo();
+    removeVideo();
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    //if (data.loop) g_main_loop_unref(data.loop);
-    //if (data.bus) gst_object_unref(data.bus);
-    //if (data.pipeline) gst_object_unref(data.pipeline);
+    // if (data.loop) g_main_loop_unref(data.loop);
+    // if (data.bus) gst_object_unref(data.bus);
+    // if (data.pipeline) gst_object_unref(data.pipeline);
 }

@@ -1,6 +1,6 @@
 project(general_use VERSION 0.1 LANGUAGES CXX)
 
-find_package(Qt5 REQUIRED COMPONENTS
+find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Widgets
 	Network
 )
@@ -22,8 +22,8 @@ add_library(${PROJECT_NAME} SHARED
 
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	Qt5::Widgets
-	Qt5::Network
+	Qt${QT_VERSION}::Widgets
+	Qt${QT_VERSION}::Network
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -42,8 +42,8 @@ if(BUILD_TESTS)
     target_link_libraries(general_use_tests
 		GTest::Main
 		${PROJECT_NAME}
-		Qt5::Widgets
-		Qt5::Network
+		Qt${QT_VERSION}::Widgets
+		Qt${QT_VERSION}::Network
 	)
     enable_testing()
 	add_test(NAME unit_tests COMMAND tests)

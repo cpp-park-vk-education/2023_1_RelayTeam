@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
+set(QT_VERSION 6)
+
 if(LINUX)
     target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
@@ -19,13 +21,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QT_DEBUG_PLUGINS ON)
 
-option(BUILD_TESTS "Build tests" ON)
-option(BUILD_DOCS "Build documentation" ON)
+option(BUILD_TESTS "Build tests" OFF)
+option(BUILD_DOCS "Build documentation" OFF)
 option(BUILD_COVERAGE "Build code coverage" OFF)
 
 add_subdirectory(general_use)
 add_subdirectory(search_devices)
-add_subdirectory(ssh_server)
+add_subdirectory(ssl_server)
 add_subdirectory(gstreamer_interface)
 add_subdirectory(bluetooth)
 add_subdirectory(application)
