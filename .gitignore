@@ -72,5 +72,6 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
-include/variables.h
-qt_application/include/variables.h
+# configured files
+general_use/include/variables.h
+puml/

@@ -30,6 +30,7 @@ void SessionManager::startThread(Session* session, const QString session_type) {
 
 void SessionManager::onStartVideoSession(const QHostAddress ip_address) {
     emit sendStartReciver(ip_address, "video");
+
     onSetVolume(ip_address, 0);
 }
 
