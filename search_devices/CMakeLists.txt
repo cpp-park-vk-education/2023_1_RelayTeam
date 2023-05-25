@@ -6,7 +6,9 @@ find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Network
 )
 
-find_library(qmdnsengine 0.2.0 CONFIG)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(qmdnsengine REQUIRED)
 
 file(GLOB SRC_FILES
 	${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
