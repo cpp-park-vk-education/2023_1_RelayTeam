@@ -41,4 +41,8 @@ public slots:
     void onStartSession() override;
 
     void onKillSession() override;
+
+    void onSetVolume(float volume) override;
+
+    void onSetBitrate(const int bitrate) override;
 };

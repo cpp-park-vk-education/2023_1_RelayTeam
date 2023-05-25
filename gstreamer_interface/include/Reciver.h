@@ -29,7 +29,6 @@ public:
     ~Reciver();
 
 public slots:
-    void onVolumeChanged();
 
     void onEnableVideo() override;
 
@@ -42,6 +41,10 @@ public slots:
     void onStartSession() override;
 
     void onKillSession() override;
+
+    void onSetVolume(const float volume) override;
+
+    void onSetBitrate(const int bitrate) override;
 
 signals:
     void mainWindowClosed();

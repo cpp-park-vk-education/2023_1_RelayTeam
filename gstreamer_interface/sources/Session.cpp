@@ -1,20 +1,15 @@
 #include <Session.h>
 
 Session::Session(const QHostAddress& ip_address_, const qint32 video_port_, const qint32 audio_port_)
-    : ip_address(ip_address_), video_port(video_port_), audio_port(audio_port_) {
-}
+    : ip_address(ip_address_), video_port(video_port_), audio_port(audio_port_) {}
 
-Session::Session(const QHostAddress& ip_address_, const qint32 audio_port_) : ip_address(ip_address_), audio_port(audio_port_) {
-}
+Session::Session(const QHostAddress& ip_address_, const qint32 audio_port_) : ip_address(ip_address_), audio_port(audio_port_) {}
 
-Session::Session(const qint32 video_port_, const qint32 audio_port_) : video_port(video_port_), audio_port(audio_port_) {
-}
+Session::Session(const qint32 video_port_, const qint32 audio_port_) : video_port(video_port_), audio_port(audio_port_) {}
 
-Session::Session(const qint32 audio_port_) : audio_port(audio_port_) {
-}
+Session::Session(const qint32 audio_port_) : audio_port(audio_port_) {}
 
-Session::~Session() {
-}
+Session::~Session() {}
 
 gboolean Session::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
     GMainLoop* loop = (GMainLoop*)data;
@@ -61,15 +56,17 @@ gboolean Session::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
     return TRUE;
 }
 
+void Session::onSetBitrate(const int bitrate) {}
+
 const char* Session::representIP(const QHostAddress& ext_ip_address) {
-	char* ip_char_string = nullptr;
-	if (ext_ip_address.protocol() == QAbstractSocket::IPv4Protocol) {
-		ip_char_string = new char[ext_ip_address.toString().size()];
-		strcpy(ip_char_string, ext_ip_address.toString().toStdString().c_str());
-	}
-	if (ext_ip_address.protocol() == QAbstractSocket::IPv6Protocol) {  // needs processing
-		ip_char_string = new char[ext_ip_address.toString().size()];
-		strcpy(ip_char_string, ext_ip_address.toString().toStdString().c_str());
-	}
-	return ip_char_string;
+    char* ip_char_string = nullptr;
+    if (ext_ip_address.protocol() == QAbstractSocket::IPv4Protocol) {
+        ip_char_string = new char[ext_ip_address.toString().size()];
+        strcpy(ip_char_string, ext_ip_address.toString().toStdString().c_str());
+    }
+    if (ext_ip_address.protocol() == QAbstractSocket::IPv6Protocol) {  // needs processing
+        ip_char_string = new char[ext_ip_address.toString().size()];
+        strcpy(ip_char_string, ext_ip_address.toString().toStdString().c_str());
+    }
+    return ip_char_string;
 }

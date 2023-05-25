@@ -34,6 +34,8 @@ protected:
     QHostAddress ip_address;
     qint32 video_port;
     qint32 audio_port;
+    GstElement* volume;
+    GstElement* vp8enc;
 
 public:
     const static char* representIP(const QHostAddress& ext_ip_address);
@@ -51,6 +53,10 @@ public slots:
     virtual void onStartSession() = 0;
 
     virtual void onKillSession() = 0;
+
+    virtual void onSetVolume(const float volume) = 0;
+
+    virtual void onSetBitrate(const int bitrate) = 0;
 
 signals:
     void EnableVideo();

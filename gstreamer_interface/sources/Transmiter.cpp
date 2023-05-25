@@ -1,44 +1,45 @@
 #include "Transmiter.h"
 
 void Transmiter::addLinkVideo() {
-    GstElement *ximagesrc, *videoscale, *videoconvert, *x264enc, *h264parse, *rtph264pay, *udpsink1, *capsfilter1, *capsfilter2;
+    GstElement *ximagesrc, *queue1, *capsfilter1, *capsfilter2, *videoscale, *videoconvert1, *videoconvert2, *rtpvp8pay, *queue2, *udpsink1;
     GstCaps *caps1, *caps2;
     if (data.pipeline == NULL) {
         data.pipeline = gst_pipeline_new("pipeline");
     }
+    data.pipeline = gst_pipeline_new("my-pipeline");
     ximagesrc = gst_element_factory_make("ximagesrc", "ximagesrc");
-    capsfilter1 = gst_element_factory_make("capsfilter", "capsfilter1");
+    // queue1 = gst_element_factory_make("queue", "queue1");
+    // capsfilter1 = gst_element_factory_make("capsfilter", "capsfilterVideo1");
+    videoconvert1 = gst_element_factory_make("videoconvert", "videoconvert1");
     videoscale = gst_element_factory_make("videoscale", "videoscale");
-    videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-    x264enc = gst_element_factory_make("x264enc", "x264enc");
-    capsfilter2 = gst_element_factory_make("capsfilter", "capsfilter2");
-    h264parse = gst_element_factory_make("h264parse", "h264parse");
-    rtph264pay = gst_element_factory_make("rtph264pay", "rtph264pay");
+    capsfilter1 = gst_element_factory_make("capsfilter", "capsfilterVideo1");
+    videoconvert2 = gst_element_factory_make("videoconvert", "videoconvert2");
+    queue1 = gst_element_factory_make("queue", "queue1");
+    vp8enc = gst_element_factory_make("vp8enc", "vp8enc");
+    // capsfilter2 = gst_element_factory_make("capsfilter", "capsfilterVideo2");
+    rtpvp8pay = gst_element_factory_make("rtpvp8pay", "rtpvp8pay");
+    queue2 = gst_element_factory_make("queue", "queue2");
     udpsink1 = gst_element_factory_make("udpsink", "udpsink1");
 
-    if (!data.pipeline || !h264parse || !ximagesrc || !capsfilter1 || !capsfilter2 || !videoscale || !videoconvert || !x264enc ||
-        !rtph264pay || !udpsink1) {
+    if (!data.pipeline || !ximagesrc || !vp8enc || !videoconvert1 || !videoscale || !videoconvert2 || !queue2 || !queue1 || !rtpvp8pay ||
+        !udpsink1) {
         g_printerr("Not all elements could be created\n");
         return;
     }
+    caps1 =
+        gst_caps_new_simple("video/x-raw", "profile", G_TYPE_STRING, "main", "width", G_TYPE_INT, 1600, "height", G_TYPE_INT, 900, NULL);
 
-    caps1 = gst_caps_new_simple("video/x-raw", "framerate", GST_TYPE_FRACTION, 30, 1,
-
-                                NULL);
-
-    caps2 =
-        gst_caps_new_simple("video/x-h264", "profile", G_TYPE_STRING, "main", "width", G_TYPE_INT, 1024, "height", G_TYPE_INT, 600, NULL);
 
     g_object_set(G_OBJECT(capsfilter1), "caps", caps1, NULL);
-    g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
+
 
     gst_caps_unref(caps1);
-    gst_caps_unref(caps2);
 
-    gst_bin_add_many(GST_BIN(data.pipeline), ximagesrc, capsfilter1, videoscale, videoconvert, x264enc, capsfilter2, h264parse, rtph264pay,
-                     udpsink1, NULL);
 
-    if (gst_element_link_many(ximagesrc, capsfilter1, videoscale, videoconvert, x264enc, capsfilter2, h264parse, rtph264pay, udpsink1,
+    gst_bin_add_many(GST_BIN(data.pipeline), ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc, rtpvp8pay,
+                     queue2, udpsink1, NULL);
+
+    if (gst_element_link_many(ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc, rtpvp8pay, queue2, udpsink1,
                               NULL) != TRUE) {
         g_printerr(
             "Failed to link elements: ximagesrc -> videoscale -> videoconvert -> x264enc -> "
@@ -48,7 +49,8 @@ void Transmiter::addLinkVideo() {
     }
 
     g_object_set(udpsink1, "sync", FALSE, "host", representIP(ip_address), "port", video_port, NULL);
-    g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2200, NULL);
+    // g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2000, "speed-preset", 0x00000005, NULL);
+    g_object_set(G_OBJECT(vp8enc), "deadline", 1, "target-bitrate", 2000000, NULL);
 }
 
 void Transmiter::addLinkAudio() {
@@ -85,13 +87,14 @@ void Transmiter::addLinkAudio() {
 void Transmiter::removeVideo() {
     gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
     gst_bin_get_by_name(GST_BIN(data.pipeline), "ximagesrc");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "capsfilter1");
+    gst_bin_get_by_name(GST_BIN(data.pipeline), "videoconvert1");
     gst_bin_get_by_name(GST_BIN(data.pipeline), "videoscale");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "videoconvert");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "x264enc");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "capsfilter2");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "h264parse");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "rtph264pay");
+    gst_bin_get_by_name(GST_BIN(data.pipeline), "capsfilterVideo1");
+    gst_bin_get_by_name(GST_BIN(data.pipeline), "videoconvert2");
+    gst_bin_get_by_name(GST_BIN(data.pipeline), "queue1");
+    gst_bin_get_by_name(GST_BIN(data.pipeline), "vp8enc");
+    gst_bin_get_by_name(GST_BIN(data.pipeline), "rtpvp8pay");
+    gst_bin_get_by_name(GST_BIN(data.pipeline), "queue2");
     gst_bin_get_by_name(GST_BIN(data.pipeline), "udpsink1");
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
 }
@@ -183,7 +186,21 @@ void Transmiter::onStartSession() {
 
 void Transmiter::onKillSession() {
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    //if (data.loop) g_main_loop_unref(data.loop);
-    //if (data.bus) gst_object_unref(data.bus);
-    //if (data.pipeline) gst_object_unref(data.pipeline);
+    // if (data.loop) g_main_loop_unref(data.loop);
+    // if (data.bus) gst_object_unref(data.bus);
+    // if (data.pipeline) gst_object_unref(data.pipeline);
 }
+
+void Transmiter::onSetVolume(float volume_) {
+  g_object_set(volume, "volume", volume_, NULL);
+}
+
+void Transmiter::onSetBitrate(const int bitrate) {
+    qDebug() << "set bitrate";
+    gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
+    g_object_set(G_OBJECT(vp8enc), "target-bitrate", bitrate, NULL);
+
+    gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
+}
+
+// void Transmiter::onSetVolume(float volume) {}
