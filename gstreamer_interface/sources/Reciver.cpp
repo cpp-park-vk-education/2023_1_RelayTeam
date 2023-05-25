@@ -71,7 +71,7 @@ void Reciver::addLinkAudio() {
     g_object_set(G_OBJECT(capsfilter), "caps", caps, NULL);
 
     gst_caps_unref(caps);
-    // g_object_set(volume, "volume", 0.5, NULL);
+    g_object_set(volume, "volume", 0.5, NULL);
 
     gst_bin_add_many(GST_BIN(data.pipeline), udpsrc, queue, capsfilter, depay, parse, decode, convert, audioresample, volume, autovideosink,
                      NULL);
@@ -114,7 +114,6 @@ void Reciver::removeAudio() {
 
 void Reciver::startReceive() {
     gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    // gst_element_set_state(data.pipeline, GST_STATE_READY);
     gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
 
     data.loop = g_main_loop_new(NULL, FALSE);
@@ -146,7 +145,13 @@ void Reciver::onSetVolume(float volume_) {
     g_object_set(volume, "volume", volume_, NULL);
 }
 
-void Reciver::onSetBitrate(const int bitrate) {}
+void Reciver::onSetBitrate(const int bitrate) {
+  qDebug() << "set bitrate";
+  gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
+  g_object_set(G_OBJECT(vp8enc), "target-bitrate", bitrate, NULL);
+
+  gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
+}
 
 void Reciver::onEnableVideo() {
     if (!data.pipeline) {
@@ -187,7 +192,7 @@ void Reciver::onDisableAudio() {
 }
 
 void Reciver::onStartSession() {
-    /*на данный момент ен используется*/
+    /*на данный момент не используется*/
     /* qDebug() << "Starting video receiver";
      gst_init(nullptr, nullptr);
      addLinkVideo();

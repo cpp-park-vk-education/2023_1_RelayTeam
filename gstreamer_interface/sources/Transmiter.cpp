@@ -26,22 +26,15 @@ void Transmiter::addLinkVideo() {
         g_printerr("Not all elements could be created\n");
         return;
     }
-
-    // caps1 = gst_caps_new_simple("video/x-raw", "framerate", GST_TYPE_FRACTION, 30, 1, NULL);
-
     caps1 =
-        gst_caps_new_simple("video/x-raw", "profile", G_TYPE_STRING, "main", "width", G_TYPE_INT, 1024, "height", G_TYPE_INT, 600, NULL);
+        gst_caps_new_simple("video/x-raw", "profile", G_TYPE_STRING, "main", "width", G_TYPE_INT, 1600, "height", G_TYPE_INT, 900, NULL);
 
-    // g_object_set(G_OBJECT(vp8enc), "width", 1024, "height", 600, NULL);
-    // g_object_set(vp8enc, "min-quantizer", 10, NULL);
 
     g_object_set(G_OBJECT(capsfilter1), "caps", caps1, NULL);
-    // g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
-    // g_object_set(videoscale, "add-borders", TRUE, 0x00000000, "width", 1024, "height", 600, NULL);
+
 
     gst_caps_unref(caps1);
-    //
-    // gst_caps_unref(caps2);
+
 
     gst_bin_add_many(GST_BIN(data.pipeline), ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc, rtpvp8pay,
                      queue2, udpsink1, NULL);
@@ -198,7 +191,9 @@ void Transmiter::onKillSession() {
     // if (data.pipeline) gst_object_unref(data.pipeline);
 }
 
-void Transmiter::onSetVolume(float volume) {}
+void Transmiter::onSetVolume(float volume_) {
+  g_object_set(volume, "volume", volume_, NULL);
+}
 
 void Transmiter::onSetBitrate(const int bitrate) {
     qDebug() << "set bitrate";
