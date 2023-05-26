@@ -25,27 +25,25 @@
 #include <QtGlobal>
 
 #ifdef Q_OS_UNIX
-#  include <cerrno>
-#  include <cstring>
-#  include <sys/socket.h>
-#endif
+#include <sys/socket.h>
 
-#include <QHostAddress>
-#include <QNetworkInterface>
+#include <cerrno>
+#include <cstring>
+#endif
 
 #include <qmdnsengine/dns.h>
 #include <qmdnsengine/mdns.h>
 #include <qmdnsengine/message.h>
 #include <qmdnsengine/server.h>
 
+#include <QHostAddress>
+#include <QNetworkInterface>
+
 #include "server_p.h"
 
 using namespace QMdnsEngine;
 
-ServerPrivate::ServerPrivate(Server *server)
-    : QObject(server),
-      q(server)
-{
+ServerPrivate::ServerPrivate(Server* server) : QObject(server), q(server) {
     connect(&timer, &QTimer::timeout, this, &ServerPrivate::onTimeout);
     connect(&ipv4Socket, &QUdpSocket::readyRead, this, &ServerPrivate::onReadyRead);
     connect(&ipv6Socket, &QUdpSocket::readyRead, this, &ServerPrivate::onReadyRead);
@@ -55,8 +53,7 @@ ServerPrivate::ServerPrivate(Server *server)
     onTimeout();
 }
 
-bool ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
-{
+bool ServerPrivate::bindSocket(QUdpSocket& socket, const QHostAddress& address) {
     // Exit early if the socket is already bound
     if (socket.state() == QAbstractSocket::BoundState) {
         return true;
@@ -69,8 +66,7 @@ bool ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
 #ifdef Q_OS_UNIX
     if (!socket.bind(address, MdnsPort, QAbstractSocket::ShareAddress)) {
         int arg = 1;
-        if (setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR,
-                reinterpret_cast<char*>(&arg), sizeof(int))) {
+        if (setsockopt(socket.socketDescriptor(), SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&arg), sizeof(int))) {
             emit q->error(strerror(errno));
             return false;
         }
@@ -86,8 +82,7 @@ bool ServerPrivate::bindSocket(QUdpSocket &socket, const QHostAddress &address)
     return true;
 }
 
-void ServerPrivate::onTimeout()
-{
+void ServerPrivate::onTimeout() {
     // A timer is used to run a set of operations once per minute; first, the
     // two sockets are bound - if this fails, another attempt is made once per
     // timeout; secondly, all network interfaces are enumerated; if the
@@ -99,7 +94,7 @@ void ServerPrivate::onTimeout()
 
     if (ipv4Bound || ipv6Bound) {
         const auto interfaces = QNetworkInterface::allInterfaces();
-        for (const QNetworkInterface &networkInterface : interfaces) {
+        for (const QNetworkInterface& networkInterface : interfaces) {
             if (networkInterface.flags() & QNetworkInterface::CanMulticast) {
                 if (ipv4Bound) {
                     ipv4Socket.joinMulticastGroup(MdnsIpv4Address, networkInterface);
@@ -114,10 +109,9 @@ void ServerPrivate::onTimeout()
     timer.start();
 }
 
-void ServerPrivate::onReadyRead()
-{
+void ServerPrivate::onReadyRead() {
     // Read the packet from the socket
-    QUdpSocket *socket = qobject_cast<QUdpSocket*>(sender());
+    QUdpSocket* socket = qobject_cast<QUdpSocket*>(sender());
     QByteArray packet;
     packet.resize(socket->pendingDatagramSize());
     QHostAddress address;
@@ -133,14 +127,9 @@ void ServerPrivate::onReadyRead()
     }
 }
 
-Server::Server(QObject *parent)
-    : AbstractServer(parent),
-      d(new ServerPrivate(this))
-{
-}
+Server::Server(QObject* parent) : AbstractServer(parent), d(new ServerPrivate(this)) {}
 
-void Server::sendMessage(const Message &message)
-{
+void Server::sendMessage(const Message& message) {
     QByteArray packet;
     toPacket(message, packet);
     if (message.address().protocol() == QAbstractSocket::IPv4Protocol) {
@@ -150,8 +139,7 @@ void Server::sendMessage(const Message &message)
     }
 }
 
-void Server::sendMessageToAll(const Message &message)
-{
+void Server::sendMessageToAll(const Message& message) {
     QByteArray packet;
     toPacket(message, packet);
     d->ipv4Socket.writeDatagram(packet, MdnsIpv4Address, MdnsPort);

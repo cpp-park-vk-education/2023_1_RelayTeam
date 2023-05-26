@@ -5,8 +5,9 @@ find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Network
 )
 
+#find_package(GSTREAMER)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+pkg_check_modules(GST REQUIRED gstreamer-1.0)
 
 file(GLOB SRC_FILES
 	${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
