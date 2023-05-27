@@ -5,24 +5,30 @@ find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Network
 )
 
-find_package(OpenSSL REQUIRED)
-
 file(GLOB SRC_FILES
 	${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
 	${CMAKE_CURRENT_LIST_DIR}/include/*.h
 )
 
-link_libraries(OpenSSL::SSL OpenSSL::Crypto)
-
 add_library(${PROJECT_NAME} SHARED
-	${SRC_FILES}
+        ${SRC_FILES}
 )
+
+if (ANDROID)
+    include(E:/Users/AntonGer/AppData/Local/Android/Sdk/android_openssl/CMakeLists.txt)
+elseif()
+    find_package(OpenSSL REQUIRED)
+endif()
+
+
+link_libraries(OpenSSL::SSL OpenSSL::Crypto)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt${QT_VERSION}::Core
 	Qt${QT_VERSION}::Network
 	general_use
-	OpenSSL::SSL
+#	OpenSSL::SSL
+        ssl
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

@@ -62,11 +62,11 @@ target_include_directories(qmdnsengine PUBLIC
 )
 
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
-	Network
+   Network
 )
 
 target_link_libraries(qmdnsengine
-	Qt${QT_VERSION}::Network
+   Qt${QT_VERSION}::Network
 )
 
 install(TARGETS qmdnsengine
