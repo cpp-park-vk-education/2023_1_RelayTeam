@@ -24,6 +24,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	general_use
 )
 
+if(ANDROID)
+    target_include_directories(${PROJECT_NAME} PUBLIC
+        "${CMAKE_SOURCE_DIR}/qmdnsengine_extern/include"
+    )
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include
 	${QMDNSENGINE_INCLUDE_DIRS}

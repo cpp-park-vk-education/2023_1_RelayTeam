@@ -15,21 +15,29 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 if (ANDROID)
-    include(E:/Users/AntonGer/AppData/Local/Android/Sdk/android_openssl/CMakeLists.txt)
+    #    set something like E:/Users/<user>/AppData/Local/Android/Sdk/android_openssl
+
+    include("${ANDROID_OPENSSL_ROOT}/CMakeLists.txt")
+    include_directories("${ANDROID_OPENSSL_ROOT}/ssl_3/include")
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${ANDROID_EXTRA_LIBS}
+    )
+
 elseif()
     find_package(OpenSSL REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ssl
+    )
 endif()
-
-
-link_libraries(OpenSSL::SSL OpenSSL::Crypto)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt${QT_VERSION}::Core
 	Qt${QT_VERSION}::Network
-	general_use
-#	OpenSSL::SSL
-        ssl
+        general_use
 )
+
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include

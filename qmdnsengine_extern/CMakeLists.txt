@@ -1,4 +1,5 @@
 configure_file(qmdnsengine_export.h.in "${CMAKE_CURRENT_BINARY_DIR}/qmdnsengine_export.h")
+configure_file(qmdnsengine_export.h.in "${CMAKE_CURRENT_LIST_DIR}/include/qmdnsengine_export.h")
 
 set(HEADERS
     include/qmdnsengine/abstractserver.h
@@ -61,6 +62,10 @@ target_include_directories(qmdnsengine PUBLIC
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
 
+target_include_directories(qmdnsengine PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}/include
+)
+
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
    Network
 )
@@ -69,26 +74,4 @@ target_link_libraries(qmdnsengine
    Qt${QT_VERSION}::Network
 )
 
-install(TARGETS qmdnsengine
-    EXPORT        qmdnsengine-export
-    RUNTIME       DESTINATION "${BIN_INSTALL_DIR}"
-    LIBRARY       DESTINATION "${LIB_INSTALL_DIR}"
-    ARCHIVE       DESTINATION "${LIB_INSTALL_DIR}"
-    PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}/qmdnsengine"
-)
 
-install(EXPORT qmdnsengine-export
-    FILE        qmdnsengineConfig.cmake
-    DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
-)
-
-include(CMakePackageConfigHelpers)
-
-write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/qmdnsengineConfigVersion.cmake"
-    VERSION       ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qmdnsengineConfigVersion.cmake"
-    DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
-)

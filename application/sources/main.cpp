@@ -1,13 +1,14 @@
 #include <QApplication>
 #include <QtDebug>
+#include <QMainWindow>
 
 #include "MainWindow.h"
-// #include "PortScaner.h"
 #include "networkTools.h"
 #include "variables.h"
 
 int main(int argc, char* argv[]) {
-    qDebug() << "Application started.";
+    qDebug() << "MR: Application started.";
+
     QApplication a(argc, argv);
     a.setApplicationDisplayName("MultiRelay");
     a.setApplicationName("MultiRelay");
