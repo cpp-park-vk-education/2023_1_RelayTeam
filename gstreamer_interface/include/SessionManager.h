@@ -24,6 +24,8 @@ public:
 public slots:
     void onStartVideoSession(const QHostAddress ip_address);
 
+    void onStartCameraSession(const QHostAddress ip_address);
+
     void onStartAudioSession(const QHostAddress ip_address);
 
     void onKillVideoSession(const QHostAddress ip_address);
@@ -34,9 +36,15 @@ public slots:
 
     void onKillVideoReciver(const QHostAddress ip_address);
 
+    void onKillCameraSession(const QHostAddress ip_address);
+
     void onKillAudioReciver(const QHostAddress ip_address);
 
     void onReceivedPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
+
+    void onReceivedCameraPorts(const QHostAddress ip_address, qint32 video_port);
+
+    void onCloseWindow(const QHostAddress& ip_address_, const QString session_type);
 
     void onSetVolume(const QHostAddress ip_address, const int volume);
 
@@ -44,6 +52,12 @@ public slots:
 
 signals:
     void sendErrorOccured(const QString error_string);
+
+    void sendCameraSession(const QHostAddress ip_address, qint32 video_port);
+
+    void senStartCameraSession(const QHostAddress ip_address, qint32 video_port);
+
+    void sendSetCameraPort(const QHostAddress ip_address, qint32 video_port);
 
     void setVolume(const int volume);
 

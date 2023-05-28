@@ -1,6 +1,7 @@
 project(gstreamer_interface VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
+        Widgets
 	Core
 	Network
 )
@@ -17,11 +18,16 @@ add_library(${PROJECT_NAME} SHARED
 	${SRC_FILES}
 )
 
+target_link_libraries(${PROJECT_NAME} PRIVATE gstvideo-1.0)
+
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
+        Qt${QT_VERSION}::Widgets
 	Qt${QT_VERSION}::Core
 	Qt${QT_VERSION}::Network
 	general_use
 	${GSTREAMER_LIBRARIES}
+        ${GSTREAMER_VIDEO_LIBRARIES}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -46,6 +52,7 @@ if(BUILD_TESTS)
 		Qt${QT_VERSION}::Network
 		general_use
 		${GSTREAMER_LIBRARIES}
+                ${GSTREAMER_VIDEO_LIBRARIES}
 	)
 
     enable_testing()
