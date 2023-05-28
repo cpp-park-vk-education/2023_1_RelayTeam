@@ -7,6 +7,7 @@
 #include <iostream>
 
 void MainWindow::createRightBar() {
+    qDebug() << "MR: MainWindow initialization started";
     right_bar = new QVBoxLayout();                  // Creating right bar.
     settings_button = new QPushButton("Settings");  // Creating settings button.
     settings_button->setFixedHeight(60 * options->getScale());
@@ -66,6 +67,9 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false), streaming_session_manager() {
     options = new Options();
     data_base.getOptions(options);
+    if(ANDROID) {
+        options->scale_factor /= 2;
+    }
     QFont font = this->font();
     font.setPointSize(16 * getFontScaling(options->getScale()));
     this->setFont(font);

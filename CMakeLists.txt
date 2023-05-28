@@ -10,6 +10,10 @@ if(MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 endif()
 
+if(ANDROID)
+    add_definitions(-DANDROID_DISABLE_SECCOMP)
+endif()
+
 project(MultiRelay VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
@@ -24,6 +28,9 @@ set(QT_DEBUG_PLUGINS ON)
 option(BUILD_TESTS "Build tests" OFF)
 option(BUILD_DOCS "Build documentation" OFF)
 option(BUILD_COVERAGE "Build code coverage" OFF)
+
+
+add_subdirectory(qmdnsengine_extern)
 
 add_subdirectory(general_use)
 add_subdirectory(search_devices)

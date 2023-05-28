@@ -6,8 +6,6 @@ find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Network
 )
 
-find_library(qmdnsengine 0.2.0 CONFIG)
-
 file(GLOB SRC_FILES
 	${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
 	${CMAKE_CURRENT_LIST_DIR}/include/*.h
@@ -25,6 +23,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 #	${QMDNSENGINE_LIBRARIES}
 	general_use
 )
+
+if(ANDROID)
+    target_include_directories(${PROJECT_NAME} PUBLIC
+        "${CMAKE_SOURCE_DIR}/qmdnsengine_extern/include"
+    )
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/include

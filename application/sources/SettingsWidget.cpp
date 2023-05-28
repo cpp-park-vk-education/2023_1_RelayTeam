@@ -14,11 +14,11 @@ SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(pa
 	change_device_name_layout = new QHBoxLayout();
 	main_layout->addLayout(change_device_name_layout);
 	reset_device_name_button = new QPushButton("Reset device name");
-	reset_device_name_button->setFixedSize(170 * scale, 40 * scale);
+    reset_device_name_button->setFixedSize(170 * scale, 40 * scale);
 	change_device_name_layout->addWidget(reset_device_name_button);
 	set_device_name_button = new QPushButton("Set device name");
 	change_device_name_layout->addWidget(set_device_name_button);
-	set_device_name_button->setFixedSize(170 * scale, 40 * scale);
+    set_device_name_button->setFixedSize(170 * scale, 40 * scale);
 	device_name_input_box = new QLineEdit();
 	device_name_input_box->setFixedHeight(40 * scale);
 	device_name_input_box->setPlaceholderText(options->device_name);
@@ -31,8 +31,8 @@ SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(pa
 	scaling_label = new QLabel("UI scaling: ");
 	change_scale_layout->addWidget(scaling_label);
 	scale_slider = new QSlider(Qt::Horizontal);  // Creating scale slider.
-	scale_slider->setFixedWidth(160 * scale);
-	scale_slider->setMaximum(200);
+    scale_slider->setFixedWidth(160 * scale);
+    scale_slider->setMaximum(200);
 	scale_slider->setMinimum(50);
 	change_scale_layout->addWidget(scale_slider);
 	scale_box = new QSpinBox();  // Creating scale label.
