@@ -26,8 +26,13 @@ protected:
 public:
     SslServer(SslIOManager* ssl_io_manager_, QObject* parent = nullptr);
 
+    ~SslServer();
+
 public slots:
     SslConnection* onConnectToServer(QHostAddress address);
+
+signals:
+    void sendKillAll();
 };
 
 class ServerThread : public QThread {

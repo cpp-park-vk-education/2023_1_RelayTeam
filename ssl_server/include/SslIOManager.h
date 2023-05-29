@@ -22,6 +22,8 @@ private:
 public:
     SslIOManager(QObject* parent = nullptr);
 
+    ~SslIOManager();
+
 public slots:
     /*!
      * \brief Writes text to opend socket. Creates one if doesn't exist.
@@ -72,4 +74,6 @@ signals:
      * \param audio_port - chosen audio port.
      */
     void sendReceivedPorts(const QHostAddress ipv_address, qint32 video_port, qint32 audio_port);
+
+    void sendKillAll();
 };

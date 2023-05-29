@@ -55,39 +55,20 @@ if (ANDROID)
        "${GST_ANDROID_LIBRARIES}/lib/glib-2.0/include"
        "${GST_ANDROID_LIBRARIES}/include/libxml2/"
     )
-
-
-#    set(GST_ROOT "${ANDROID_GSTREAMER_ROOT}/${ANDROID_ABI}")
-
-#    find_package(GSTREAMER REQUIRED)
-
-#    target_link_libraries(${PROJECT_NAME} PRIVATE
-#        ${GSTREAMER_LIBRARIES}
-#    )
-
-#    target_include_directories(${PROJECT_NAME} PUBLIC
-#        ${GSTREAMER_INCLUDE_DIRS}
-#    )
-
-
-elseif()
+else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GST REQUIRED gstreamer-1.0)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
-        ${GSTREAMER_LIBRARIES}
+		${GST_LIBRARIES}
     )
+
+    message("====${GST_INCLUDE_DIRS}")
 
     target_include_directories(${PROJECT_NAME} PUBLIC
-       ${GSTREAMER_INCLUDE_DIRS}
+		${GST_INCLUDE_DIRS}
     )
 endif()
-#find_package(GSTREAMER)
-
-
-
-
-
 
 
 

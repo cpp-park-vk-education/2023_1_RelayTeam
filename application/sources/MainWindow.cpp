@@ -67,9 +67,9 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false), streaming_session_manager() {
     options = new Options();
     data_base.getOptions(options);
-    if(ANDROID) {
-        options->scale_factor /= 2;
-    }
+#ifdef ANDROID
+    options->scale_factor = 0.5;
+#endif
     QFont font = this->font();
     font.setPointSize(16 * getFontScaling(options->getScale()));
     this->setFont(font);
@@ -100,6 +100,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow() {
     emit killAll();
+    ssl_io_manager->deleteLater();
     delete options;
 }
 
@@ -108,6 +109,12 @@ void MainWindow::makeDeviceConnections(DeviceWidget* device) {
     connect(device, &DeviceWidget::sendStopVideoSession, &streaming_session_manager, &SessionManager::onKillVideoSession);
     connect(device, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
     connect(device, &DeviceWidget::sendStopAudioSession, &streaming_session_manager, &SessionManager::onKillAudioSession);
+
+    //    connect(devoce, &DeviceWidget::sendChangeBitrait, &streaming_session_manager, &SessionManager::);
+    //    connect(devoce, &DeviceWidget::sendChangeVolume, &streaming_session_manager, &SessionManager::);
+    //    connect(devoce, &DeviceWidget::sendSetCameraCaptureMode, &streaming_session_manager, &SessionManager::);
+    //    connect(devoce, &DeviceWidget::sendSetScreenCaptureMode, &streaming_session_manager, &SessionManager::);
+    //    connect(devoce, &DeviceWidget::sendToggleRecording, &streaming_session_manager, &SessionManager::);
 }
 
 void MainWindow::onSettingsButtonPressed() {

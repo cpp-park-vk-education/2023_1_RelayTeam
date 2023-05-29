@@ -13,6 +13,10 @@ SslServer::SslServer(SslIOManager* ssl_io_manager_, QObject* parent) : ssl_io_ma
     }
 }
 
+SslServer::~SslServer() {
+    emit sendKillAll();
+}
+
 void SslServer::incomingConnection(qintptr socketDescriptor) {
     SslConnection* ssl_connection = new SslConnection(key, cert);
     connect(ssl_connection, &SslConnection::sendStartReceivingSession, ssl_io_manager, &SslIOManager::sendStartReceivingSession);
@@ -20,6 +24,8 @@ void SslServer::incomingConnection(qintptr socketDescriptor) {
 
     connect(ssl_connection, &SslConnection::sendAddSslConnection, ssl_io_manager, &SslIOManager::onAddSslConnection);
     connect(ssl_connection, &SslConnection::sendRemoveSslConnection, ssl_io_manager, &SslIOManager::onRemoveSslConnection);
+
+    connect(this, &SslServer::sendKillAll, ssl_connection, &SslConnection::deleteLater);
 
     QMetaObject::invokeMethod(ssl_connection, "onConnectToClient", Qt::QueuedConnection, Q_ARG(qintptr, socketDescriptor));
 }
@@ -31,6 +37,8 @@ SslConnection* SslServer::onConnectToServer(QHostAddress address) {
 
     connect(ssl_connection, &SslConnection::sendAddSslConnection, ssl_io_manager, &SslIOManager::onAddSslConnection);
     connect(ssl_connection, &SslConnection::sendRemoveSslConnection, ssl_io_manager, &SslIOManager::onRemoveSslConnection);
+
+    connect(this, &SslServer::sendKillAll, ssl_connection, &SslConnection::deleteLater);
 
     QMetaObject::invokeMethod(ssl_connection, "onConnectToServer", Qt::QueuedConnection, Q_ARG(QHostAddress, address));
     return ssl_connection;

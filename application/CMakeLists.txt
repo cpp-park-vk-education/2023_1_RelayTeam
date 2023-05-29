@@ -3,7 +3,7 @@ project(MultiRelay VERSION 0.1 LANGUAGES CXX)
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Widgets
 	Sql
-        Network
+	Network
 )
 
 file(GLOB SRC_FILES
@@ -16,7 +16,6 @@ qt_add_executable(${PROJECT_NAME}
 )
 
 if (ANDROID)
-
     set(ANDROID_MANIFEST_XML_PATH "${CMAKE_CURRENT_BINARY_DIR}/android-build/AndroidManifest.xml")
     file(READ "${ANDROID_MANIFEST_XML_PATH}" ANDROID_MANIFEST_XML_CONTENTS)
     string(REPLACE "android:screenOrientation=\"unspecified\"" "android:screenOrientation=\"landscape\" " ANDROID_MANIFEST_XML_CONTENTS "${ANDROID_MANIFEST_XML_CONTENTS}")
@@ -35,7 +34,7 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt${QT_VERSION}::Widgets
 	Qt${QT_VERSION}::Sql
-        Qt${QT_VERSION}::Network
+	Qt${QT_VERSION}::Network
 	general_use
 	gstreamer_interface
 	bluetooth

@@ -4,6 +4,12 @@ SslIOManager::SslIOManager(QObject* parent) : QObject(parent) {
     ServerThread* ssl_server_thread = new ServerThread();
     QMetaObject::invokeMethod(ssl_server_thread, "init", Qt::BlockingQueuedConnection, Q_ARG(SslIOManager*, this));
     ssl_server = reinterpret_cast<SslServer*>(ssl_server_thread->getObject());
+
+    connect(this, &SslIOManager::sendKillAll, ssl_server_thread, &ServerThread::deleteLater);
+}
+
+SslIOManager::~SslIOManager() {
+    emit sendKillAll();
 }
 
 void SslIOManager::writeTo(QHostAddress address, QString message) {
