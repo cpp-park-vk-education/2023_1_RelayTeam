@@ -30,19 +30,18 @@ public:
     ~Transmiter();
 
 public slots:
+    void onEbableCamera() override;
+
     void onEnableVideo() override;
 
     void onEnableAudio() override;
-
-    void onDisableVideo() override;
-
-    void onDisableAudio() override;
 
     void onStartSession() override;
 
     void onKillSession() override;
 
-    void onSetVolume(float volume) override;
+    void onSetBitrate(const int bitrate);
 
-    void onSetBitrate(const int bitrate) override;
+signals:
+
 };

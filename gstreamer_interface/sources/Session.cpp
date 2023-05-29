@@ -50,13 +50,11 @@ gboolean Session::busCallback(GstBus* bus, GstMessage* msg, gpointer data) {
             break;
 
         default:
-            qDebug() << "1";
+            qDebug() << "busCallback message";
             break;
     }
     return TRUE;
 }
-
-void Session::onSetBitrate(const int bitrate) {}
 
 const char* Session::representIP(const QHostAddress& ext_ip_address) {
     char* ip_char_string = nullptr;
