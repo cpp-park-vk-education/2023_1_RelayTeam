@@ -110,11 +110,11 @@ void MainWindow::makeDeviceConnections(DeviceWidget* device) {
     connect(device, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
     connect(device, &DeviceWidget::sendStopAudioSession, &streaming_session_manager, &SessionManager::onKillAudioSession);
 
-    //    connect(devoce, &DeviceWidget::sendChangeBitrait, &streaming_session_manager, &SessionManager::);
-    //    connect(devoce, &DeviceWidget::sendChangeVolume, &streaming_session_manager, &SessionManager::);
-    //    connect(devoce, &DeviceWidget::sendSetCameraCaptureMode, &streaming_session_manager, &SessionManager::);
-    //    connect(devoce, &DeviceWidget::sendSetScreenCaptureMode, &streaming_session_manager, &SessionManager::);
-    //    connect(devoce, &DeviceWidget::sendToggleRecording, &streaming_session_manager, &SessionManager::);
+    connect(device, &DeviceWidget::sendChangeBitrait, &streaming_session_manager, &SessionManager::onSetBitrate);
+    connect(device, &DeviceWidget::sendChangeVolume, &streaming_session_manager, &SessionManager::onSetVolume);
+    connect(device, &DeviceWidget::sendSetCameraCaptureMode, &streaming_session_manager, &SessionManager::setCameraCaptureMode);
+    connect(device, &DeviceWidget::sendSetScreenCaptureMode, &streaming_session_manager, &SessionManager::setScreenCaptureMode);
+    //connect(devoce, &DeviceWidget::sendToggleRecording, &streaming_session_manager, &SessionManager::);
 }
 
 void MainWindow::onSettingsButtonPressed() {

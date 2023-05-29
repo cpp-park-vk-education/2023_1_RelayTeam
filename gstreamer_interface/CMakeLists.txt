@@ -1,6 +1,7 @@
 project(gstreamer_interface VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
+        Widgets
 	Core
 	Network
 )
@@ -15,9 +16,11 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+        Qt${QT_VERSION}::Widgets
         Qt${QT_VERSION}::Core
         Qt${QT_VERSION}::Network
         general_use
+        gstvideo-1.0
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

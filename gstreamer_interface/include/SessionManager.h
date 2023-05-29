@@ -16,6 +16,10 @@ private:
 
     void startThread(Session* session, const QString session_type);
 
+    void killSessionIp4(const QHostAddress ip_address, const QString key);
+
+    void killSessionIp6(const QHostAddress ip_address, const QString key);
+
 public:
     SessionManager();
 
@@ -23,6 +27,8 @@ public:
 
 public slots:
     void onStartVideoSession(const QHostAddress ip_address);
+
+    void onStartCameraSession(const QHostAddress ip_address);
 
     void onStartAudioSession(const QHostAddress ip_address);
 
@@ -32,18 +38,30 @@ public slots:
 
     void onStartReceivingSession(const QHostAddress ip_address, const QString session_type);
 
-    void onKillVideoReciver(const QHostAddress ip_address);
-
-    void onKillAudioReciver(const QHostAddress ip_address);
+    void onKillCameraSession(const QHostAddress ip_address);
 
     void onReceivedPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
+
+    void onReceivedCameraPorts(const QHostAddress ip_address, qint32 video_port);
+
+    void onCloseWindow(const QHostAddress& ip_address_, const QString session_type);
 
     void onSetVolume(const QHostAddress ip_address, const int volume);
 
     void onSetBitrate(const QHostAddress ip_address, const int bitrate);
 
+    void setCameraCaptureMode(const QHostAddress ip_address);
+
+    void setScreenCaptureMode(const QHostAddress ip_address);
+
 signals:
     void sendErrorOccured(const QString error_string);
+
+    void sendCameraSession(const QHostAddress ip_address, const qint32 video_port);
+
+    void senStartCameraSession(const QHostAddress ip_address,const  qint32 video_port);
+
+    void sendSetCameraPort(const QHostAddress ip_address, const qint32 video_port);
 
     void setVolume(const int volume);
 
@@ -59,7 +77,9 @@ signals:
 
     void sendKillAll();
 
+    void setPorts(const QHostAddress ip_address, const qint32 session_type);
+
     void sendStartReciver(const QHostAddress local_ip6, const QString session_type);
 
-    void sendSetPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port);
+    void sendSetPorts(const QHostAddress ip_address, const qint32 video_port, const qint32 audio_port);
 };

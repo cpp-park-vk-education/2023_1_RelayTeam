@@ -1,7 +1,10 @@
 #pragma once
 
 #include <gst/gst.h>
+#include <gst/video/videooverlay.h>
 
+#include <QApplication>
+#include <QMainWindow>
 #include <QString>
 #include <QThread>
 #include <QtNetwork/QAbstractSocket>
@@ -27,10 +30,9 @@ protected:
     Session(const QHostAddress& ip_address_, const qint32 video_port_, const qint32 audio_port_);
     Session(const QHostAddress& ip_address_, const qint32 audio_port_);
     Session(const qint32 video_port_, const qint32 audio_port_);
-    Session(const qint32 audio_port_);
-    ~Session();
+    Session(const qint32 audio_port_); 
 
-    CustomData data;
+    CustomData customData;
     QHostAddress ip_address;
     qint32 video_port;
     qint32 audio_port;
@@ -40,23 +42,18 @@ protected:
 public:
     const static char* representIP(const QHostAddress& ext_ip_address);
 
+    ~Session();
+
 public slots:
+    virtual void onEbableCamera() = 0;
 
     virtual void onEnableVideo() = 0;
 
     virtual void onEnableAudio() = 0;
 
-    virtual void onDisableVideo() = 0;
-
-    virtual void onDisableAudio() = 0;
-
     virtual void onStartSession() = 0;
 
     virtual void onKillSession() = 0;
-
-    virtual void onSetVolume(const float volume) = 0;
-
-    virtual void onSetBitrate(const int bitrate) = 0;
 
 signals:
     void EnableVideo();
@@ -68,4 +65,6 @@ signals:
     void DisableAudio();
 
     void sendSessionKilled();
+
+    void closeWindow(const QHostAddress& ip_address_, QString pipelineName);
 };

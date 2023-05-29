@@ -3,10 +3,10 @@
 void Transmiter::addLinkVideo() {
     GstElement *ximagesrc, *queue1, *capsfilter1, *capsfilter2, *videoscale, *videoconvert1, *videoconvert2, *rtpvp8pay, *queue2, *udpsink1;
     GstCaps *caps1, *caps2;
-    if (data.pipeline == NULL) {
-        data.pipeline = gst_pipeline_new("pipeline");
+    if (customData.pipeline == NULL) {
+        customData.pipeline = gst_pipeline_new("video");
     }
-    data.pipeline = gst_pipeline_new("my-pipeline");
+    //customData.pipeline = gst_pipeline_new("my-pipeline");
     ximagesrc = gst_element_factory_make("ximagesrc", "ximagesrc");
     // queue1 = gst_element_factory_make("queue", "queue1");
     // capsfilter1 = gst_element_factory_make("capsfilter", "capsfilterVideo1");
@@ -21,37 +21,27 @@ void Transmiter::addLinkVideo() {
     queue2 = gst_element_factory_make("queue", "queue2");
     udpsink1 = gst_element_factory_make("udpsink", "udpsink1");
 
-    if (!data.pipeline || !ximagesrc || !vp8enc || !videoconvert1 || !videoscale || !videoconvert2 || !queue2 || !queue1 || !rtpvp8pay ||
-        !udpsink1) {
-        g_printerr("Not all elements could be created\n");
+    if (!customData.pipeline || !ximagesrc || !vp8enc || !videoconvert1 || !videoscale || !videoconvert2 || !queue2 || !queue1 ||
+        !rtpvp8pay || !udpsink1 || !capsfilter1) {
+        g_printerr("Not all elements could be created Transmiter\n");
         return;
     }
-
-    // caps1 = gst_caps_new_simple("video/x-raw", "framerate", GST_TYPE_FRACTION, 30, 1, NULL);
-
     caps1 =
         gst_caps_new_simple("video/x-raw", "profile", G_TYPE_STRING, "main", "width", G_TYPE_INT, 1024, "height", G_TYPE_INT, 600, NULL);
 
-    // g_object_set(G_OBJECT(vp8enc), "width", 1024, "height", 600, NULL);
-    // g_object_set(vp8enc, "min-quantizer", 10, NULL);
-
     g_object_set(G_OBJECT(capsfilter1), "caps", caps1, NULL);
-    // g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
-    // g_object_set(videoscale, "add-borders", TRUE, 0x00000000, "width", 1024, "height", 600, NULL);
 
     gst_caps_unref(caps1);
-    //
-    // gst_caps_unref(caps2);
 
-    gst_bin_add_many(GST_BIN(data.pipeline), ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc, rtpvp8pay,
-                     queue2, udpsink1, NULL);
+    gst_bin_add_many(GST_BIN(customData.pipeline), ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc,
+                     rtpvp8pay, queue2, udpsink1, NULL);
 
     if (gst_element_link_many(ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc, rtpvp8pay, queue2, udpsink1,
                               NULL) != TRUE) {
         g_printerr(
             "Failed to link elements: ximagesrc -> videoscale -> videoconvert -> x264enc -> "
             "rtph264pay -> udpsink1\n");
-        gst_object_unref(data.pipeline);
+        gst_object_unref(customData.pipeline);
         return;
     }
 
@@ -62,8 +52,8 @@ void Transmiter::addLinkVideo() {
 
 void Transmiter::addLinkAudio() {
     GstElement *alsasrc, *audioconvert, *audioresample, *opusenc, *rtpopuspay, *udpsink2;
-    if (data.pipeline == NULL) {
-        data.pipeline = gst_pipeline_new("pipeline");
+    if (customData.pipeline == NULL) {
+        customData.pipeline = gst_pipeline_new("audio");
     }
 
     alsasrc = gst_element_factory_make("alsasrc", "alsasrc");
@@ -73,85 +63,101 @@ void Transmiter::addLinkAudio() {
     rtpopuspay = gst_element_factory_make("rtpopuspay", "rtpopuspay");
     udpsink2 = gst_element_factory_make("udpsink", "udpsink2");
 
-    if (!data.pipeline || !alsasrc || !audioconvert || !audioresample || !opusenc || !rtpopuspay || !udpsink2) {
-        g_printerr("Not all elements could be created\n");
+    if (!customData.pipeline || !alsasrc || !audioconvert || !audioresample || !opusenc || !rtpopuspay || !udpsink2) {
+        g_printerr("Not all elements could be created.Transmiter\n");
         return;
     }
 
-    gst_bin_add_many(GST_BIN(data.pipeline), alsasrc, audioconvert, audioresample, opusenc, rtpopuspay, udpsink2, NULL);
+    gst_bin_add_many(GST_BIN(customData.pipeline), alsasrc, audioconvert, audioresample, opusenc, rtpopuspay, udpsink2, NULL);
 
     if (gst_element_link_many(alsasrc, audioconvert, audioresample, opusenc, rtpopuspay, udpsink2, NULL) != TRUE) {
         g_printerr(
             "Failed to link elements: ximagesrc -> videoscale -> videoconvert -> x264enc -> "
             "rtph264pay -> udpsink1\n");
-        gst_object_unref(data.pipeline);
+        gst_object_unref(customData.pipeline);
         return;
     }
 
     g_object_set(udpsink2, "sync", FALSE, "host", representIP(ip_address), "port", audio_port, NULL);
 }
 
-void Transmiter::removeVideo() {
-    gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "ximagesrc");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "videoconvert1");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "videoscale");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "capsfilterVideo1");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "videoconvert2");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "queue1");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "vp8enc");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "rtpvp8pay");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "queue2");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "udpsink1");
-    gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
-}
-
-void Transmiter::removeAudio() {
-    gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "alsasrc");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "audioconvert");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "audioresample");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "opusenc");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "rtpopuspay");
-    gst_bin_get_by_name(GST_BIN(data.pipeline), "udpsink2");
-    gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
-}
-
 void Transmiter::startSend() {
-    data.bus = gst_element_get_bus(data.pipeline);
+    customData.loop = g_main_loop_new(NULL, FALSE);
+    customData.bus = gst_element_get_bus(customData.pipeline);
     // qDebug() << data.pipeline;
 
-    gst_bus_add_watch(data.bus, static_cast<GstBusFunc>(busCallback), this);
+    gst_bus_add_watch(customData.bus, static_cast<GstBusFunc>(busCallback), this);
 
-    gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
-    gst_bus_timed_pop_filtered(data.bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+    // gst_element_set_state(data.pipeline, GST_STATE_NULL);
+    gst_element_set_state(customData.pipeline, GST_STATE_PLAYING);
+    gst_bus_timed_pop_filtered(customData.bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 }
 
 Transmiter::Transmiter(const QHostAddress& ip_address_, const qint32 video_port_, const qint32 audio_port_)
     : Session(ip_address_, video_port_, audio_port_) {
-    qDebug() << "Constructor TransmiterVideo" << this;
+    qDebug() << "Constructor Transmiter" << this;
 }
 
 Transmiter::Transmiter(const QHostAddress& ip_address_, const qint32 audio_port_) : Session(ip_address_, audio_port_) {
-    qDebug() << "Constructor TransmiterAudio" << this;
+    qDebug() << "Constructor Transmiter" << this;
 }
 
 Transmiter::~Transmiter() {
-    qDebug() << "Transmiter Destructor"
+    qDebug() << "Destructor Transmiter"
              << "(" << this << ")";
+    QString pipelineName = gst_element_get_name(customData.pipeline);
+    emit closeWindow(ip_address, pipelineName);
     onKillSession();
-    // gst_element_set_state(data.pipeline, GST_STATE_NULL);
+}
+
+void Transmiter::onEbableCamera() {
+    qDebug() << "onEbableCamera Transmiter ";
+    GstElement *v4l2src, *videoconvert, *videoscale, *vp8enc, *rtpvp8pay, *udpsink;
+
+    gst_init(nullptr, nullptr);
+    if (customData.pipeline == NULL) {
+        customData.pipeline = gst_pipeline_new("camera");
+    }
+
+    v4l2src = gst_element_factory_make("v4l2src", "v4l2src");
+    videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+    videoscale = gst_element_factory_make("videoscale", "videoscale");
+    // capsfilter = gst_element_factory_make("capsfilter", "capsfilterVideo1");
+    vp8enc = gst_element_factory_make("vp8enc", "vp8enc");
+    rtpvp8pay = gst_element_factory_make("rtpvp8pay", "rtpvp8pay");
+    udpsink = gst_element_factory_make("udpsink", "udpsink1");
+    if (!customData.pipeline || !v4l2src || !vp8enc || !videoconvert || !videoscale || !rtpvp8pay || !udpsink) {
+        g_printerr("Not all elements could be created Transmiter\n");
+        return;
+    }
+
+    g_object_set(v4l2src, "device", "/dev/video0", NULL);
+
+    g_object_set(udpsink, "sync", FALSE, "host", representIP(ip_address), "port", 5001, NULL);
+
+    gst_bin_add_many(GST_BIN(customData.pipeline), v4l2src, videoconvert, videoscale, vp8enc, rtpvp8pay, udpsink, NULL);
+
+    if (gst_element_link_many(v4l2src, videoconvert, videoscale, vp8enc, rtpvp8pay, udpsink, NULL) != TRUE) {
+        g_printerr(
+            "Failed to link elements: v4l2src -> videoscale -> videoconvert -> x264enc -> "
+            "rtph264pay -> udpsink1\n");
+        gst_object_unref(customData.pipeline);
+        return;
+    }
+
+    startSend();
 }
 
 void Transmiter::onEnableVideo() {
-    if (!data.pipeline) {
+    qDebug() << "onEnableVideo TRANSMITER";
+    if (!customData.pipeline) {
         gst_init(nullptr, nullptr);
         addLinkVideo();
         startSend();
     } else {
-        gst_object_unref(data.bus);
-        gst_object_unref(data.loop);
-        gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
+        gst_object_unref(customData.bus);
+        gst_object_unref(customData.loop);
+        gst_element_set_state(customData.pipeline, GST_STATE_PAUSED);
 
         addLinkVideo();
         startSend();
@@ -159,53 +165,30 @@ void Transmiter::onEnableVideo() {
 }
 
 void Transmiter::onEnableAudio() {
-    if (!data.pipeline) {
+    if (!customData.pipeline) {
         gst_init(nullptr, nullptr);
         addLinkAudio();
         startSend();
     } else {
-        gst_object_unref(data.bus);
-        gst_object_unref(data.loop);
-        gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
+        gst_object_unref(customData.bus);
+        gst_object_unref(customData.loop);
+        gst_element_set_state(customData.pipeline, GST_STATE_PAUSED);
 
         addLinkAudio();
         startSend();
     }
 }
 
-void Transmiter::onDisableVideo() {
-    removeVideo();
-}
-
-void Transmiter::onDisableAudio() {
-    removeAudio();
-}
-
-void Transmiter::onStartSession() {
-    /*на данный момент не используемая функция*/
-    /*qDebug() << "Starting video transmition";
-
-     gst_init(nullptr, nullptr);
-     addLinkVideo();
-     addLinkAudio();
-     startSend();*/
-}
+void Transmiter::onStartSession() {}
 
 void Transmiter::onKillSession() {
-    gst_element_set_state(data.pipeline, GST_STATE_NULL);
-    // if (data.loop) g_main_loop_unref(data.loop);
-    // if (data.bus) gst_object_unref(data.bus);
-    // if (data.pipeline) gst_object_unref(data.pipeline);
+    gst_element_set_state(customData.pipeline, GST_STATE_NULL);
 }
-
-void Transmiter::onSetVolume(float volume) {}
 
 void Transmiter::onSetBitrate(const int bitrate) {
     qDebug() << "set bitrate";
-    gst_element_set_state(data.pipeline, GST_STATE_PAUSED);
+    gst_element_set_state(customData.pipeline, GST_STATE_PAUSED);
     g_object_set(G_OBJECT(vp8enc), "target-bitrate", bitrate, NULL);
 
-    gst_element_set_state(data.pipeline, GST_STATE_PLAYING);
+    gst_element_set_state(customData.pipeline, GST_STATE_PLAYING);
 }
-
-// void Transmiter::onSetVolume(float volume) {}
