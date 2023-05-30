@@ -89,9 +89,11 @@ MainWindow::MainWindow(QWidget* parent)
     // Initializing ssl server
     ssl_io_manager = new SslIOManager;
     QThread* ssl_io_manager_thread = new QThread;
+
     ssl_io_manager->moveToThread(ssl_io_manager_thread);
     ssl_io_manager_thread->start();
 
+    connect(this, &MainWindow::killAll, ssl_io_manager_thread, &QThread::deleteLater);
     connect(ssl_io_manager, &SslIOManager::sendReceivedPorts, &streaming_session_manager, &SessionManager::onReceivedPorts);
     connect(&streaming_session_manager, &SessionManager::sendStartReciver, ssl_io_manager, &SslIOManager::onStartReciver);
     connect(ssl_io_manager, &SslIOManager::sendStartReceivingSession, &streaming_session_manager, &SessionManager::onStartReceivingSession);
@@ -100,7 +102,6 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow() {
     emit killAll();
-    ssl_io_manager->deleteLater();
     delete options;
 }
 
@@ -110,10 +111,12 @@ void MainWindow::makeDeviceConnections(DeviceWidget* device) {
     connect(device, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
     connect(device, &DeviceWidget::sendStopAudioSession, &streaming_session_manager, &SessionManager::onKillAudioSession);
 
-    //    connect(devoce, &DeviceWidget::sendChangeBitrait, &streaming_session_manager, &SessionManager::);
+    //    connect(devoce, &DeviceWidget::sendChangeVideoBitrait, &streaming_session_manager, &SessionManager::);
+    //    connect(devoce, &DeviceWidget::sendChangeAudioBitrait, &streaming_session_manager, &SessionManager::);
     //    connect(devoce, &DeviceWidget::sendChangeVolume, &streaming_session_manager, &SessionManager::);
     //    connect(devoce, &DeviceWidget::sendSetCameraCaptureMode, &streaming_session_manager, &SessionManager::);
     //    connect(devoce, &DeviceWidget::sendSetScreenCaptureMode, &streaming_session_manager, &SessionManager::);
+    //    connect(devoce, &DeviceWidget::sendSetBothCaptureMode, &streaming_session_manager, &SessionManager::);
     //    connect(devoce, &DeviceWidget::sendToggleRecording, &streaming_session_manager, &SessionManager::);
 }
 
@@ -162,7 +165,8 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 void MainWindow::onDevicePreparedToAdd(QString name, QHostAddress local_ipv4_address, QString mac_address) {
     qDebug() << "Adding device: " << name;
-    DeviceWidget* device_widget = new DeviceWidget(mac_address, name, local_ipv4_address, 50, options->getScale());
+    DeviceWidget* device_widget = new DeviceWidget(mac_address, name, 50, options->getScale());
+    device_widget->setLocalIPv4(local_ipv4_address);
     makeDeviceConnections(device_widget);
     devices_layout->addLayout(device_widget);
     data_base.addDevice(device_widget);

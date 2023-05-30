@@ -46,15 +46,18 @@ public:
     const QString ID;
     qint16 volume;
     QString name;
-    QHostAddress local_ipv4_address;
-    qint32 bitrait = 200;
+    QHostAddress local_ipv4_address = QHostAddress();  // isNull = true
+    qint32 video_bitrait = 200;
+    qint32 audio_bitrait = 200;
     bool source_mode_is_screen = true;
 
-    explicit DeviceWidget(QString ID_, const QString& name_, const QHostAddress& local_ipv4_address_, qint16 volume_, qreal scale_,
-                          QWidget* parent = nullptr);
+    explicit DeviceWidget(QString ID_, const QString& name_, qint16 volume_, qreal scale, qint32 video_bitrait_ = DEFAULT_VIDEO_BITRAIT,
+                          qint32 audio_bitrait_ = DEFAULT_AUDIO_BITRAIT, QWidget* parent = nullptr);
 
-    explicit DeviceWidget(QString ID_, QString&& name_, const QHostAddress& local_ipv4_address_, qint16 volume_, qreal scale_,
-                          QWidget* parent = nullptr);
+    explicit DeviceWidget(QString ID_, QString&& name_, qint16 volume_, qreal scale_, qint32 video_bitrait_ = DEFAULT_VIDEO_BITRAIT,
+                          qint32 audio_bitrait_ = DEFAULT_AUDIO_BITRAIT, QWidget* parent = nullptr);
+
+    void setLocalIPv4(const QHostAddress& local_ipv4_address_);
 
 private slots:
     void onAudioPressed();
@@ -64,18 +67,25 @@ private slots:
     void onSettingsPressed();
 
     void onVolumeChanged(qint16 volume_);
+    /////////////////////////////////////////////////////////////////////////
+    void onVideoBitraitChanged(qint32 bitrait_);
 
-    void onBitraitChanged(qint32 bitrait_);
+    void onAudioBitraitChanged(qint32 bitrait_);
 
+    void onSetVideoBitrait();
+
+    void onSetAudioBitrait();
+    /////////////////////////////////////////////////////////////////////////
     void onSetScreenCaptureMode();
 
     void onSetCameraCaptureMode();
 
-    void onSetBitraitCaptureMode();
+    void onSetBothCaptureMode();
 
     void onToggleRecording(bool checked);
 
 signals:
+    /////////////////VIDEO_SESSION_CONTROL///////////////////////////////////
     void sendStartVideoSession(QHostAddress ipv4_address);
 
     void sendStopVideoSession(QHostAddress ipv4_address);
@@ -83,14 +93,18 @@ signals:
     void sendStartAudioSession(QHostAddress ipv4_address);
 
     void sendStopAudioSession(QHostAddress ipv4_address);
-
+    /////////////////VOLUME_CONTROL//////////////////////////////////////////
     void sendChangeVolume(QHostAddress ipv4_address, qint16 volume_);
+    /////////////////BITRAIT_CONTROL/////////////////////////////////////////
+    void sendChangeVideoBitrait(QHostAddress ipv4_address, qint16 volume_);
 
-    void sendChangeBitrait(QHostAddress ipv4_address, qint16 volume_);
-
+    void sendChangeAudioBitrait(QHostAddress ipv4_address, qint16 volume_);
+    /////////////////CAPTURE_MODE_CONTROL////////////////////////////////////
     void sendSetScreenCaptureMode(QHostAddress ipv4_address);
 
     void sendSetCameraCaptureMode(QHostAddress ipv4_address);
 
+    void sendSetBothCaptureMode(QHostAddress ipv4_address);
+    /////////////////RECORDING_CONTROL///////////////////////////////////////
     void sendToggleRecording(QHostAddress ipv4_address, bool checked);
 };
