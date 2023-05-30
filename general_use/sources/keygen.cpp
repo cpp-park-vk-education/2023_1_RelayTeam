@@ -1,13 +1,31 @@
-#include "generateCertificates.h"
+#include "keygen.h"
 
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 #include <variables.h>
 
 #include <QDebug>
+#include <QRandomGenerator>
 #include <iostream>
 
+#define PUB_EXP 65537
+
+void seedRandom() {
+    QRandomGenerator prng(time(nullptr));
+
+    uint8_t seed_data[256];
+    for (size_t i = 0; i < sizeof(seed_data) / 4; i += 4) {
+        uint32_t random_number = prng.generate();
+        for (size_t j = 0; j < 4; ++j) {
+            seed_data[i + j] = (random_number << (8 * j));
+        }
+    }
+
+    RAND_seed(seed_data, sizeof(seed_data));
+}
+
 QPair<QSslKey, QSslCertificate> generateKeyPair() {
+    seedRandom();
     EVP_PKEY* pkey = nullptr;
     RSA* rsa = nullptr;
     X509* x509 = nullptr;
@@ -15,10 +33,21 @@ QPair<QSslKey, QSslCertificate> generateKeyPair() {
     BIO *bp_public = nullptr, *bp_private = nullptr;
     const char* buffer = nullptr;
     long size;
+    int ret;
 
     pkey = EVP_PKEY_new();
     q_check_ptr(pkey);
-    rsa = RSA_generate_key(2048, RSA_F4, nullptr, nullptr);
+    BIGNUM* bne = NULL;
+    bne = BN_new();
+    ret = BN_set_word(bne, PUB_EXP);
+    if (ret != 1) {
+        qFatal("OPENSSL: Unable to generate BIGNUM");
+    }
+    rsa = RSA_new();
+    ret = RSA_generate_key_ex(rsa, 2048, bne, NULL);
+    if (ret != 1) {
+        qFatal("OPENSSL: Unable to generate RSA key");
+    }
     q_check_ptr(rsa);
     EVP_PKEY_assign_RSA(pkey, rsa);
     x509 = X509_new();
@@ -40,7 +69,7 @@ QPair<QSslKey, QSslCertificate> generateKeyPair() {
         EVP_PKEY_free(pkey);
         X509_free(x509);
         BIO_free_all(bp_private);
-        qFatal("PEM_write_bio_PrivateKey");
+        qFatal("OPENSSL: PEM_write_bio_PrivateKey");
     }
     bp_public = BIO_new(BIO_s_mem());
     q_check_ptr(bp_public);
@@ -49,19 +78,19 @@ QPair<QSslKey, QSslCertificate> generateKeyPair() {
         X509_free(x509);
         BIO_free_all(bp_public);
         BIO_free_all(bp_private);
-        qFatal("PEM_write_bio_PrivateKey");
+        qFatal("OPENSSL: PEM_write_bio_PrivateKey");
     }
     size = BIO_get_mem_data(bp_public, &buffer);
     q_check_ptr(buffer);
     QSslCertificate cert = QSslCertificate(QByteArray(buffer, size));
     if (cert.isNull()) {
-        qFatal("Failed to generate a random client certificate");
+        qFatal("OPENSSL: Failed to generate a random client certificate");
     }
     size = BIO_get_mem_data(bp_private, &buffer);
     q_check_ptr(buffer);
     QSslKey key = QSslKey(QByteArray(buffer, size), QSsl::Rsa);
     if (key.isNull()) {
-        qFatal("Failed to generate a random private key");
+        qFatal("OPENSSL: Failed to generate a random private key");
     }
 
     EVP_PKEY_free(pkey);  // this will also free the rsa key
@@ -69,4 +98,12 @@ QPair<QSslKey, QSslCertificate> generateKeyPair() {
     BIO_free_all(bp_public);
     BIO_free_all(bp_private);
     return {key, cert};
+}
+
+QByteArray generate_AES_key_128() {
+    seedRandom();
+    uint8_t key[EVP_MAX_KEY_LENGTH];
+    constexpr uint16_t num_bytes = 128 / 8;
+    RAND_bytes(key, num_bytes);
+    return QByteArray(reinterpret_cast<const char*>(key), num_bytes);
 }

@@ -1,10 +1,12 @@
 #include "SSLServer.h"
 
 #include <QFile>
+#include <QMetaType>
 
-#include "generateCertificates.h"
+#include "keygen.h"
 
 SslServer::SslServer(SslIOManager* ssl_io_manager_, QObject* parent) : ssl_io_manager(ssl_io_manager_), QTcpServer(parent) {
+    qRegisterMetaType<qintptr>("qintptr");
     QPair<QSslKey, QSslCertificate> key_pair = generateKeyPair();
     key = key_pair.first;
     cert = key_pair.second;
