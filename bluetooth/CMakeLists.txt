@@ -1,7 +1,11 @@
 project(bluetooth VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
-	Core
+       Bluetooth
+       Core
+       Multimedia
+       DBus
+       Widgets
 )
 
 file(GLOB SRC_FILES
@@ -14,7 +18,11 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	Qt${QT_VERSION}::Core
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Bluetooth
+        Qt${QT_VERSION_MAJOR}::DBus
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Multimedia
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
