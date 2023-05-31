@@ -23,6 +23,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt${QT_VERSION_MAJOR}::DBus
         Qt${QT_VERSION_MAJOR}::Core
         Qt${QT_VERSION_MAJOR}::Multimedia
+	Qt${QT_VERSION_MAJOR}::Widgets
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
