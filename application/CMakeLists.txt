@@ -12,16 +12,14 @@ file(GLOB SRC_FILES
 )
 
 qt_add_executable(${PROJECT_NAME}
-	${SRC_FILES}
+        ${SRC_FILES}
 )
 
-if (ANDROID)
-    set(ANDROID_MANIFEST_XML_PATH "${CMAKE_CURRENT_BINARY_DIR}/android-build/AndroidManifest.xml")
-    file(READ "${ANDROID_MANIFEST_XML_PATH}" ANDROID_MANIFEST_XML_CONTENTS)
-    string(REPLACE "android:screenOrientation=\"unspecified\"" "android:screenOrientation=\"landscape\" " ANDROID_MANIFEST_XML_CONTENTS "${ANDROID_MANIFEST_XML_CONTENTS}")
-    message("${ANDROID_MANIFEST_XML_CONTENTS}")
-    file(WRITE "${ANDROID_MANIFEST_XML_PATH}" "${ANDROID_MANIFEST_XML_CONTENTS}")
 
+if (ANDROID)
+    set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY
+        QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/android
+    )
     #    set ANDROID_OPENSSL_ROOT to something like E:/Users/<user>/AppData/Local/Android/Sdk/android_openssl
     include("${ANDROID_OPENSSL_ROOT}/CMakeLists.txt")
     include_directories("${ANDROID_OPENSSL_ROOT}/ssl_3/include")
@@ -52,6 +50,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
+#    ANDROID_MANIFEST "${CMAKE_CURRENT_LIST_DIR}/android/AndroidManifest.xml"
 )
 
 install(TARGETS ${PROJECT_NAME}
