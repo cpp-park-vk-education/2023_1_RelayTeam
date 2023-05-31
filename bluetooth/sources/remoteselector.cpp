@@ -55,9 +55,7 @@ RemoteSelector::RemoteSelector(const QBluetoothAddress &local_adapter,
     }
   }
 
-  QBluetoothServiceInfo RemoteSelector::service() const { 
-    return m_service; 
-}
+  QBluetoothServiceInfo RemoteSelector::service() const { return m_service; }
 
   void RemoteSelector::onServiceDiscovered(
       const QBluetoothServiceInfo &service_info) {
@@ -83,10 +81,11 @@ RemoteSelector::RemoteSelector(const QBluetoothAddress &local_adapter,
   }
 
   void RemoteSelector::onDiscoveryFinished() {
-     qDebug() << "Bluetooth socket finished scanning";
+    qDebug() << "Bluetooth socket finished scanning";
   }
 
-  void RemoteSelector::onRemoteDevicesItemActivated(QListWidgetItem * item_device) {
+  void RemoteSelector::onRemoteDevicesItemActivated(QListWidgetItem *
+                                                    item_device) {
     qDebug() << "got click" << item_device->text();
     m_service = m_discovered_services.value(item_device);
     if (m_discovery_agent->isActive()) {
@@ -98,4 +97,8 @@ RemoteSelector::RemoteSelector(const QBluetoothAddress &local_adapter,
 
   void RemoteSelector::onCancelButtonClicked() { 
     reject(); 
-}
+  }
+
+  void RemoteSelector::getListWidget() { 
+    return m_remote_devices_list; 
+  }
