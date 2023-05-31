@@ -14,7 +14,7 @@ if(ANDROID)
     add_definitions(-DANDROID_DISABLE_SECCOMP)
 endif()
 
-project(MultiRelay VERSION 0.1 LANGUAGES CXX)
+project(MultiRelayApplication VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -38,6 +38,4 @@ add_subdirectory(ssl_server)
 add_subdirectory(gstreamer_interface)
 add_subdirectory(bluetooth)
 add_subdirectory(application)
-
-
 

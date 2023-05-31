@@ -67,9 +67,9 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false), streaming_session_manager() {
     options = new Options();
     data_base.getOptions(options);
-#ifdef ANDROID
-    options->scale_factor = 0.5;
-#endif
+//    if(ANDROID) {
+        options->scale_factor = 50;
+//    }
     QFont font = this->font();
     font.setPointSize(16 * getFontScaling(options->getScale()));
     this->setFont(font);

@@ -30,19 +30,23 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 if (ANDROID)
-	#set to ANDROID_OPENSSL_ROOT something like E:/Users/<user>/AppData/Local/Android/Sdk/android_openssl
-	include("${ANDROID_OPENSSL_ROOT}/CMakeLists.txt")
-	include_directories("${ANDROID_OPENSSL_ROOT}/ssl_3/include")
+    #set to ANDROID_OPENSSL_ROOT something like E:/Users/<user>/AppData/Local/Android/Sdk/android_openssl
+    include("${ANDROID_OPENSSL_ROOT}/CMakeLists.txt")
+    include_directories("${ANDROID_OPENSSL_ROOT}/ssl_3/include")
 
-	target_link_libraries(${PROJECT_NAME} PRIVATE
-		${ANDROID_EXTRA_LIBS}
-	)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${ANDROID_EXTRA_LIBS}
+    )
+
+    target_include_directories(${PROJECT_NAME} PUBLIC
+        "${ANDROID_OPENSSL_ROOT}/ssl_3/include"
+    )
 
 else()
-	find_package(OpenSSL REQUIRED)
-	target_link_libraries(${PROJECT_NAME} PRIVATE
-		OpenSSL::SSL
-	)
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+            OpenSSL::SSL
+    )
 endif()
 
 if(BUILD_TESTS)
