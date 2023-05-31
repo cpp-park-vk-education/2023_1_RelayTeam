@@ -15,3 +15,5 @@
 #define RESOURCES_PATH "@RESOURCES_PATH@"
 
 const QDir Q_RESOURCE_DIR(RESOURCES_PATH);
+
+static const QLatin1String serviceUuid("e8e10f95-1a70-4b27-9ccf-02010264e9c8");
