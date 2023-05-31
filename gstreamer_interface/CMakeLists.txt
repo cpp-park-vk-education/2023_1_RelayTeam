@@ -26,7 +26,15 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 if (ANDROID)
     # for ANDROID_GSTREAMER_ROOT set something like E:/path/to/gstreamer-1.0-android-universal-1.22.3
-    set(GST_ANDROID_LIBRARIES "${ANDROID_GSTREAMER_ROOT}/${ANDROID_ABI}")
+    if("${ANDROID_ABI}" STREQUAL "x86")
+        set(ANDROID_ABI_PATH "x86")
+    elseif("${ANDROID_ABI}" STREQUAL "arm64-v8a")
+        set(ANDROID_ABI_PATH "arm64")
+    else()
+        set(ANDROID_ABI_PATH "UNKNOWN ABI")
+    endif()
+
+    set(GST_ANDROID_LIBRARIES "${ANDROID_GSTREAMER_ROOT}/${ANDROID_ABI_PATH}")
 
     target_link_directories(${PROJECT_NAME} PRIVATE
         "${GST_ANDROID_LIBRARIES}/lib"

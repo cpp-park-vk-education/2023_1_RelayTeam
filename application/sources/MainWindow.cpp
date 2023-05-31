@@ -7,7 +7,6 @@
 #include <iostream>
 
 void MainWindow::createRightBar() {
-    qDebug() << "MR: MainWindow initialization started";
     right_bar = new QVBoxLayout();                  // Creating right bar.
     settings_button = new QPushButton("Settings");  // Creating settings button.
     settings_button->setFixedHeight(60 * options->getScale());
@@ -63,27 +62,47 @@ void MainWindow::createLeftBar() {
     connect(settings_widget, &SettingsWidget::sendChangeServiceName, publisher_widget, &Publisher::onChangeServiceName);
 }
 
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), current_search_widget_is_manual(true), current_control_widget_is_settings(false), streaming_session_manager() {
+MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
+    : application_screen(application_screen_),
+      QMainWindow(parent),
+      current_search_widget_is_manual(true),
+      current_control_widget_is_settings(false),
+      streaming_session_manager() {
+    qDebug() << "MR: MainWindow initialization started";
+
+    //    QStackedWidget* m_stackedWidget;
     options = new Options();
     data_base.getOptions(options);
-//    if(ANDROID) {
-        options->scale_factor = 50;
-//    }
+    qint32 max_screen_dimention = qMax(application_screen->size().width(), application_screen->size().height());
+    if (options->scale_factor > max_screen_dimention * 100 / 900) {
+        settings_widget->setScale(max_screen_dimention * 100 / 900);
+    }
+    options->scale_factor = 50;
+
     QFont font = this->font();
     font.setPointSize(16 * getFontScaling(options->getScale()));
     this->setFont(font);
     main_widget = new QWidget();  // Setting up main window widgets.
-    main_layout = new QHBoxLayout();
+    main_layout = new QGridLayout();
     main_widget->setLayout(main_layout);
-    main_widget->setMinimumSize(920 * options->getScale(), 400 * options->getScale());
+    main_widget->setMinimumSize(500 * options->getScale(), 400 * options->getScale());
+    main_widget->resize(900 * options->getScale(), 400 * options->getScale());
     this->setCentralWidget(main_widget);
     // Creating main widget layouts
     createRightBar();
     createLeftBar();
+    qDebug() << application_screen->size();
+    qDebug() << application_screen->orientation();
 
-    main_layout->addLayout(left_bar);
-    main_layout->addLayout(right_bar);
+    main_layout->addLayout(left_bar, 0, 0);
+    if (application_screen->orientation() & (Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation)) {
+        main_layout->addLayout(right_bar, 0, 1);
+        qDebug() << "MR: 1, 0";
+    } else {
+        main_layout->addLayout(right_bar, 1, 0);
+        qDebug() << "MR: 0, 1";
+    }
+
     main_widget->show();
 
     // Initializing ssl server

@@ -51,6 +51,10 @@ SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(pa
     scale_box->setValue(options->scale_factor);
 }
 
+void SettingsWidget::setScale(qreal scale_factor_) {
+    scale_slider->setValue(scale_factor_);
+}
+
 void SettingsWidget::onSetDeviceNameButtonClicked() {
     if (device_name_input_box->text().size() == 0) {
         return;

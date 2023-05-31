@@ -10,10 +10,13 @@
 #include <QGroupBox>
 #include <QMainWindow>
 #include <QPushButton>
+#include <QScreen>
 #include <QScrollArea>
 #include <QSet>
+#include <QStackedWidget>
 #include <QTextEdit>
 #include <QThread>
+#include <QWindow>
 #include <QtNetwork/QHostAddress>
 
 #include "DBManager.h"
@@ -26,7 +29,7 @@ private:
     Q_OBJECT
     // Widgets
     QWidget* main_widget;         // main  widget
-    QHBoxLayout* main_layout;     // min widget layout
+    QGridLayout* main_layout;     // min widget layout
     QVBoxLayout* devices_layout;  // layout with device widgets
     QVBoxLayout* left_bar;
     QVBoxLayout* right_bar;
@@ -42,6 +45,7 @@ private:
     bool current_search_widget_is_manual;
     bool current_control_widget_is_settings;
 
+    QScreen* application_screen;
     Options* options;
     DBManager data_base;
     SettingsWidget* settings_widget;
@@ -67,7 +71,7 @@ private:
     void makeDeviceConnections(DeviceWidget* device);
 
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
+    explicit MainWindow(QScreen* application_screen_, QWidget* parent = nullptr);
 
     ~MainWindow();
 
