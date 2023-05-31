@@ -82,7 +82,9 @@ RemoteSelector::RemoteSelector(const QBluetoothAddress &local_adapter,
     m_remote_devices_list->addItem(item_device);
   }
 
-  void RemoteSelector::onDiscoveryFinished() {}
+  void RemoteSelector::onDiscoveryFinished() {
+     qDebug() << "Bluetooth socket finished scanning";
+  }
 
   void RemoteSelector::onRemoteDevicesItemActivated(QListWidgetItem * item_device) {
     qDebug() << "got click" << item_device->text();
