@@ -1,5 +1,4 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 #include "bluetoothformatimage.h"
 
@@ -36,4 +35,3 @@ private slots:
 private:
     QBluetoothSocket *socket = nullptr;
 };
-#endif // CLIENT_H

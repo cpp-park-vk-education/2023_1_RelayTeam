@@ -3,8 +3,6 @@
 #include <QtBluetooth/qbluetoothserver.h>
 #include <QtBluetooth/qbluetoothsocket.h>
 
-static const QLatin1String serviceUuid("e8e10f95-1a70-4b27-9ccf-02010264e9c8");
-
 Server::Server(QObject *parent)
     :   QObject(parent) {
 }
@@ -85,7 +83,7 @@ void Server::onRename(QString _name) {
 void Server::onSendMessage(const QString &message) {
     QByteArray text = message.toUtf8();
 
-    for (QBluetoothSocket *socket : qAsConst(client_sockets)){
+    for (QBluetoothSocket *socket : qAsConst(client_sockets)) {
         socket->write(text);
     }
 }

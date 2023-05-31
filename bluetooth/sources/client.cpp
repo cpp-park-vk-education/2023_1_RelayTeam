@@ -33,8 +33,9 @@ void Client::stopClient() {
 }
 
 void Client::onReadSocket() {
-    if (!socket)
+    if (!socket) {
         return;
+    }
 
     while (socket->canReadLine()) {
         QByteArray line = socket->readAll().trimmed();

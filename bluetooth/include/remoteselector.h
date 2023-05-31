@@ -1,5 +1,4 @@
-#ifndef REMOTESELECTOR_H
-#define REMOTESELECTOR_H
+#pragma once
 
 #include <QtWidgets/qdialog.h>
 #include <QLabel>
@@ -13,8 +12,6 @@
 
 QT_FORWARD_DECLARE_CLASS(QBluetoothServiceDiscoveryAgent)
 QT_FORWARD_DECLARE_CLASS(QListWidgetItem)
-
-QT_USE_NAMESPACE
 
 class RemoteSelector : public QDialog
 {
@@ -38,12 +35,10 @@ private:
     QVBoxLayout *main_layout;
     QLabel* m_status_label;
     QListWidget* m_remote_devices_list;
-    QListWidgetItem* item;
+    QListWidgetItem* item_device;
 private slots:
     void onServiceDiscovered(const QBluetoothServiceInfo &service_info);
     void onDiscoveryFinished();
     void onRemoteDevicesItemActivated(QListWidgetItem *item);
     void onCancelButtonClicked();
 };
-
-#endif // REMOTESELECTOR_H

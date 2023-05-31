@@ -1,5 +1,4 @@
-#ifndef MANAGER_H
-#define MANAGER_H
+#pragma once
 
 #include <QLabel>
 #include <QPixmap>
@@ -65,4 +64,3 @@ private:
     QString local_name;
     BluetoothFormatImage *img = nullptr;
 };
-#endif // MANAGER_H

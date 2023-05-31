@@ -1,5 +1,4 @@
-#ifndef BLUETOOTHFORMATIMAGE_H
-#define BLUETOOTHFORMATIMAGE_H
+#pragma once
 
 #include <QPixmap>
 #include <QApplication>
@@ -22,5 +21,3 @@ public:
     BluetoothFormatImage(QPixmap &map_image);
     QByteArray getDataImage();
 };
-
-#endif // BLUETOOTHFORMATIMAGE_H

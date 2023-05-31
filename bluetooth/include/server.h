@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #include <QObject>
 #include <QMap>
@@ -44,5 +43,3 @@ private:
     QBluetoothServiceInfo service_info;
     QMap<QString, QBluetoothSocket*> client_sockets;
 };
-
-#endif // SERVER_H
