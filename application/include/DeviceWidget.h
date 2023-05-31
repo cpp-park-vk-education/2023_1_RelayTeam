@@ -47,8 +47,8 @@ public:
     qint16 volume;
     QString name;
     QHostAddress local_ipv4_address = QHostAddress();  // isNull = true
-    qint32 video_bitrait = 200;
-    qint32 audio_bitrait = 200;
+    qint32 video_bitrait;
+    qint32 audio_bitrait;
     bool source_mode_is_screen = true;
 
     explicit DeviceWidget(QString ID_, const QString& name_, qint16 volume_, qreal scale, qint32 video_bitrait_ = DEFAULT_VIDEO_BITRAIT,
