@@ -26,14 +26,15 @@ void MainWindow::createRightBar() {
     devices_scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     devices_scroll_area->setWidgetResizable(true);
     devices_scroll_area->setAlignment(Qt::AlignRight);
-    devices_scroll_area->setMinimumWidth(570 * options->getScale());
-    devices_scroll_area->setMaximumWidth(700 * options->getScale());
     devices_scroll_area->setWidget(devices_widget);
     right_bar->addWidget(devices_scroll_area);
     settings_widget = new SettingsWidget(options);  // Creating settings widget.
     settings_widget->setFixedWidth(570 * options->getScale());
     settings_widget->hide();
     right_bar->addWidget(settings_widget);
+    right_bar_widget = new QWidget;
+    right_bar_widget->setLayout(right_bar);
+    right_bar_widget->setMinimumWidth(600 * options->getScale());
 }
 
 void MainWindow::createLeftBar() {
@@ -48,8 +49,11 @@ void MainWindow::createLeftBar() {
     add_button->setFixedHeight(60 * options->getScale());
     button_layout->addWidget(add_button);
     left_bar->addLayout(button_layout);
-    input_box = new QTextEdit("Text box");  // Creating input box.
-    left_bar->addWidget(input_box);
+
+    bluetooth_manager = new BluetoothManager;  // Creating input box.
+    left_bar->addWidget(bluetooth_manager);
+    connect(add_button, &QPushButton::clicked, bluetooth_manager, &BluetoothManager::onAddButtonCLicked);
+
     search_widget = new SearchWidget(options->getScale());  // Creating network widgets.
     search_widget->hide();
     left_bar->addWidget(search_widget);
@@ -57,27 +61,37 @@ void MainWindow::createLeftBar() {
     connect(search_widget, &SearchWidget::devicePreparedToAdd, this, &MainWindow::onDevicePreparedToAdd);
     connect(search_widget, &SearchWidget::sendUpdateAddress, this, &MainWindow::onUpdateAddress);
     publisher_widget = new Publisher(options->device_name, this);
-    connect(this, &MainWindow::sendDeviceIdsUpdated, search_widget, &SearchWidget::onDeviceIdsUpdated);
-    getDeviceIds();
+    connect(this, &MainWindow::sendDeviceMacAddressesUpdated, search_widget, &SearchWidget::onDeviceIdsUpdated);
     connect(settings_widget, &SettingsWidget::sendChangeServiceName, publisher_widget, &Publisher::onChangeServiceName);
+
+    left_bar_widget = new QWidget;
+    left_bar_widget->setLayout(left_bar);
+    left_bar_widget->setMinimumWidth(300 * options->getScale());
 }
 
 MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
     : application_screen(application_screen_),
       QMainWindow(parent),
-      current_search_widget_is_manual(true),
+      current_search_widget_is_bluetooth(true),
       current_control_widget_is_settings(false),
       streaming_session_manager() {
     qDebug() << "MR: MainWindow initialization started";
+    qDebug() << application_screen->size();
+    qDebug() << application_screen->orientation();
 
     //    QStackedWidget* m_stackedWidget;
     options = new Options();
     data_base.getOptions(options);
     qint32 max_screen_dimention = qMax(application_screen->size().width(), application_screen->size().height());
-    if (options->scale_factor > max_screen_dimention * 100 / 900) {
-        settings_widget->setScale(max_screen_dimention * 100 / 900);
+    if (application_screen->orientation() & (Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation)) {
+        if (options->scale_factor > max_screen_dimention * 100 / 930) {
+            settings_widget->setScale(max_screen_dimention * 100 / 930);
+        }
+    } else {
+        if (options->scale_factor > max_screen_dimention * 100 / 630) {
+            settings_widget->setScale(max_screen_dimention * 100 / 630);
+        }
     }
-    options->scale_factor = 50;
 
     QFont font = this->font();
     font.setPointSize(16 * getFontScaling(options->getScale()));
@@ -85,23 +99,23 @@ MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
     main_widget = new QWidget();  // Setting up main window widgets.
     main_layout = new QGridLayout();
     main_widget->setLayout(main_layout);
-    main_widget->setMinimumSize(500 * options->getScale(), 400 * options->getScale());
-    main_widget->resize(900 * options->getScale(), 400 * options->getScale());
     this->setCentralWidget(main_widget);
     // Creating main widget layouts
     createRightBar();
     createLeftBar();
-    qDebug() << application_screen->size();
-    qDebug() << application_screen->orientation();
 
-    main_layout->addLayout(left_bar, 0, 0);
+    main_layout->addWidget(left_bar_widget, 0, 0);
     if (application_screen->orientation() & (Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation)) {
-        main_layout->addLayout(right_bar, 0, 1);
+        main_layout->addWidget(right_bar_widget, 0, 1);
+        main_widget->setMinimumSize(930 * options->getScale(), 400 * options->getScale());
         qDebug() << "MR: 1, 0";
     } else {
-        main_layout->addLayout(right_bar, 1, 0);
+        main_layout->addWidget(right_bar_widget, 1, 0);
+        main_widget->setMinimumSize(630 * options->getScale(), 400 * options->getScale());
         qDebug() << "MR: 0, 1";
     }
+
+    getDeviceMacAddresses();  // Get device mac addresses and send them to classes that require them.
 
     main_widget->show();
 
@@ -153,17 +167,20 @@ void MainWindow::onSettingsButtonPressed() {
 }
 
 void MainWindow::onScanNetworkButtonPressed() {
-    if (current_search_widget_is_manual) {
-        input_box->hide();
+    if (current_search_widget_is_bluetooth) {
+        bluetooth_manager->clearSelection();
+        bluetooth_manager->hide();
         search_widget->show();
-        scan_network_button->setText("Manual pairing");
+        scan_network_button->setText("Bluetooth");
     } else {
+        search_widget->clearSelection();
         search_widget->hide();
-        input_box->show();
+        bluetooth_manager->show();
         scan_network_button->setText("Scan local");
     }
-    current_search_widget_is_manual = !current_search_widget_is_manual;
+    current_search_widget_is_bluetooth = !current_search_widget_is_bluetooth;
 }
+
 void MainWindow::saveAllChanges() {
     for (size_t i = 0; i < devices_layout->count(); ++i) {
         data_base.saveDeviceChanges(static_cast<DeviceWidget*>(devices_layout->itemAt(i)));
@@ -189,15 +206,15 @@ void MainWindow::onDevicePreparedToAdd(QString name, QHostAddress local_ipv4_add
     makeDeviceConnections(device_widget);
     devices_layout->addLayout(device_widget);
     data_base.addDevice(device_widget);
-    device_ids.insert(mac_address);
-    emit sendDeviceIdsUpdated(device_ids);
+    device_mac_addresses.insert(mac_address);
+    emit sendDeviceMacAddressesUpdated(device_mac_addresses);
 }
 
-void MainWindow::getDeviceIds() {
+void MainWindow::getDeviceMacAddresses() {
     for (size_t i = 0; i < devices_layout->count(); ++i) {
-        device_ids.insert(static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID);
+        device_mac_addresses.insert(static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID);
     }
-    emit sendDeviceIdsUpdated(device_ids);
+    emit sendDeviceMacAddressesUpdated(device_mac_addresses);
 }
 
 void MainWindow::onUpdateAddress(QString mac_address, QHostAddress local_ipv4_address) {

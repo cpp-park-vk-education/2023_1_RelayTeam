@@ -19,6 +19,7 @@
 class DeviceWidget : public QVBoxLayout {
 private:
     Q_OBJECT
+    /////////////////////////////////////////////////
     QLabel* name_box;
     QSlider* volume_slider;
     QSpinBox* volume_box;
@@ -26,9 +27,15 @@ private:
     QPushButton* cast_button;
     QPushButton* settings_button;
     QHBoxLayout* basic_control_layout;
-
+    /////////////////////////////////////////////////
+    QLabel* video_bitrait_label;
+    QLabel* audio_bitrait_label;
+    /////////////////////////////////////////////////
     QWidget* additional_control_widget;
     QVBoxLayout* additional_control_layout;
+
+    qint32 unset_video_bitrait;
+    qint32 unset_audio_bitrait;
 
     qreal scale;
 

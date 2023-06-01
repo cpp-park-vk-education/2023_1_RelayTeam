@@ -30,9 +30,9 @@ option(BUILD_DOCS "Build documentation" OFF)
 option(BUILD_COVERAGE "Build code coverage" OFF)
 
 
-add_subdirectory(qmdnsengine_extern)
 
 add_subdirectory(general_use)
+add_subdirectory(qmdnsengine_extern)
 add_subdirectory(search_devices)
 add_subdirectory(ssl_server)
 add_subdirectory(gstreamer_interface)

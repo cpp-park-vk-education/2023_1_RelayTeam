@@ -60,7 +60,7 @@ void DeviceWidget::setAdditionalControlLayout() {
     additional_control_layout->addWidget(both_capture_button);
 
     QHBoxLayout* video_bitrait_layout = new QHBoxLayout;  // Creating bitrait layout.
-    QLabel* video_bitrait_label = new QLabel("Set video bitrait: ");
+    video_bitrait_label = new QLabel("Set video bitrait: ");
     video_bitrait_layout->addWidget(video_bitrait_label);
     QSlider* video_bitrait_slider = new QSlider(Qt::Horizontal);
     video_bitrait_slider->setFixedWidth(160 * scale);
@@ -83,7 +83,7 @@ void DeviceWidget::setAdditionalControlLayout() {
     additional_control_layout->addLayout(video_bitrait_layout);
 
     QHBoxLayout* audio_bitrait_layout = new QHBoxLayout;  // Creating bitrait layout.
-    QLabel* audio_bitrait_label = new QLabel("Set audio bitrait: ");
+    audio_bitrait_label = new QLabel("Set audio bitrait: ");
     audio_bitrait_layout->addWidget(audio_bitrait_label);
     QSlider* audio_bitrait_slider = new QSlider(Qt::Horizontal);
     audio_bitrait_slider->setFixedWidth(160 * scale);
@@ -120,6 +120,9 @@ void DeviceWidget::setAdditionalControlLayout() {
 void DeviceWidget::defineWdgets() {
     this->setAlignment(Qt::AlignTop);
     basic_control_layout = new QHBoxLayout;
+    QFrame* line_start = new QFrame;
+    line_start->setFrameShape(QFrame::HLine);
+    this->addWidget(line_start);
     setBasicControlLayout();
     this->addLayout(basic_control_layout);
     additional_control_widget = new QWidget;
@@ -128,6 +131,9 @@ void DeviceWidget::defineWdgets() {
     additional_control_widget->setLayout(additional_control_layout);
     this->addWidget(additional_control_widget);
     additional_control_widget->hide();
+    QFrame* line_end = new QFrame;
+    line_end->setFrameShape(QFrame::HLine);
+    this->addWidget(line_end);
 }
 
 DeviceWidget::DeviceWidget(QString ID_, const QString& name_, qint16 volume_, qreal scale_, qint32 video_bitrait_, qint32 audio_bitrait_,
@@ -137,7 +143,9 @@ DeviceWidget::DeviceWidget(QString ID_, const QString& name_, qint16 volume_, qr
       volume(volume_),
       scale(scale_),
       video_bitrait(video_bitrait_),
+      unset_video_bitrait(video_bitrait_),
       audio_bitrait(audio_bitrait_),
+      unset_audio_bitrait(audio_bitrait_),
       QVBoxLayout(parent) {
     defineWdgets();
 }
@@ -149,7 +157,9 @@ DeviceWidget::DeviceWidget(QString ID_, QString&& name_, qint16 volume_, qreal s
       volume(volume_),
       scale(scale_),
       video_bitrait(video_bitrait_),
+      unset_video_bitrait(video_bitrait_),
       audio_bitrait(audio_bitrait_),
+      unset_audio_bitrait(audio_bitrait_),
       QVBoxLayout(parent) {
     defineWdgets();
 }
@@ -209,19 +219,34 @@ void DeviceWidget::onVolumeChanged(qint16 volume_) {
 }
 
 void DeviceWidget::onVideoBitraitChanged(qint32 video_bitrait_) {
-    video_bitrait = video_bitrait_;
+    unset_video_bitrait = video_bitrait_;
+
+    if (video_bitrait_ != video_bitrait) {
+        video_bitrait_label->setStyleSheet("QLabel { color : red; }");
+    } else {
+        video_bitrait_label->setStyleSheet("QLabel { color : grey; }");
+    }
 }
 
 void DeviceWidget::onAudioBitraitChanged(qint32 audio_bitrait_) {
-    audio_bitrait = audio_bitrait_;
+    unset_audio_bitrait = audio_bitrait_;
+    if (audio_bitrait_ != audio_bitrait) {
+        audio_bitrait_label->setStyleSheet("QLabel { color : red; }");
+    } else {
+        audio_bitrait_label->setStyleSheet("QLabel { color : grey; }");
+    }
 }
 
 void DeviceWidget::onSetVideoBitrait() {
+    video_bitrait = unset_video_bitrait;
     emit sendChangeVolume(local_ipv4_address, video_bitrait);
+    video_bitrait_label->setStyleSheet("QLabel { color : grey; }");
 }
 
 void DeviceWidget::onSetAudioBitrait() {
+    audio_bitrait = unset_audio_bitrait;
     emit sendChangeVolume(local_ipv4_address, audio_bitrait);
+    audio_bitrait_label->setStyleSheet("QLabel { color : grey; }");
 }
 
 void DeviceWidget::onToggleRecording(bool checked) {
