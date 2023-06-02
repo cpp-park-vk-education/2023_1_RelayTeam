@@ -59,4 +59,6 @@ signals:
     void devicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
 
     void sendUpdateAddress(QString mac_address, QHostAddress local_ipv4_address);
+
+    void sendUnsetAddress(QString mac_address);
 };

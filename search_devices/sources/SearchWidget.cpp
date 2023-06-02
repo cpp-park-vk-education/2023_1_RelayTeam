@@ -66,6 +66,7 @@ void SearchWidget::onServiceRemoved(const QMdnsEngine::Service service) {
     }
     qDebug() << service.name() << "removing!";
     ServiceItem* service_item = service_item_map[getServiceName(service)];
+    emit sendUnsetAddress(service_item_map[getServiceName(service)]->getMacAddress());
     service_item_map.remove(getServiceName(service));
     delete service_item;
 }

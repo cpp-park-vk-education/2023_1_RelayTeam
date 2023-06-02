@@ -12,18 +12,12 @@ private:
 
     QBluetoothSocket* bluetooth_client_socket = nullptr;
 
-    void onSendStarted();
-
-    void captureScreen();
+    void sendScreenshot();
 
 public:
     explicit BluetoothClient(QObject* parent = nullptr);
 
     ~BluetoothClient();
-
-    void connectToService(const QBluetoothServiceInfo& remote_service);
-
-    void killConnection();
 
 private slots:
     void onReadSocket();
@@ -35,6 +29,12 @@ private slots:
     void onSocketErrorOccurred(QBluetoothSocket::SocketError);
 
 public slots:
+    void connectToService(const QBluetoothServiceInfo& remote_service);
+
+    void killConnection();
+
+    void onStartSendingScreenshots();
+
     void onSendMessage(const QString& message);
 
 signals:

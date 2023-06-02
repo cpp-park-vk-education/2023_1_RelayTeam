@@ -20,6 +20,8 @@ class DeviceWidget : public QVBoxLayout {
 private:
     Q_OBJECT
     /////////////////////////////////////////////////
+    QLabel* wifi_label;
+    QLabel* bluetooth_label;
     QLabel* name_box;
     QSlider* volume_slider;
     QSpinBox* volume_box;
@@ -39,6 +41,7 @@ private:
 
     qreal scale;
 
+    bool wifi_state = false;
     bool expanded_state = false;
     bool audio_state = false;
     bool cast_state = false;
@@ -65,6 +68,7 @@ public:
                           qint32 audio_bitrait_ = DEFAULT_AUDIO_BITRAIT, QWidget* parent = nullptr);
 
     void setLocalIPv4(const QHostAddress& local_ipv4_address_);
+    void unsetLocalIPv4();
 
 private slots:
     void onAudioPressed();

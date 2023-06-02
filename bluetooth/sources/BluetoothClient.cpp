@@ -69,13 +69,15 @@ void BluetoothClient::onSendMessage(const QString& message) {
     bluetooth_client_socket->write(text);
 }
 
-void BluetoothClient::onSendStarted() {
+void BluetoothClient::onStartSendingScreenshots() {
+    QEventLoop loop;
     while (true) {
-        captureScreen();
+        loop.processEvents();
+        sendScreenshot();
     }
 }
 
-void BluetoothClient::captureScreen() {
+void BluetoothClient::sendScreenshot() {
     QScreen* screen = QGuiApplication::primaryScreen();
     QPixmap pixmap = screen->grabWindow(0);
 

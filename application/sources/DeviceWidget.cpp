@@ -8,6 +8,20 @@ void DeviceWidget::setBasicControlLayout() {
     name_box->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     name_box->setFixedHeight(50 * scale);
     basic_control_layout->addWidget(name_box);
+    // Creating layout of indicators.
+    QVBoxLayout* indicators_layout = new QVBoxLayout;
+    wifi_label = new QLabel;
+    wifi_label->setPixmap(QPixmap(Q_RESOURCE_DIR.absoluteFilePath("wifi.png")).scaled(25 * scale, 25 * scale));
+    wifi_label->setFixedSize(25 * scale, 25 * scale);
+    wifi_label->setStyleSheet("background-color: red;");
+    indicators_layout->addWidget(wifi_label);
+    bluetooth_label = new QLabel;
+    bluetooth_label->setPixmap(QPixmap(Q_RESOURCE_DIR.absoluteFilePath("bluetooth.png")).scaled(25 * scale, 25 * scale));
+    bluetooth_label->setFixedSize(25 * scale, 25 * scale);
+    bluetooth_label->setStyleSheet("background-color: red;");
+    indicators_layout->addWidget(bluetooth_label);
+    basic_control_layout->addLayout(indicators_layout);
+    // Creating Volume slider widgets.
     volume_slider = new QSlider(Qt::Horizontal);  // Creating volume slider.
     volume_slider->setFixedWidth(140 * scale);
     volume_slider->setMaximum(100);
@@ -165,29 +179,49 @@ DeviceWidget::DeviceWidget(QString ID_, QString&& name_, qint16 volume_, qreal s
 }
 
 void DeviceWidget::setLocalIPv4(const QHostAddress& local_ipv4_address_) {
+    wifi_label->setStyleSheet("background-color: #4dff6d;");
+    wifi_state = true;
     local_ipv4_address = local_ipv4_address_;
 }
 
+void DeviceWidget::unsetLocalIPv4() {
+    wifi_label->setStyleSheet("background-color: red;");
+    wifi_state = false;
+    local_ipv4_address = QHostAddress();
+}
+
 void DeviceWidget::onAudioPressed() {
-    if (audio_state) {
+    if (wifi_state) {
+        if (audio_state) {
+            audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio-disabled.png")));
+            emit sendStopAudioSession(local_ipv4_address);
+        } else {
+            audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio.png")));
+            emit sendStartAudioSession(local_ipv4_address);
+        }
+        audio_state = !audio_state;
+    } else {
         audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio-disabled.png")));
         emit sendStopAudioSession(local_ipv4_address);
-    } else {
-        audio_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("audio.png")));
-        emit sendStartAudioSession(local_ipv4_address);
+        audio_state = false;
     }
-    audio_state = !audio_state;
 }
 
 void DeviceWidget::onCastPressed() {
-    if (cast_state) {
+    if (wifi_state) {
+        if (cast_state) {
+            cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
+            emit sendStopVideoSession(local_ipv4_address);
+        } else {
+            cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
+            emit sendStartVideoSession(local_ipv4_address);
+        }
+        cast_state = !cast_state;
+    } else {
         cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
         emit sendStopVideoSession(local_ipv4_address);
-    } else {
-        cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
-        emit sendStartVideoSession(local_ipv4_address);
+        cast_state = false;
     }
-    cast_state = !cast_state;
 }
 
 void DeviceWidget::onSettingsPressed() {

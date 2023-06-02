@@ -34,7 +34,7 @@ void MainWindow::createRightBar() {
     right_bar->addWidget(settings_widget);
     right_bar_widget = new QWidget;
     right_bar_widget->setLayout(right_bar);
-    right_bar_widget->setMinimumWidth(600 * options->getScale());
+    right_bar_widget->setMinimumWidth(620 * options->getScale());
 }
 
 void MainWindow::createLeftBar() {
@@ -60,6 +60,8 @@ void MainWindow::createLeftBar() {
     connect(add_button, &QPushButton::clicked, search_widget, &SearchWidget::onAddButtonCLicked);
     connect(search_widget, &SearchWidget::devicePreparedToAdd, this, &MainWindow::onDevicePreparedToAdd);
     connect(search_widget, &SearchWidget::sendUpdateAddress, this, &MainWindow::onUpdateAddress);
+    connect(search_widget, &SearchWidget::sendUnsetAddress, this, &MainWindow::onUnsetAddress);
+
     publisher_widget = new Publisher(options->device_name, this);
     connect(this, &MainWindow::sendDeviceMacAddressesUpdated, search_widget, &SearchWidget::onDeviceIdsUpdated);
     connect(settings_widget, &SettingsWidget::sendChangeServiceName, publisher_widget, &Publisher::onChangeServiceName);
@@ -84,12 +86,12 @@ MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
     data_base.getOptions(options);
     qint32 max_screen_dimention = qMax(application_screen->size().width(), application_screen->size().height());
     if (application_screen->orientation() & (Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation)) {
-        if (options->scale_factor > max_screen_dimention * 100 / 930) {
-            settings_widget->setScale(max_screen_dimention * 100 / 930);
+        if (options->scale_factor > max_screen_dimention * 100 / 950) {
+            settings_widget->setScale(max_screen_dimention * 100 / 950);
         }
     } else {
-        if (options->scale_factor > max_screen_dimention * 100 / 630) {
-            settings_widget->setScale(max_screen_dimention * 100 / 630);
+        if (options->scale_factor > max_screen_dimention * 100 / 650) {
+            settings_widget->setScale(max_screen_dimention * 100 / 650);
         }
     }
 
@@ -107,11 +109,11 @@ MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
     main_layout->addWidget(left_bar_widget, 0, 0);
     if (application_screen->orientation() & (Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation)) {
         main_layout->addWidget(right_bar_widget, 0, 1);
-        main_widget->setMinimumSize(930 * options->getScale(), 400 * options->getScale());
+        main_widget->setMinimumSize(950 * options->getScale(), 400 * options->getScale());
         qDebug() << "MR: 1, 0";
     } else {
         main_layout->addWidget(right_bar_widget, 1, 0);
-        main_widget->setMinimumSize(630 * options->getScale(), 400 * options->getScale());
+        main_widget->setMinimumSize(650 * options->getScale(), 400 * options->getScale());
         qDebug() << "MR: 0, 1";
     }
 
@@ -221,7 +223,17 @@ void MainWindow::onUpdateAddress(QString mac_address, QHostAddress local_ipv4_ad
     for (size_t i = 0; i < devices_layout->count(); ++i) {
         if (static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID == mac_address) {
             qDebug() << "Updating local ipv4 for" << static_cast<DeviceWidget*>(devices_layout->itemAt(i))->name;
-            static_cast<DeviceWidget*>(devices_layout->itemAt(i))->local_ipv4_address = local_ipv4_address;
+            static_cast<DeviceWidget*>(devices_layout->itemAt(i))->setLocalIPv4(local_ipv4_address);
+            return;
+        }
+    }
+}
+
+void MainWindow::onUnsetAddress(QString mac_address) {
+    for (size_t i = 0; i < devices_layout->count(); ++i) {
+        if (static_cast<DeviceWidget*>(devices_layout->itemAt(i))->ID == mac_address) {
+            qDebug() << "Unsetting local ipv4 for" << static_cast<DeviceWidget*>(devices_layout->itemAt(i))->name;
+            static_cast<DeviceWidget*>(devices_layout->itemAt(i))->unsetLocalIPv4();
             return;
         }
     }

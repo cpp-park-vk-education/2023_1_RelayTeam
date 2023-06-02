@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QPixmap>
 #include <QShortcut>
+#include <QThread>
 #include <QTimer>
 #include <QtBluetooth/QBluetoothAddress>
 #include <QtBluetooth/QBluetoothLocalDevice>
@@ -36,13 +37,10 @@ public:
 
     ~BluetoothManager();
 
-signals:
-    void sendMessage(const QString& data);
-
 public slots:
-    void onStartVideotransmission(const QBluetoothAddress& bluetooth_address) {}
+    void onStartVideotransmission(const QBluetoothAddress& bluetooth_address);
 
-    void onStopTransmitt(const QBluetoothAddress& bluetooth_address) {}
+    void onStopTransmitt(const QBluetoothAddress& bluetooth_address);
 
     void onAddButtonCLicked() {}
 

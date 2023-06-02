@@ -1,6 +1,7 @@
 project(MultiRelay VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
+	Bluetooth
 	Widgets
 	Sql
 	Network
@@ -12,9 +13,8 @@ file(GLOB SRC_FILES
 )
 
 qt_add_executable(${PROJECT_NAME}
-        ${SRC_FILES}
+	${SRC_FILES}
 )
-
 
 if (ANDROID)
     set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY
@@ -33,6 +33,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt${QT_VERSION}::Widgets
 	Qt${QT_VERSION}::Sql
 	Qt${QT_VERSION}::Network
+	Qt${QT_VERSION_MAJOR}::Bluetooth
 	general_use
 	gstreamer_interface
 	bluetooth

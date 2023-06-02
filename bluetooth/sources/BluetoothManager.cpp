@@ -23,8 +23,14 @@ BluetoothManager::BluetoothManager(QWidget* parent) : QListWidget(parent) {
         adapter.setHostMode(QBluetoothLocalDevice::HostDiscoverable);
     }
 
-    bluetooth_server = new BluetoothServer(this);
-    bluetooth_server->initServer();
+    QThread* bluetooth_client_thread = new QThread;
+    bluetooth_client = new BluetoothClient();
+    bluetooth_client->moveToThread(bluetooth_client_thread);
+
+    QThread* bluetooth_server_thread = new QThread;
+    bluetooth_server = new BluetoothServer();
+    bluetooth_server->moveToThread(bluetooth_server_thread);
+    QMetaObject::invokeMethod(bluetooth_server, "initServer", Qt::QueuedConnection);
     connect(bluetooth_server, &BluetoothServer::sendMessageReceived, this, &BluetoothManager::onShowMessage);
 
     local_name = QBluetoothLocalDevice().name();
@@ -44,15 +50,42 @@ BluetoothManager::BluetoothManager(QWidget* parent) : QListWidget(parent) {
 }
 
 BluetoothManager::~BluetoothManager() {
-    if (bluetooth_client) {
-        bluetooth_client->deleteLater();
-    }
+    bluetooth_client->deleteLater();
     bluetooth_server->deleteLater();
 }
+
+void BluetoothManager::onStartVideotransmission(const QBluetoothAddress& bluetooth_address) {
+    QMetaObject::invokeMethod(bluetooth_client, "killConnection", Qt::BlockingQueuedConnection);
+    QMetaObject::invokeMethod(bluetooth_client, "connectToService", Q_ARG(QBluetoothAddress, bluetooth_address), Qt::QueuedConnection);
+}
+
+void BluetoothManager::onStopTransmitt(const QBluetoothAddress& bluetooth_address) {}
 
 void BluetoothManager::onServiceDiscovered(const QBluetoothServiceInfo& service_info) {
     services[service_info.device().address()] = service_info;
     this->addItem(service_info.device().name());
+}
+
+void BluetoothManager::onConnectToBluetoothService(QBluetoothAddress bluetooth_address) {
+    QBluetoothServiceInfo service = services[bluetooth_address];
+
+    qDebug() << "Connecting to service: " << service.serviceName() << " on: " << service.device().name();
+
+    QMetaObject::invokeMethod(bluetooth_client, "killConnection", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(bluetooth_client, "connectToService", Q_ARG(QBluetoothServiceInfo, service), Qt::QueuedConnection);
+    qDebug() << "Connecting...";
+
+    connect(bluetooth_client, &BluetoothClient::sendMessageReceived, this, &BluetoothManager::onShowMessage);
+    qDebug() << "Start client";
+
+    bluetooth_client->connectToService(service);
+}
+
+void BluetoothManager::onShowMessage(const QString& sender, const QString& message) {
+    QByteArray image_data = QByteArray::fromBase64(message.toLatin1());
+    QLabel* label = new QLabel(this);
+    label->setPixmap(QPixmap(image_data));
+    label->show();
 }
 
 // void BluetoothManager::onNewAdapterSelected() {
@@ -73,26 +106,3 @@ void BluetoothManager::onServiceDiscovered(const QBluetoothServiceInfo& service_
 //    QBluetoothAddress new_adapter = local_adapters.at(0).address();
 //    return result;
 //}
-
-void BluetoothManager::onConnectToBluetoothService(QBluetoothAddress bluetooth_address) {
-    QBluetoothServiceInfo service = services[bluetooth_address];
-
-    qDebug() << "Connecting to service: " << service.serviceName() << " on: " << service.device().name();
-
-    QMetaObject::invokeMethod(bluetooth_client, "killConnection", Qt::QueuedConnection);
-    QMetaObject::invokeMethod(bluetooth_client, "connectToService", Q_ARG(QBluetoothServiceInfo, service), Qt::QueuedConnection);
-    qDebug() << "Connecting...";
-
-    connect(bluetooth_client, &BluetoothClient::sendMessageReceived, this, &BluetoothManager::onShowMessage);
-    connect(this, &BluetoothManager::sendMessage, bluetooth_client, &BluetoothClient::onSendMessage);
-    qDebug() << "Start client";
-
-    bluetooth_client->connectToService(service);
-}
-
-void BluetoothManager::onShowMessage(const QString& sender, const QString& message) {
-    QByteArray image_data = QByteArray::fromBase64(message.toLatin1());
-    QLabel* label = new QLabel(this);
-    label->setPixmap(QPixmap(image_data));
-    label->show();
-}

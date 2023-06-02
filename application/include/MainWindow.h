@@ -92,6 +92,8 @@ public slots:
 
     void onUpdateAddress(QString mac_address, QHostAddress ipv6_address);
 
+    void onUnsetAddress(QString mac_address);
+
 signals:
     void sendDeviceMacAddressesUpdated(QSet<QString> device_ids);
 
