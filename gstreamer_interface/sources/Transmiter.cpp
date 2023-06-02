@@ -1,4 +1,11 @@
 #include "Transmiter.h"
+#include "qvideowidget.h"
+#include <QVideoWidget>
+
+bool Transmiter::isRunning()
+{
+  return running;
+}
 
 void Transmiter::addLinkVideo() {
     GstElement *ximagesrc, *queue1, *capsfilter1, *capsfilter2, *videoscale, *videoconvert1, *videoconvert2, *rtpvp8pay, *queue2, *udpsink1;
@@ -48,6 +55,8 @@ void Transmiter::addLinkVideo() {
     g_object_set(udpsink1, "sync", FALSE, "host", representIP(ip_address), "port", video_port, NULL);
     // g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2000, "speed-preset", 0x00000005, NULL);
     g_object_set(G_OBJECT(vp8enc), "deadline", 1, "target-bitrate", 2000000, NULL);
+
+
 }
 
 void Transmiter::addLinkAudio() {
@@ -110,42 +119,55 @@ Transmiter::~Transmiter() {
     onKillSession();
 }
 
+void Transmiter::onStartCameraRecording(WId id_, QWidget* window1)
+{
+  id=id_;
+  qDebug()<<"\nPISDOSS 1T\n";
+
+}
+
 void Transmiter::onEbableCamera() {
-    qDebug() << "onEbableCamera Transmiter ";
-    GstElement *v4l2src, *videoconvert, *videoscale, *vp8enc, *rtpvp8pay, *udpsink;
 
-    gst_init(nullptr, nullptr);
-    if (customData.pipeline == NULL) {
-        customData.pipeline = gst_pipeline_new("camera");
-    }
+  qDebug()<<"\nPISDOSS  onEbableCamera  2T\n" << id;
 
-    v4l2src = gst_element_factory_make("v4l2src", "v4l2src");
-    videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-    videoscale = gst_element_factory_make("videoscale", "videoscale");
-    // capsfilter = gst_element_factory_make("capsfilter", "capsfilterVideo1");
-    vp8enc = gst_element_factory_make("vp8enc", "vp8enc");
-    rtpvp8pay = gst_element_factory_make("rtpvp8pay", "rtpvp8pay");
-    udpsink = gst_element_factory_make("udpsink", "udpsink1");
-    if (!customData.pipeline || !v4l2src || !vp8enc || !videoconvert || !videoscale || !rtpvp8pay || !udpsink) {
-        g_printerr("Not all elements could be created Transmiter\n");
-        return;
-    }
+  qDebug() << "onEbableCamera Transmiter ";
+  GstElement *v4l2src, *videoconvert, *videoscale, *vp8enc, *rtpvp8pay, *udpsink;
 
-    g_object_set(v4l2src, "device", "/dev/video0", NULL);
 
-    g_object_set(udpsink, "sync", FALSE, "host", representIP(ip_address), "port", 5001, NULL);
 
-    gst_bin_add_many(GST_BIN(customData.pipeline), v4l2src, videoconvert, videoscale, vp8enc, rtpvp8pay, udpsink, NULL);
+  gst_init(nullptr, nullptr);
+  if (customData.pipeline == NULL) {
+      customData.pipeline = gst_pipeline_new("camera");
+  }
 
-    if (gst_element_link_many(v4l2src, videoconvert, videoscale, vp8enc, rtpvp8pay, udpsink, NULL) != TRUE) {
-        g_printerr(
-            "Failed to link elements: v4l2src -> videoscale -> videoconvert -> x264enc -> "
-            "rtph264pay -> udpsink1\n");
-        gst_object_unref(customData.pipeline);
-        return;
-    }
+  v4l2src = gst_element_factory_make("ximagesrc", "v4l2src");
+  videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+  videoscale = gst_element_factory_make("videoscale", "videoscale");
+  // capsfilter = gst_element_factory_make("capsfilter", "capsfilterVideo1");
+  vp8enc = gst_element_factory_make("vp8enc", "vp8enc");
+  rtpvp8pay = gst_element_factory_make("rtpvp8pay", "rtpvp8pay");
+  udpsink = gst_element_factory_make("udpsink", "udpsink1");
+  if (!customData.pipeline || !v4l2src || !vp8enc || !videoconvert || !videoscale || !rtpvp8pay || !udpsink) {
+      g_printerr("Not all elements could be created Transmiter\n");
+      return;
+  }
 
-    startSend();
+  g_object_set(v4l2src, "xid", id, NULL);
+
+  g_object_set(udpsink, "sync", FALSE, "host", representIP(ip_address), "port", 5004, NULL);
+
+  gst_bin_add_many(GST_BIN(customData.pipeline), v4l2src, videoconvert, videoscale, vp8enc, rtpvp8pay, udpsink, NULL);
+
+  if (gst_element_link_many(v4l2src, videoconvert, videoscale, vp8enc, rtpvp8pay, udpsink, NULL) != TRUE) {
+      g_printerr(
+          "Failed to link elements: v4l2src -> videoscale -> videoconvert -> x264enc -> "
+          "rtph264pay -> udpsink1\n");
+      gst_object_unref(customData.pipeline);
+      return;
+  }
+    qDebug() << "\nЯ запустил трансивер камеру\n" ;
+  startSend();
+
 }
 
 void Transmiter::onEnableVideo() {

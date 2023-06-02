@@ -8,11 +8,28 @@
 #include <QtNetwork/QHostAddress>
 #include <cstring>
 
+#include <QtMultimedia/QCameraDevice>
+#include <QtMultimedia/QMediaDevices>
+#include <QtMultimedia/QCamera>
+#include <QtMultimedia/QImageCapture>
+#include <QtMultimedia/QMediaRecorder>
+
+#include <QtMultimedia/QMediaCaptureSession>
+
+#include <QtMultimedia/QMediaPlayer>
+
+#include <QWidget>
+
+
 class SessionManager : public QObject {
 private:
     Q_OBJECT
-    QHash<QPair<QHostAddress, QString>, std::shared_ptr<Session>> live_sessions;  // map<session_id, session>
-    // void handleException(GstreamerError error);	 // Provides flowless application work after gstreamer errors.
+    QHash<QPair<QHostAddress, QString>, Session*> live_sessions;
+    QMediaCaptureSession *captureSession;
+    QWidget* window1;
+    QCamera* camera;
+
+
 
     void startThread(Session* session, const QString session_type);
 
@@ -26,6 +43,8 @@ public:
     ~SessionManager();
 
 public slots:
+    WId onStartCameraRecording();
+
     void onStartVideoSession(const QHostAddress ip_address);
 
     void onStartCameraSession(const QHostAddress ip_address);
@@ -82,4 +101,6 @@ signals:
     void sendStartReciver(const QHostAddress local_ip6, const QString session_type);
 
     void sendSetPorts(const QHostAddress ip_address, const qint32 video_port, const qint32 audio_port);
+
+    void sendCameraRecording(WId id);
 };

@@ -1,6 +1,9 @@
 #include "Reciver.h"
 
+#include "gst/video/videooverlay.h"
+#include "qboxlayout.h"
 #include "qevent.h"
+#include "qvideowidget.h"
 
 void Reciver::addLinkVideo() {
     qDebug() << "onEnableVideo RECIVER";
@@ -44,14 +47,49 @@ void Reciver::addLinkVideo() {
         return;
     }
 
-    g_object_set(udpsrc, "address", representIP(ip_address), "port", video_port, NULL);
+    g_object_set(udpsrc, "port", video_port, NULL);
 
     window = new QWidget();
     window->resize(1024, 600);
     window->show();
     WId xwinid = window->winId();
-    gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(autovideosink), xwinid);
-    window->installEventFilter(this);
+
+    if (windowCamera != nullptr){
+        qDebug() << "\n 01ddddAAAA1\n\n" ;
+      //full = new ;
+      full = new QWidget(window); ;
+
+      gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(autovideosink), xwinid);
+     // window->installEventFilter(this);
+      //QHBoxLayout* layout = new QHBoxLayout();
+      QGridLayout* layout = new QGridLayout();
+      layout->addWidget(window, 0,0,2,2);
+      layout->addWidget(windowCamera,1,1,1,1);
+
+
+
+      full->setLayout(layout);
+      full->installEventFilter(this);
+
+
+    }
+    else {
+        qDebug() << "\n 11NOOO11\n\n" ;
+      gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(autovideosink), xwinid);
+      window->installEventFilter(this);
+    }
+
+    //gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(autovideosink), xwinid);
+    //window->installEventFilter(this);
+
+
+    //QWidget* parentWidget = new QWidget();
+    //QWidget* childWidget = new QWidget(parentWidget);
+
+    //QVBoxLayout* layout = new QVBoxLayout(parentWidget);
+    //layout->addWidget(childWidget);
+
+    //parentWidget->show();
 }
 
 void Reciver::addLinkAudio() {
@@ -112,6 +150,8 @@ void Reciver::startReceive() {
 Reciver::Reciver(const QHostAddress& ip_address_, const qint16 video_port, const qint16 audio_port)
     : Session(ip_address_, video_port, audio_port) {
     qDebug() << "Constructor Reciver" << this;
+    window = nullptr;
+    windowCamera = nullptr;
     if (!g_thread_supported()) {
         g_thread_init(NULL);
     }
@@ -119,6 +159,8 @@ Reciver::Reciver(const QHostAddress& ip_address_, const qint16 video_port, const
 
 Reciver::Reciver(const QHostAddress& ip_address_, const qint16 audio_port) : Session(ip_address_, audio_port) {
     qDebug() << "Constructor Reciver" << this;
+    window = nullptr;
+    windowCamera = nullptr;
     if (!g_thread_supported()) {
         g_thread_init(NULL);
     }
@@ -130,7 +172,22 @@ Reciver::~Reciver() {
     onKillSession();
     if (window != nullptr){
       delete window;
+      window=nullptr;
     }
+    if (windowCamera!=nullptr){
+      delete windowCamera;
+      windowCamera = nullptr;
+    }
+}
+
+void Reciver::onStartCameraRecording(WId id, QWidget* window1)
+{
+  // windowCamera = window1;
+}
+
+void Reciver::onGetCameraWidget(QWidget* camera_)
+{
+  // windowCamera = camera_;
 }
 
 bool Reciver::eventFilter(QObject* obj, QEvent* event) {
@@ -144,8 +201,10 @@ bool Reciver::eventFilter(QObject* obj, QEvent* event) {
 }
 
 void Reciver::onEbableCamera() {
-    qDebug() << "onEbableCamera Reciver";
+    qDebug() << "\n\nonEbableCamera Reciver\n";
     gst_init(nullptr, nullptr);
+
+
 
     GstElement *source, *queue1, *udpsrc, *depay, *decoder, *queue2, *sink;
     GstCaps *caps, *caps2;
@@ -174,15 +233,75 @@ void Reciver::onEbableCamera() {
         g_printerr("Could not link all elements. Reciver. Exiting.\n");
         return;
     }
-    g_object_set(source, "port", 5001, NULL);
-    window = new QWidget();
-    window->resize(1024, 600);
-    window->show();
-    WId xwinid = window->winId();
+
+    g_object_set(source, "port", 5004, NULL);
+    windowCamera = new QWidget();
+    windowCamera->resize(640, 480);
+    windowCamera->show();
+    WId xwinid = windowCamera->winId();
     gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(sink), xwinid);
-    window->installEventFilter(this);
+    windowCamera->installEventFilter(this);
 
     startReceive();
+
+
+//    GstElement *capsfilter1, *capsfilter2, *udpsrc, *queue1, *vp8dec, *rtpvp8depay, *videoconvert, *queue2, *autovideosink;
+//    GstCaps *caps, *caps2;
+//    if (customData.pipeline == NULL) {
+//        customData.pipeline = gst_pipeline_new("video");
+//    }
+
+//    udpsrc = gst_element_factory_make("udpsrc", "udpsrc");
+//    queue1 = gst_element_factory_make("queue", "queue1");
+//    capsfilter1 = gst_element_factory_make("capsfilter", "capsfilterVideo1");
+//    rtpvp8depay = gst_element_factory_make("rtpvp8depay", "rtpvp8depay");
+//    vp8dec = gst_element_factory_make("vp8dec", "vp8dec");
+//    videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+//    capsfilter2 = gst_element_factory_make("capsfilter", "capsfilterVideo2");
+//    queue2 = gst_element_factory_make("queue", "queue2");
+//    autovideosink = gst_element_factory_make("glimagesink", "videosink");
+
+//    if (!customData.pipeline || !udpsrc || !rtpvp8depay || !vp8dec || !videoconvert || !autovideosink || !queue1 || !queue2 ||
+//        !capsfilter1 || !capsfilter2) {
+//        g_printerr("Not all elements could be created. Exiting.\n");
+//        return;
+//    }
+
+//    caps = gst_caps_new_simple("application/x-rtp", "media", G_TYPE_STRING, "video", "clock-rate", G_TYPE_INT, 90000, "encoding-name",
+//                               G_TYPE_STRING, "VP8", "payload", G_TYPE_INT, 96, NULL);
+
+//    caps2 = gst_caps_new_simple("video/x-raw", NULL);
+
+//    g_object_set(G_OBJECT(capsfilter1), "caps", caps, NULL);
+//    g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
+//    gst_caps_unref(caps);
+//    gst_caps_unref(caps2);
+
+//    gst_bin_add_many(GST_BIN(customData.pipeline), udpsrc, queue1, capsfilter1, rtpvp8depay, vp8dec, videoconvert, queue2, capsfilter2,
+//                     autovideosink, NULL);
+
+//    if (!gst_element_link_many(udpsrc, queue1, capsfilter1, rtpvp8depay, vp8dec, videoconvert, queue2, capsfilter2, autovideosink, NULL)) {
+//        g_printerr("Could not link all elements. Exiting.\n");
+//        return;
+//    }
+
+//    g_object_set(udpsrc, "port", 5004, NULL);
+
+//    window = new QWidget();
+//    window->resize(1024, 600);
+//    window->show();
+//    WId xwinid = window->winId();
+//    gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(autovideosink), xwinid);
+//    window->installEventFilter(this);
+
+//        windowCamera = new QWidget();
+//        //windowCamera->resize(640, 480);
+//        windowCamera->show();
+//        WId xwinid = windowCamera->winId();
+//        gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(autovideosink), xwinid);
+//        windowCamera->installEventFilter(this);
+
+
 }
 
 void Reciver::onSetVolume(float volume_) {

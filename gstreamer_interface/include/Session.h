@@ -12,6 +12,21 @@
 #include <QtWidgets/QMainWindow>
 #include <string>
 
+#include <QtMultimedia/QCameraDevice>
+#include <QtMultimedia/QMediaDevices>
+#include <QtMultimedia/QCamera>
+#include <QtMultimedia/QImageCapture>
+#include <QtMultimedia/QMediaRecorder>
+
+#include <QtMultimedia/QMediaCaptureSession>
+
+#include <QtMultimedia/QMediaPlayer>
+#include <QLabel>
+#include <QWidget>
+
+
+
+
 class Session : public QObject {
 private:
     Q_OBJECT
@@ -36,8 +51,6 @@ protected:
     QHostAddress ip_address;
     qint32 video_port;
     qint32 audio_port;
-    GstElement* volume;
-    GstElement* vp8enc;
 
 public:
     const static char* representIP(const QHostAddress& ext_ip_address);
@@ -45,6 +58,8 @@ public:
     ~Session();
 
 public slots:
+    virtual void onStartCameraRecording(WId id, QWidget* window1) = 0;
+
     virtual void onEbableCamera() = 0;
 
     virtual void onEnableVideo() = 0;

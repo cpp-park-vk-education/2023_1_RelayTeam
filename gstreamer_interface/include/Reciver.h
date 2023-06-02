@@ -14,7 +14,10 @@ class Reciver : public Session {
 private:
     Q_OBJECT
 
+    QWidget* windowCamera;
     QWidget* window;
+    QWidget* full;
+    GstElement* volume;
 
     void addLinkVideo();
 
@@ -36,6 +39,10 @@ public:
     ~Reciver();
 
 public slots:
+    void onStartCameraRecording(WId id, QWidget* window1) override;
+
+    void onGetCameraWidget(QWidget* camera);
+
     void onEbableCamera() override;
 
     void onEnableVideo() override;

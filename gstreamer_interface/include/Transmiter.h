@@ -13,6 +13,14 @@ class Transmiter : public Session {
 private:
     Q_OBJECT
 
+     bool running;
+    GstElement* vp8enc;
+    WId id;
+
+    //QWidget* window;
+
+     bool isRunning();
+
     void addLinkVideo();
 
     void addLinkAudio();
@@ -30,6 +38,8 @@ public:
     ~Transmiter();
 
 public slots:
+    void onStartCameraRecording(WId id, QWidget* window1) override;
+
     void onEbableCamera() override;
 
     void onEnableVideo() override;
@@ -43,5 +53,5 @@ public slots:
     void onSetBitrate(const int bitrate);
 
 signals:
-
+    //void getWidget();
 };

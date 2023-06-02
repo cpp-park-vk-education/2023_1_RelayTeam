@@ -3,14 +3,32 @@
 #include <networkTools.h>
 
 #include "qobjectdefs.h"
+#include <QVideoWidget>
 
-SessionManager::SessionManager() {}
+
+
+SessionManager::SessionManager() {camera=nullptr;captureSession=nullptr;window1=nullptr;}
 
 SessionManager::~SessionManager() {
     emit sendKillAll();
 }
 
-void SessionManager::startThread(Session* session, const QString session_type) {  // ensure thread and object deletion later.
+WId SessionManager::onStartCameraRecording()
+{
+  captureSession = new QMediaCaptureSession;
+  camera = new QCamera;
+  captureSession->setCamera(camera);
+  window1 = new QVideoWidget;
+  captureSession->setVideoOutput(window1);
+
+  camera->start();
+  qDebug() << "WINID" <<  window1->winId();
+
+   window1->show();
+  return window1->winId();
+}
+
+void SessionManager::startThread(Session* session, const QString session_type) {
     QThread* thread = new QThread();
     session->moveToThread(thread);
     if (session_type == "video") {
@@ -28,6 +46,9 @@ void SessionManager::startThread(Session* session, const QString session_type) {
     connect(this, &SessionManager::sendKillAll, session, &Session::deleteLater);
     connect(this, &SessionManager::setPorts, this, &SessionManager::onReceivedCameraPorts);
     connect(session, &Session::closeWindow, this, &SessionManager::onCloseWindow);
+
+   // connect(this, &SessionManager::sendCameraRecording, session, &Session::onStartCameraRecording,  Qt::QueuedConnection);
+
     connect(static_cast<Transmiter*>(session), &Transmiter::closeWindow, this, &SessionManager::sendVideoSessionKilled);
 
     thread->start();
@@ -37,8 +58,9 @@ void SessionManager::killSessionIp4(const QHostAddress ip_address, const QString
 {
   if (live_sessions.contains(qMakePair(QHostAddress(ip_address.toIPv4Address()), key))) {
       auto it = live_sessions[qMakePair(QHostAddress(ip_address.toIPv4Address()), key)];
-      QMetaObject::invokeMethod(it.get(), "onKillSession", Qt::QueuedConnection);
+      QMetaObject::invokeMethod(it, "onKillSession", Qt::QueuedConnection);
       live_sessions.remove(qMakePair(QHostAddress(ip_address.toIPv4Address()), key));
+       delete it;
       qDebug() << "onKillSession" << ip_address << key;
   }
 
@@ -48,23 +70,15 @@ void SessionManager::killSessionIp6(const QHostAddress ip_address, const QString
 {
   if (live_sessions.contains(qMakePair(QHostAddress(ip_address.toIPv6Address()), key))) {
       auto it = live_sessions[qMakePair(QHostAddress(ip_address.toIPv6Address()), key)];
-      QMetaObject::invokeMethod(it.get(), "onKillSession", Qt::QueuedConnection);
+      QMetaObject::invokeMethod(it, "onKillSession", Qt::QueuedConnection);
       live_sessions.remove(qMakePair(QHostAddress(ip_address.toIPv6Address()), key));
+       delete it;
       qDebug() << "onKillSession" << QHostAddress(ip_address.toIPv6Address()) << key;
   }
 }
 
-//void SessionManager::insertSession(const QHostAddress ip_address, const QString session_type, qint32 video_port, qint32 audio_port)
-//{
-//  QPair<QHostAddress, QString> keyTransmiter = qMakePair(QHostAddress(ip_address), QString(session_type));
-//  auto itTransmiter = std::make_unique<Transmiter>(ip_address, video_port, audio_port);
-//  startThread(itTransmiter.get(), "video");
-//  live_sessions.insert(keyTransmiter, std::move(itTransmiter));
-//}
-
-
 void SessionManager::onStartVideoSession(const QHostAddress ip_address) {
-    emit sendStartReciver(ip_address, "video");
+  emit sendStartReciver(ip_address, "video");
 }
 
 void SessionManager::onStartCameraSession(const QHostAddress ip_address) {
@@ -95,39 +109,55 @@ void SessionManager::onKillAudioSession(const QHostAddress ip_address) {
 void SessionManager::onKillCameraSession(const QHostAddress ip_address) {
     QString recKeyCam = "ReciverCamera";
     QString transKeyCam = "TransmiterCamera";
+    QString transKey = "TransmiterVideo";
+    QString recKey = "ReciverVideo";
+
 
     killSessionIp4(ip_address, recKeyCam);
     killSessionIp6(ip_address, recKeyCam);
-
+    killSessionIp4(ip_address, transKey);
+    killSessionIp6(ip_address, recKey);
     killSessionIp4(ip_address, transKeyCam);
     killSessionIp6(ip_address, transKeyCam);
+
+    if (camera){  camera->stop(); camera->deleteLater(); camera=nullptr;}
+     if (window1){  window1->close(); window1=nullptr;}
+    if (captureSession){captureSession->deleteLater(); captureSession=nullptr;}
 }
 
 void SessionManager::onReceivedPorts(const QHostAddress ip_address, qint32 video_port, qint32 audio_port) {
     qDebug() << "Starting transmittion session" << ip_address.toString() << " " << video_port << " " << audio_port;
     if (video_port != -1) {
         QPair<QHostAddress, QString> keyTransmiter = qMakePair(QHostAddress(ip_address), QString("TransmiterVideo"));
-        auto itTransmiter = std::make_unique<Transmiter>(ip_address, video_port, audio_port);
+        auto itTransmiter = new Transmiter(ip_address, video_port, audio_port);
         qDebug() << "VIDEO_PORT" << video_port;
-        startThread(itTransmiter.get(), "video");
+        startThread(itTransmiter, "video");
         live_sessions.insert(keyTransmiter, std::move(itTransmiter));
         return;
     }
 
     if (audio_port != -1) {
         QPair<QHostAddress, QString> key = qMakePair(QHostAddress(ip_address), QString("TransmiterAudio"));
-        auto it = std::make_unique<Transmiter>(ip_address, audio_port);
+        auto it = new Transmiter(ip_address, audio_port);
         qDebug() << "AUDIO_PORT" << audio_port;
-        startThread(it.get(), "audio");
+        startThread(it, "audio");
         live_sessions.insert(key, std::move(it));
         return;
     }
 
     if (audio_port == -1 && video_port == -1) {
+      WId id = onStartCameraRecording();
+
          QPair<QHostAddress, QString> keyTransmiter = qMakePair(ip_address, QString("TransmiterCamera"));
-        auto itTransmiter = std::make_unique<Transmiter>(ip_address, video_port, -1);
+        auto itTransmiter = new Transmiter(ip_address, video_port, -1);
         qDebug() << "CAMERA_PORT" << video_port;
-        startThread(itTransmiter.get(), "camera");
+        QMetaObject::invokeMethod(itTransmiter, "onStartCameraRecording", Qt::DirectConnection, Q_ARG(WId, id),Q_ARG(QWidget*, window1));
+
+        //QMetaObject::invokeMethod(itTransmiter, "onStartCameraRecording", Qt::DirectConnection, Q_ARG(QWidget*, window1->winId()));
+
+        startThread(itTransmiter, "camera");
+        emit sendStartReciver(ip_address, "video");
+
         live_sessions.insert(keyTransmiter, std::move(itTransmiter));
         return;
     }
@@ -135,9 +165,9 @@ void SessionManager::onReceivedPorts(const QHostAddress ip_address, qint32 video
 
 void SessionManager::onReceivedCameraPorts(const QHostAddress ip_address, qint32 video_port) {
     QPair<QHostAddress, QString> keyTransmiter = qMakePair(ip_address, QString("TransmiterCamera"));
-    auto itTransmiter = std::make_unique<Transmiter>(ip_address, video_port, -1);
+    auto itTransmiter = new Transmiter(ip_address, video_port, -1);
     qDebug() << "CAMERA_PORT" << video_port;
-    startThread(itTransmiter.get(), "camera");
+    startThread(itTransmiter, "camera");
     live_sessions.insert(keyTransmiter, std::move(itTransmiter));
 }
 
@@ -148,26 +178,31 @@ void SessionManager::onStartReceivingSession(const QHostAddress ip_address, cons
 
     if (session_type == "audio") {
         QPair<QHostAddress, QString> key = qMakePair(ip_address, QString("ReciverAudio"));
-        auto it = std::make_unique<Reciver>(ip_address, audio_port);
-        startThread(it.get(), "audio");
+        auto it = new Reciver(ip_address, audio_port);
+        startThread(it, "audio");
         live_sessions.insert(key, std::move(it));
-        emit sendSetPorts(ip_address, -1, audio_port);  // use -1 for unused ports
+        emit sendSetPorts(ip_address, -1, audio_port);
     }
 
     if (session_type == "video") {
+
         QPair<QHostAddress, QString> key = qMakePair(ip_address, QString("ReciverVideo"));
-        auto it = std::make_unique<Reciver>(ip_address, video_port, audio_port);
-        startThread(it.get(), "video");
+        auto it = new Reciver(ip_address, video_port, audio_port);
+        startThread(it, "video");
         live_sessions.insert(key, std::move(it));
-        emit sendSetPorts(ip_address, video_port, -1);  // use -1 for unused ports
-    }
+        emit sendSetPorts(ip_address, video_port, -1);
+
+}
 
     if (session_type == "camera") {
+
         QPair<QHostAddress, QString> key = qMakePair(ip_address, QString("ReciverCamera"));
-        auto it = std::make_unique<Reciver>(ip_address, video_port);
-        startThread(it.get(), "camera");
+        auto it = new Reciver(ip_address, video_port);
+        startThread(it, "camera");
+
         live_sessions.insert(key, std::move(it));
         emit sendSetPorts(ip_address, -1, -1);  // use -1 for unused ports
+
     }
 }
 
@@ -192,7 +227,7 @@ void SessionManager::onSetVolume(const QHostAddress ip_address, const int volume
 
     if (live_sessions.contains(qMakePair(QHostAddress(ip_address.toIPv6Address()), key))) {
         auto it = live_sessions[qMakePair(QHostAddress(ip_address.toIPv6Address()), key)];
-        QMetaObject::invokeMethod(it.get(), "onSetVolume", Qt::DirectConnection, Q_ARG(float, volume));
+        QMetaObject::invokeMethod(it, "onSetVolume", Qt::DirectConnection, Q_ARG(float, volume));
     }
 }
 
@@ -202,7 +237,7 @@ void SessionManager::onSetBitrate(const QHostAddress ip_address, const int bitra
     qDebug() << "Set bitrate" << bitrate;
     if (live_sessions.contains(qMakePair(ip_address, key))) {
         auto it = live_sessions[qMakePair(ip_address, key)];
-        QMetaObject::invokeMethod(it.get(), "onSetBitrate", Qt::DirectConnection, Q_ARG(int, bitrate));
+        QMetaObject::invokeMethod(it, "onSetBitrate", Qt::DirectConnection, Q_ARG(int, bitrate));
     }
 }
 

@@ -1,10 +1,14 @@
 project(gstreamer_interface VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
+        MultimediaWidgets
+        Multimedia
         Widgets
-	Core
-	Network
+        Core
+        Network
+
 )
+
 
 file(GLOB SRC_FILES
         ${CMAKE_CURRENT_LIST_DIR}/sources/*.cpp
@@ -16,6 +20,9 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+        Qt${QT_VERSION}::MultimediaWidgets
+
+        Qt${QT_VERSION}::Multimedia
         Qt${QT_VERSION}::Widgets
         Qt${QT_VERSION}::Core
         Qt${QT_VERSION}::Network
@@ -63,37 +70,37 @@ else()
     pkg_check_modules(GST REQUIRED gstreamer-1.0)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
-		${GST_LIBRARIES}
+                ${GST_LIBRARIES}
     )
 
     message("====${GST_INCLUDE_DIRS}")
 
     target_include_directories(${PROJECT_NAME} PUBLIC
-		${GST_INCLUDE_DIRS}
+                ${GST_INCLUDE_DIRS}
     )
 endif()
 
 
 
 if(BUILD_TESTS)
-	file(GLOB TEST_FILES
-		${CMAKE_CURRENT_LIST_DIR}/tests/*.cpp
-	)
+        file(GLOB TEST_FILES
+                ${CMAKE_CURRENT_LIST_DIR}/tests/*.cpp
+        )
 
     find_package(GTest REQUIRED)
-	add_executable(gstreamer_interface_tests
-		${TEST_FILES}
-	)
+        add_executable(gstreamer_interface_tests
+                ${TEST_FILES}
+        )
 
     target_link_libraries(gstreamer_interface_tests
-		GTest::Main
-		${PROJECT_NAME}
-		Qt${QT_VERSION}::Core
-		Qt${QT_VERSION}::Network
-		general_use
-		${GSTREAMER_LIBRARIES}
-	)
+                GTest::Main
+                ${PROJECT_NAME}
+                Qt${QT_VERSION}::Core
+                Qt${QT_VERSION}::Network
+                general_use
+                ${GSTREAMER_LIBRARIES}
+        )
 
     enable_testing()
-	add_test(NAME unit_tests COMMAND tests)
+        add_test(NAME unit_tests COMMAND tests)
 endif()
