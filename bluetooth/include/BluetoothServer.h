@@ -21,8 +21,6 @@ public:
 
     ~BluetoothServer();
 
-    void initServer(const QBluetoothAddress& local_adapter = QBluetoothAddress());
-
     void stopServer();
 
 private slots:
@@ -33,6 +31,8 @@ private slots:
     void onReadSocket();
 
 public slots:
+    void initServer(const QBluetoothAddress& local_adapter = QBluetoothAddress());
+
     void onSetServiceName(QString name);
 
     void onSendMessage(const QString& message);

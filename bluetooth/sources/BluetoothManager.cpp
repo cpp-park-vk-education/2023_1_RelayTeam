@@ -12,9 +12,6 @@
 #include "variables.h"
 
 BluetoothManager::BluetoothManager(QWidget* parent) : QListWidget(parent) {
-    //    connect(/* твоя кнопка */, &QPushButton::clicked, this, &Manager::onConnectClicked);
-    //    connect(/* твоя кнопка */, &QPushButton::clicked, this, &Manager::onSendStarted);
-
     local_adapters = QBluetoothLocalDevice::allDevices();
     if (local_adapters.count() < 2) {
         qDebug() << "localAdapters 0";
@@ -37,16 +34,9 @@ BluetoothManager::BluetoothManager(QWidget* parent) : QListWidget(parent) {
 
     const QBluetoothAddress adapter = local_adapters.isEmpty() ? QBluetoothAddress() : local_adapters.at(current_adapter_index).address();
     remote_selector = new BluetoothScanner(adapter);
-#ifdef Q_OS_ANDROID
-    if (QtAndroid::androidSdkVersion() >= 23)
-        remote_selector->startDiscovery(QBluetoothUuid(reverseUuid));
-    else
-        remote_selector->startDiscovery(QBluetoothUuid(serviceUuid));
-#else
     remote_selector->startDiscovery(QBluetoothUuid(serviceUuid));
 
     connect(remote_selector, &BluetoothScanner::sendAddService, this, &BluetoothManager::onServiceDiscovered);
-#endif
 }
 
 BluetoothManager::~BluetoothManager() {
@@ -54,12 +44,12 @@ BluetoothManager::~BluetoothManager() {
     bluetooth_server->deleteLater();
 }
 
-void BluetoothManager::onStartVideotransmission(const QBluetoothAddress& bluetooth_address) {
+void BluetoothManager::onStartVideotransmission(QBluetoothAddress bluetooth_address) {
     QMetaObject::invokeMethod(bluetooth_client, "killConnection", Qt::BlockingQueuedConnection);
     QMetaObject::invokeMethod(bluetooth_client, "connectToService", Q_ARG(QBluetoothAddress, bluetooth_address), Qt::QueuedConnection);
 }
 
-void BluetoothManager::onStopTransmitt(const QBluetoothAddress& bluetooth_address) {}
+void BluetoothManager::onStopTransmitt(QBluetoothAddress bluetooth_address) {}
 
 void BluetoothManager::onServiceDiscovered(const QBluetoothServiceInfo& service_info) {
     services[service_info.device().address()] = service_info;
@@ -86,6 +76,16 @@ void BluetoothManager::onShowMessage(const QString& sender, const QString& messa
     QLabel* label = new QLabel(this);
     label->setPixmap(QPixmap(image_data));
     label->show();
+}
+
+void BluetoothManager::onAddButtonCLicked() {}
+
+void BluetoothManager::onStartBluetoothVideoSession(QBluetoothAddress bluetooth_address) {}
+
+void BluetoothManager::onStopBluetoothVideoSession(QBluetoothAddress bluetooth_address) {}
+
+void BluetoothManager::onDeviceMacAddressesUpdated(QSet<QString> device_mac_addresses_) {
+    device_mac_addresses = std::move(device_mac_addresses_);
 }
 
 // void BluetoothManager::onNewAdapterSelected() {

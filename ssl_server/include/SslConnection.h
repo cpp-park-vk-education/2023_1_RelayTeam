@@ -69,5 +69,7 @@ signals:
 
     void sendReceivedPorts(const QHostAddress ipv6_address, qint32 video_port, qint32 audio_port);
 
+    void sendInitializationResponse(QString service_name, QString mac_address);
+
     void finished();
 };

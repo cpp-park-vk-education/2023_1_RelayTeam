@@ -28,7 +28,7 @@ private:
 public:
     SettingsWidget(Options* options_, QWidget* parrent = nullptr);
 
-    void setScale(qreal scale_factor_);
+    void setScale(qint16 scale_factor_);
 
 private slots:
     void onScaleChanged(int volume_);

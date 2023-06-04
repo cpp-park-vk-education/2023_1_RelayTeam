@@ -48,15 +48,17 @@ private slots:
 
     void onSelected(QListWidgetItem* item);
 
-    void onMessageReceived(QMdnsEngine::Message message_received);
-
 public slots:
     void onAddButtonCLicked();
 
     void onDeviceIdsUpdated(QSet<QString> device_ids_);
 
+    void onInitializationResponse(QString service_name, QString mac_address);
+
 signals:
-    void devicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
+    void sendRequestInitialization(QHostAddress ipv4_address, QString service_name);
+
+    void sendDevicePreparedToAdd(QString name, QHostAddress ipv4_address, QString mac_address);
 
     void sendUpdateAddress(QString mac_address, QHostAddress local_ipv4_address);
 

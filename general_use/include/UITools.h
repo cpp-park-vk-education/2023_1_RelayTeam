@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QDebug>
+#include <QEvent>
 #include <QtMath>
 
 inline qreal getFontScaling(qreal scaling) {

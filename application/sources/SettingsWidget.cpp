@@ -51,8 +51,9 @@ SettingsWidget::SettingsWidget(Options* options_, QWidget* parrent) : QWidget(pa
     scale_box->setValue(options->scale_factor);
 }
 
-void SettingsWidget::setScale(qreal scale_factor_) {
+void SettingsWidget::setScale(qint16 scale_factor_) {
     scale_slider->setValue(scale_factor_);
+    options->scale_factor = scale_factor_;
 }
 
 void SettingsWidget::onSetDeviceNameButtonClicked() {

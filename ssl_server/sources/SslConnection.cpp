@@ -1,5 +1,7 @@
 #include "SslConnection.h"
 
+#include <networkTools.h>
+
 SslConnection::SslConnection(QSslKey key, QSslCertificate cert, QObject* parrent) : QThread(parrent) {
     this->start();
     this->moveToThread(this);
@@ -33,7 +35,9 @@ bool SslConnection::isEncrypted() {
 }
 
 void SslConnection::onSslErrors(const QList<QSslError>& errors) {
-    foreach (const QSslError& error, errors) { qDebug() << "SSL ERROR: " << error.errorString(); }
+    foreach (const QSslError& error, errors) {
+        qDebug() << "SSL ERROR: " << error.errorString();
+    }
 }
 
 void SslConnection::onDisconnected() {
@@ -61,6 +65,17 @@ void SslConnection::onReadyRead() {
         qDebug() << "got port responce from: " << localipv4_address.toString() << "which contains video port: " << video_port
                  << " audio port:" << audio_port;
         emit sendReceivedPorts(localipv4_address, video_port, audio_port);
+    }
+    if (message_items[0] == "mrelay-request-initialization") {  // prcesses port request response
+        QHostAddress other_localipv4_address = QHostAddress(clientSocket->peerAddress());
+        qDebug() << "got initialization request: ";
+        QString message = "mrelay-response-initialization|" + message_items[1] + "|" + getMacAddress();
+        onWrite(message);
+    }
+    if (message_items[0] == "mrelay-response-initialization") {  // prcesses port request response
+        QHostAddress other_localipv4_address = QHostAddress(clientSocket->peerAddress());
+        qDebug() << "got initialization response from: " << clientSocket->peerAddress();
+        emit sendInitializationResponse(message_items[1], message_items[2]);
     }
 }
 

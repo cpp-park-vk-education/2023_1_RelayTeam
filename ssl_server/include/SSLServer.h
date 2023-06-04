@@ -20,6 +20,8 @@ private:
     QSslCertificate cert;
     SslIOManager* ssl_io_manager;
 
+    void connectSslConnection(SslConnection* ssl_connection);
+
 protected:
     void incomingConnection(qintptr socketDescriptor);
 

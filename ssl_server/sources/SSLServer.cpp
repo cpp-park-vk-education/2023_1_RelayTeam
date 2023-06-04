@@ -19,13 +19,18 @@ SslServer::~SslServer() {
     emit sendKillAll();
 }
 
-void SslServer::incomingConnection(qintptr socketDescriptor) {
-    SslConnection* ssl_connection = new SslConnection(key, cert);
+void SslServer::connectSslConnection(SslConnection* ssl_connection) {
     connect(ssl_connection, &SslConnection::sendStartReceivingSession, ssl_io_manager, &SslIOManager::sendStartReceivingSession);
     connect(ssl_connection, &SslConnection::sendReceivedPorts, ssl_io_manager, &SslIOManager::sendReceivedPorts);
+    connect(ssl_connection, &SslConnection::sendInitializationResponse, ssl_io_manager, &SslIOManager::sendInitializationResponse);
 
     connect(ssl_connection, &SslConnection::sendAddSslConnection, ssl_io_manager, &SslIOManager::onAddSslConnection);
     connect(ssl_connection, &SslConnection::sendRemoveSslConnection, ssl_io_manager, &SslIOManager::onRemoveSslConnection);
+}
+
+void SslServer::incomingConnection(qintptr socketDescriptor) {
+    SslConnection* ssl_connection = new SslConnection(key, cert);
+    connectSslConnection(ssl_connection);
 
     connect(this, &SslServer::sendKillAll, ssl_connection, &SslConnection::deleteLater);
 
@@ -34,11 +39,7 @@ void SslServer::incomingConnection(qintptr socketDescriptor) {
 
 SslConnection* SslServer::onConnectToServer(QHostAddress address) {
     SslConnection* ssl_connection = new SslConnection(key, cert);
-    connect(ssl_connection, &SslConnection::sendStartReceivingSession, ssl_io_manager, &SslIOManager::sendStartReceivingSession);
-    connect(ssl_connection, &SslConnection::sendReceivedPorts, ssl_io_manager, &SslIOManager::sendReceivedPorts);
-
-    connect(ssl_connection, &SslConnection::sendAddSslConnection, ssl_io_manager, &SslIOManager::onAddSslConnection);
-    connect(ssl_connection, &SslConnection::sendRemoveSslConnection, ssl_io_manager, &SslIOManager::onRemoveSslConnection);
+    connectSslConnection(ssl_connection);
 
     connect(this, &SslServer::sendKillAll, ssl_connection, &SslConnection::deleteLater);
 

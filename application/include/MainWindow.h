@@ -6,17 +6,22 @@
 #include <SslIOManager.h>
 
 #include <QCloseEvent>
+#include <QGestureEvent>
 #include <QGridLayout>
 #include <QGroupBox>
+// #include <QJniObject>
+#include <QLabel>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QScreen>
 #include <QScrollArea>
+#include <QScroller>
 #include <QSet>
 #include <QStackedWidget>
 #include <QTextEdit>
 #include <QThread>
 #include <QWindow>
+#include <QtBluetooth/QBluetoothAddress>
 #include <QtNetwork/QHostAddress>
 
 #include "BluetoothManager.h"
@@ -44,8 +49,10 @@ private:
     QHBoxLayout* button_layout;
     QPushButton* scan_network_button;
     QPushButton* add_button;
-
+    QStackedWidget* main_window_stack_widget;
     BluetoothManager* bluetooth_manager;
+
+    QLabel* stacked_widget_placeholder;
 
     SearchWidget* search_widget;
     Publisher* publisher_widget;
@@ -54,6 +61,8 @@ private:
     bool current_search_widget_is_bluetooth;
     bool current_control_widget_is_settings;
 
+    bool is_dragging_mouse;
+    QPoint mouse_drag_start_pos;
     QScreen* application_screen;
     Options* options;
     SettingsWidget* settings_widget;
@@ -71,14 +80,19 @@ private:
 
     void saveAllChanges();
 
-    void closeEvent(QCloseEvent* event);
+    void closeEvent(QCloseEvent* event) override;
 
     void getDeviceMacAddresses();
 
     void makeDeviceConnections(DeviceWidget* device);
 
+private:
+    void mousePressEvent(QMouseEvent* event) override;
+
+    void mouseReleaseEvent(QMouseEvent* event) override;
+
 public:
-    explicit MainWindow(QScreen* application_screen_, QWidget* parent = nullptr);
+    explicit MainWindow(QWidget* parent = nullptr);
 
     ~MainWindow();
 
@@ -89,6 +103,8 @@ private slots:
 
 public slots:
     void onDevicePreparedToAdd(QString name, QHostAddress ipv6_address, QString mac_address);
+
+    void onBluetoothDevicePreparedToAdd(QString name, QBluetoothAddress local_ipv4_address, QString mac_address);
 
     void onUpdateAddress(QString mac_address, QHostAddress ipv6_address);
 

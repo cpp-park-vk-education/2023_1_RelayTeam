@@ -3,10 +3,22 @@ project(general_use VERSION 0.1 LANGUAGES CXX)
 find_package(Qt${QT_VERSION} REQUIRED COMPONENTS
 	Widgets
 	Network
+        Core
 )
 
 set(PROJECT_PATH ${CMAKE_SOURCE_DIR})
-set(RESOURCES_PATH ${CMAKE_SOURCE_DIR}/resources)
+set(PROJECT_RESOURCES_PATH ${CMAKE_SOURCE_DIR}/resources)
+set(RESOURCES_PATH ${CMAKE_BINARY_DIR}/resources)
+
+file(GLOB RESOURCE_FILE_PATHS
+        "${PROJECT_RESOURCES_PATH}/*.png"
+)
+
+foreach(resource_file ${RESOURCE_FILE_PATHS})
+    get_filename_component(file_name ${resource_file} NAME)
+    configure_file(${resource_file} ${CMAKE_BINARY_DIR}/resources/${file_name} COPYONLY)
+endforeach()
+
 configure_file(${CMAKE_CURRENT_LIST_DIR}/include/variables.h.in ${CMAKE_CURRENT_LIST_DIR}/include/variables.h @ONLY)
 
 
@@ -23,6 +35,7 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt${QT_VERSION}::Widgets
 	Qt${QT_VERSION}::Network
+        Qt${QT_VERSION}::Core
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -45,7 +58,10 @@ if (ANDROID)
 else()
     find_package(OpenSSL REQUIRED)
     target_link_libraries(${PROJECT_NAME} PRIVATE
-            OpenSSL::SSL
+        OpenSSL::SSL
+    )
+    target_include_directories(${PROJECT_NAME} PUBLIC
+        "${OPENSSL_ROOT_DIR}/include"
     )
 endif()
 

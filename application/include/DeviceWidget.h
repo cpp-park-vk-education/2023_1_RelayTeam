@@ -12,6 +12,7 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QtBluetooth/QBluetoothAddress>
 #include <QtNetwork/QHostAddress>
 
 #include "variables.h"
@@ -19,6 +20,9 @@
 class DeviceWidget : public QVBoxLayout {
 private:
     Q_OBJECT
+
+    enum CaptureModes { Camera, Screen, Both, Bluetooth };
+
     /////////////////////////////////////////////////
     QLabel* wifi_label;
     QLabel* bluetooth_label;
@@ -41,10 +45,17 @@ private:
 
     qreal scale;
 
+    CaptureModes capture_mode = CaptureModes::Camera;
     bool wifi_state = false;
+    bool bluetooth_state = false;
     bool expanded_state = false;
     bool audio_state = false;
     bool cast_state = false;
+    bool bluetooth_cast_state = false;
+
+    QBluetoothAddress bluetooth_address = QBluetoothAddress();  // isNull = true
+
+    QHostAddress local_ipv4_address = QHostAddress();  // isNull = true
 
     void setBasicControlLayout();
 
@@ -56,7 +67,6 @@ public:
     const QString ID;
     qint16 volume;
     QString name;
-    QHostAddress local_ipv4_address = QHostAddress();  // isNull = true
     qint32 video_bitrait;
     qint32 audio_bitrait;
     bool source_mode_is_screen = true;
@@ -68,7 +78,10 @@ public:
                           qint32 audio_bitrait_ = DEFAULT_AUDIO_BITRAIT, QWidget* parent = nullptr);
 
     void setLocalIPv4(const QHostAddress& local_ipv4_address_);
+
     void unsetLocalIPv4();
+
+    void setBluetoothAddress(const QBluetoothAddress& bluetooth_address_);
 
 private slots:
     void onAudioPressed();
@@ -93,10 +106,12 @@ private slots:
 
     void onSetBothCaptureMode();
 
+    void onSetBluetoothCaptureMode();
+
     void onToggleRecording(bool checked);
 
 signals:
-    /////////////////VIDEO_SESSION_CONTROL///////////////////////////////////
+    /////////////////SESSION_CONTROL//////////////////////////////////////////
     void sendStartVideoSession(QHostAddress ipv4_address);
 
     void sendStopVideoSession(QHostAddress ipv4_address);
@@ -104,6 +119,10 @@ signals:
     void sendStartAudioSession(QHostAddress ipv4_address);
 
     void sendStopAudioSession(QHostAddress ipv4_address);
+
+    void sendStartBluetoothVideoSession(QBluetoothAddress bluetooth_address);
+
+    void sendStopBluetoothVideoSession(QBluetoothAddress bluetooth_address);
     /////////////////VOLUME_CONTROL//////////////////////////////////////////
     void sendChangeVolume(QHostAddress ipv4_address, qint16 volume_);
     /////////////////BITRAIT_CONTROL/////////////////////////////////////////
@@ -116,6 +135,7 @@ signals:
     void sendSetCameraCaptureMode(QHostAddress ipv4_address);
 
     void sendSetBothCaptureMode(QHostAddress ipv4_address);
+
     /////////////////RECORDING_CONTROL///////////////////////////////////////
     void sendToggleRecording(QHostAddress ipv4_address, bool checked);
 };

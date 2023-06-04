@@ -63,18 +63,35 @@ if (ANDROID)
        "${GST_ANDROID_LIBRARIES}/lib/glib-2.0/include"
        "${GST_ANDROID_LIBRARIES}/include/libxml2/"
     )
+elseif(WIN32)
+
+
+    file(GLOB GST_LIB
+        ${MING64_ROOT}/lib/gstreamer-1.0/*.dll.a
+        ${MING64_ROOT}/lib/*.dll.a
+    )
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${GST_LIB}
+    )
+
+   target_include_directories(${PROJECT_NAME} PUBLIC
+        "${MING64_ROOT}/include/gstreamer-1.0"
+        "${MING64_ROOT}/include/glib-2.0"
+        "${MING64_ROOT}/lib/glib-2.0/include"
+        "${MING64_ROOT}/include/libxml2/"
+   )
+
 else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GST REQUIRED gstreamer-1.0)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
-		${GST_LIBRARIES}
+        ${GST_LIBRARIES}
     )
 
-    message("====${GST_INCLUDE_DIRS}")
-
     target_include_directories(${PROJECT_NAME} PUBLIC
-		${GST_INCLUDE_DIRS}
+        ${GST_INCLUDE_DIRS}
     )
 endif()
 

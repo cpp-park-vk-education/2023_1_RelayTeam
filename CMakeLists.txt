@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 set(QT_VERSION 6)
 
+set(CMAKE_CXX_STANDARD 17)
+
 if(LINUX)
     target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
@@ -16,12 +18,14 @@ endif()
 
 project(MultiRelayApplication VERSION 0.1 LANGUAGES CXX)
 
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QT_DEBUG_PLUGINS ON)
 

@@ -27,8 +27,6 @@ public:
 private slots:
     void onHostnameChanged(QByteArray hostname);
 
-    void onMessageReceived(QMdnsEngine::Message message_received);
-
 public slots:
     void onChangeServiceName(QString service_name);
 };

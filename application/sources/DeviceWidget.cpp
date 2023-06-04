@@ -73,6 +73,12 @@ void DeviceWidget::setAdditionalControlLayout() {
     connect(both_capture_button, &QPushButton::clicked, this, &DeviceWidget::onSetBothCaptureMode);
     additional_control_layout->addWidget(both_capture_button);
 
+    QRadioButton* bluetooth_capture_button = new QRadioButton;  // Creating both capture button.
+    bluetooth_capture_button->setText("Bluetooth capture");
+    bluetooth_capture_button->setChecked(!source_mode_is_screen);
+    connect(bluetooth_capture_button, &QPushButton::clicked, this, &DeviceWidget::onSetBluetoothCaptureMode);
+    additional_control_layout->addWidget(bluetooth_capture_button);
+
     QHBoxLayout* video_bitrait_layout = new QHBoxLayout;  // Creating bitrait layout.
     video_bitrait_label = new QLabel("Set video bitrait: ");
     video_bitrait_layout->addWidget(video_bitrait_label);
@@ -190,6 +196,11 @@ void DeviceWidget::unsetLocalIPv4() {
     local_ipv4_address = QHostAddress();
 }
 
+void DeviceWidget::setBluetoothAddress(const QBluetoothAddress& bluetooth_address_) {
+    bluetooth_state = true;
+    bluetooth_address = bluetooth_address_;
+}
+
 void DeviceWidget::onAudioPressed() {
     if (wifi_state) {
         if (audio_state) {
@@ -208,19 +219,32 @@ void DeviceWidget::onAudioPressed() {
 }
 
 void DeviceWidget::onCastPressed() {
-    if (wifi_state) {
-        if (cast_state) {
-            cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
-            emit sendStopVideoSession(local_ipv4_address);
-        } else {
-            cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
-            emit sendStartVideoSession(local_ipv4_address);
-        }
-        cast_state = !cast_state;
-    } else {
+    if (bluetooth_cast_state) {
+        cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
+        emit sendStopBluetoothVideoSession(bluetooth_address);
+        bluetooth_cast_state = false;
+        return;
+    }
+    if (cast_state) {
         cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast-disabled.png")));
         emit sendStopVideoSession(local_ipv4_address);
         cast_state = false;
+        return;
+    }
+    if (capture_mode == CaptureModes::Bluetooth) {
+        if ((!bluetooth_cast_state) && bluetooth_state) {
+            cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
+            emit sendStartBluetoothVideoSession(bluetooth_address);
+            bluetooth_cast_state = true;
+        }
+        return;
+    } else {
+        if ((!cast_state) && wifi_state) {
+            cast_button->setIcon(QIcon(Q_RESOURCE_DIR.absoluteFilePath("cast.png")));
+            emit sendStartVideoSession(local_ipv4_address);
+            cast_state = true;
+        }
+        return;
     }
 }
 
@@ -236,14 +260,22 @@ void DeviceWidget::onSettingsPressed() {
 }
 
 void DeviceWidget::onSetScreenCaptureMode() {
+    capture_mode = CaptureModes::Screen;
     emit sendSetCameraCaptureMode(local_ipv4_address);
 }
 
 void DeviceWidget::onSetCameraCaptureMode() {
+    capture_mode = CaptureModes::Camera;
     emit sendSetScreenCaptureMode(local_ipv4_address);
 }
 
 void DeviceWidget::onSetBothCaptureMode() {
+    capture_mode = CaptureModes::Both;
+    emit sendSetBothCaptureMode(local_ipv4_address);
+}
+
+void DeviceWidget::onSetBluetoothCaptureMode() {
+    capture_mode = CaptureModes::Bluetooth;
     emit sendSetBothCaptureMode(local_ipv4_address);
 }
 

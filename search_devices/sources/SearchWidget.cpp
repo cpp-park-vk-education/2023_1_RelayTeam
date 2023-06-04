@@ -21,7 +21,6 @@ SearchWidget::SearchWidget(qreal scale_, QWidget* parent)
     connect(&mdns_browser, &QMdnsEngine::Browser::serviceAdded, this, &SearchWidget::onDiscovered);
     connect(&mdns_browser, &QMdnsEngine::Browser::serviceRemoved, this, &SearchWidget::onServiceRemoved);
     connect(&mdns_browser, &QMdnsEngine::Browser::serviceUpdated, this, &SearchWidget::onServiceUpdated);
-    connect(&server, &QMdnsEngine::Server::messageReceived, this, &SearchWidget::onMessageReceived);
     connect(this, &QListWidget::itemClicked, this, &SearchWidget::onSelected);
 }
 
@@ -44,20 +43,22 @@ void SearchWidget::onDiscovered(const QMdnsEngine::Service service) {
         }
         qDebug() << "resolved address: " << address.toString();
         service_item->setResolved(address);
-        QMdnsEngine::Message message;
-        QMdnsEngine::Query query;
-        query.setName("mrelay-request-initialization");
-        query.setType(2222);
-        message.addQuery(query);
-        query.setName(getServiceName(service_item->getService()).toUtf8());
-        query.setType(2222);
-        message.addQuery(query);
-        message.setAddress(address);
-        message.setPort(5353);
-        message.setTransactionId(1264);
-        server.sendMessage(message);
+        emit sendRequestInitialization(address, getServiceName(service_item->getService()).toUtf8());
+
         QMetaObject::invokeMethod(resolver, &QMdnsEngine::Resolver::deleteLater);
     });
+}
+
+void SearchWidget::onInitializationResponse(QString service_name, QString mac_address) {
+    ServiceItem* service_item = service_item_map[service_name];
+    qDebug() << "got mrelay-answer-initialization from: " << service_name;
+    service_item->setInitialized(mac_address);
+    if (device_ids.contains(mac_address)) {
+        qDebug() << "Service item already added. Updating address.";
+        service_item->setAlreadyAdded();
+        emit sendUpdateAddress(mac_address, service_item->getLocalIPv4Address());
+        return;
+    }
 }
 
 void SearchWidget::onServiceRemoved(const QMdnsEngine::Service service) {
@@ -82,24 +83,6 @@ void SearchWidget::onServiceUpdated(QMdnsEngine::Service service) {
 
 void SearchWidget::onSelected(QListWidgetItem* item_) {}
 
-void SearchWidget::onMessageReceived(const QMdnsEngine::Message message_received) {
-    QList<QMdnsEngine::Query> queries = message_received.queries();
-    if (message_received.transactionId() == 3663 && queries[0].name() == "mrelay-answer-initialization.") {
-        QString service_name = queries[1].name().left(queries[1].name().size() - 1);
-        QString mac_address = queries[2].name().left(queries[2].name().size() - 1);
-        QHostAddress local_ipv4_address = QHostAddress(QString(queries[3].name().left(queries[3].name().size() - 1)));
-        ServiceItem* service_item = service_item_map[service_name];
-        qDebug() << "got mrelay-answer-initialization from: " << service_name;
-        service_item->setInitialised(mac_address, local_ipv4_address);
-        if (device_ids.contains(mac_address)) {
-            qDebug() << "Service item already added. Updating address.";
-            service_item->setAlreadyAdded();
-            emit sendUpdateAddress(mac_address, local_ipv4_address);
-            return;
-        }
-    }
-}
-
 void SearchWidget::onAddButtonCLicked() {
     QList<QListWidgetItem*> selected_items = this->selectedItems();  // Only one can actually be selected at a time.
     if (selected_items.empty()) {
@@ -111,12 +94,16 @@ void SearchWidget::onAddButtonCLicked() {
         qDebug() << "Can't add device. Not yet resolved.";
         return;
     }
+    if (!service_item->getInitialized()) {
+        qDebug() << "Can't add device. Not yet initialized.";
+        return;
+    }
     if (service_item->getAdded()) {  // still can add if service name changed.
         qDebug() << "Can't add device. Device already added.";
         return;
     }
     service_item->setAlreadyAdded();
-    emit devicePreparedToAdd(service_item->getService().name(), service_item->getLocalIPv4Address(), service_item->getMacAddress());
+    emit sendDevicePreparedToAdd(service_item->getService().name(), service_item->getLocalIPv4Address(), service_item->getMacAddress());
 }
 
 void SearchWidget::onDeviceIdsUpdated(QSet<QString> device_ids_) {

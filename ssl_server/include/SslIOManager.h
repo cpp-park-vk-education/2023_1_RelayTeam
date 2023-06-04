@@ -26,6 +26,18 @@ public:
 
 public slots:
     /*!
+     * \brief Adds connection to map of active connections.
+     * \param address - Address of connection.
+     */
+    void onAddSslConnection(QHostAddress address);
+
+    /*!
+     * \brief Removes connection to map of active connections.
+     * \param address - Address of connection.
+     */
+    void onRemoveSslConnection(QHostAddress address);
+
+    /*!
      * \brief Writes text to opend socket. Creates one if doesn't exist.
      * \param address - address of receiving socket.
      * \param message - text of message.
@@ -41,24 +53,17 @@ public slots:
     void onSendPorts(QHostAddress ip_address, qint32 video_port, qint32 audio_port);
 
     /*!
-     * \brief Request's  Receiver side to start receiving session.
-     * \param ip_address - address of receiving side.
-     * \param session_type - type of requested session.
+     * \brief Requests initalization from a certain machine
+     * \param ip_address
      */
     void onStartReciver(const QHostAddress ip_address, const QString session_type);
 
     /*!
-     * \brief Adds connection to map of active connections.
-     * \param address - Address of connection.
+     * \brief Request's  Receiver side to start receiving session.
+     * \param ip_address - address of receiving side.
+     * \param session_type - type of requested session.
      */
-    void onAddSslConnection(QHostAddress address);
-
-    /*!
-     * \brief Removes connection to map of active connections.
-     * \param address - Address of connection.
-     */
-    void onRemoveSslConnection(QHostAddress address);
-
+    void onRequestInitialization(const QHostAddress ip_address, QString service_name);
 signals:
     /*!
      * \brief Signal that conects Connections and SessionManager.
@@ -73,7 +78,9 @@ signals:
      * \param video_port - chosen video port.
      * \param audio_port - chosen audio port.
      */
-    void sendReceivedPorts(const QHostAddress ipv_address, qint32 video_port, qint32 audio_port);
+    void sendReceivedPorts(const QHostAddress ipv4_address, qint32 video_port, qint32 audio_port);
+
+    void sendInitializationResponse(QString service_name, QString mac_address);
 
     void sendKillAll();
 };

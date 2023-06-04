@@ -23,19 +23,21 @@ void Transmiter::addLinkVideo() {
 
     if (!data.pipeline || !ximagesrc || !vp8enc || !videoconvert1 || !videoscale || !videoconvert2 || !queue2 || !queue1 || !rtpvp8pay ||
         !udpsink1) {
+        qDebug() << !data.pipeline << !ximagesrc << !vp8enc << !videoconvert1 << !videoscale << !videoconvert2 << !queue2 << !queue1
+                 << !rtpvp8pay << !udpsink1;
         g_printerr("Not all elements could be created\n");
         return;
     }
 
     // caps1 = gst_caps_new_simple("video/x-raw", "framerate", GST_TYPE_FRACTION, 30, 1, NULL);
 
-    caps1 =
-        gst_caps_new_simple("video/x-raw", "profile", G_TYPE_STRING, "main", "width", G_TYPE_INT, 1024, "height", G_TYPE_INT, 600, NULL);
+    caps1 = gst_caps_new_simple("video/x-raw", "profile", G_TYPE_STRING, "main", "width", G_TYPE_INT, 1024, "height", G_TYPE_INT, 600, NULL,
+                                nullptr);
 
     // g_object_set(G_OBJECT(vp8enc), "width", 1024, "height", 600, NULL);
     // g_object_set(vp8enc, "min-quantizer", 10, NULL);
 
-    g_object_set(G_OBJECT(capsfilter1), "caps", caps1, NULL);
+    g_object_set(G_OBJECT(capsfilter1), "caps", caps1, NULL, nullptr);
     // g_object_set(G_OBJECT(capsfilter2), "caps", caps2, NULL);
     // g_object_set(videoscale, "add-borders", TRUE, 0x00000000, "width", 1024, "height", 600, NULL);
 
@@ -44,10 +46,10 @@ void Transmiter::addLinkVideo() {
     // gst_caps_unref(caps2);
 
     gst_bin_add_many(GST_BIN(data.pipeline), ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc, rtpvp8pay,
-                     queue2, udpsink1, NULL);
+                     queue2, udpsink1, NULL, nullptr);
 
     if (gst_element_link_many(ximagesrc, videoconvert1, videoscale, capsfilter1, videoconvert2, queue1, vp8enc, rtpvp8pay, queue2, udpsink1,
-                              NULL) != TRUE) {
+                              NULL, nullptr) != TRUE) {
         g_printerr(
             "Failed to link elements: ximagesrc -> videoscale -> videoconvert -> x264enc -> "
             "rtph264pay -> udpsink1\n");
@@ -55,9 +57,11 @@ void Transmiter::addLinkVideo() {
         return;
     }
 
-    g_object_set(udpsink1, "sync", FALSE, "host", representIP(ip_address), "port", video_port, NULL);
+    //    gst_debug_bin_to_dot_file(GST_BIN(data.pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline.dot");
+
+    g_object_set(udpsink1, "sync", FALSE, "host", representIP(ip_address), "port", video_port, NULL, nullptr);
     // g_object_set(x264enc, "pass", 17, "tune", 4, "bitrate", 2000, "speed-preset", 0x00000005, NULL);
-    g_object_set(G_OBJECT(vp8enc), "deadline", 1, "target-bitrate", 2000000, NULL);
+    g_object_set(G_OBJECT(vp8enc), "deadline", 1, "target-bitrate", 2000000, NULL, nullptr);
 }
 
 void Transmiter::addLinkAudio() {
@@ -78,9 +82,9 @@ void Transmiter::addLinkAudio() {
         return;
     }
 
-    gst_bin_add_many(GST_BIN(data.pipeline), alsasrc, audioconvert, audioresample, opusenc, rtpopuspay, udpsink2, NULL);
+    gst_bin_add_many(GST_BIN(data.pipeline), alsasrc, audioconvert, audioresample, opusenc, rtpopuspay, udpsink2, NULL, nullptr);
 
-    if (gst_element_link_many(alsasrc, audioconvert, audioresample, opusenc, rtpopuspay, udpsink2, NULL) != TRUE) {
+    if (gst_element_link_many(alsasrc, audioconvert, audioresample, opusenc, rtpopuspay, udpsink2, NULL, nullptr) != TRUE) {
         g_printerr(
             "Failed to link elements: ximagesrc -> videoscale -> videoconvert -> x264enc -> "
             "rtph264pay -> udpsink1\n");
@@ -88,7 +92,7 @@ void Transmiter::addLinkAudio() {
         return;
     }
 
-    g_object_set(udpsink2, "sync", FALSE, "host", representIP(ip_address), "port", audio_port, NULL);
+    g_object_set(udpsink2, "sync", FALSE, "host", representIP(ip_address), "port", audio_port, NULL, nullptr);
 }
 
 void Transmiter::removeVideo() {

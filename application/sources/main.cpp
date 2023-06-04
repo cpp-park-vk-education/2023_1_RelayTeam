@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     QApplication application(argc, argv);
     application.setApplicationDisplayName("MultiRelay");
     application.setApplicationName("MultiRelay");
-    MainWindow main_window(qApp->primaryScreen());
+    MainWindow main_window;
     main_window.show();
 
     return application.exec();

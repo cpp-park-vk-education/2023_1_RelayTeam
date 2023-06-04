@@ -6,6 +6,8 @@
 #include <QSlider>
 #include <iostream>
 
+#include "qobjectdefs.h"
+
 void MainWindow::createRightBar() {
     right_bar = new QVBoxLayout();                  // Creating right bar.
     settings_button = new QPushButton("Settings");  // Creating settings button.
@@ -28,7 +30,7 @@ void MainWindow::createRightBar() {
     devices_scroll_area->setAlignment(Qt::AlignRight);
     devices_scroll_area->setWidget(devices_widget);
     right_bar->addWidget(devices_scroll_area);
-    settings_widget = new SettingsWidget(options);  // Creating settings widget.
+    // Embeding settings widget.
     settings_widget->setFixedWidth(570 * options->getScale());
     settings_widget->hide();
     right_bar->addWidget(settings_widget);
@@ -58,9 +60,11 @@ void MainWindow::createLeftBar() {
     search_widget->hide();
     left_bar->addWidget(search_widget);
     connect(add_button, &QPushButton::clicked, search_widget, &SearchWidget::onAddButtonCLicked);
-    connect(search_widget, &SearchWidget::devicePreparedToAdd, this, &MainWindow::onDevicePreparedToAdd);
-    connect(search_widget, &SearchWidget::sendUpdateAddress, this, &MainWindow::onUpdateAddress);
-    connect(search_widget, &SearchWidget::sendUnsetAddress, this, &MainWindow::onUnsetAddress);
+    // Using old style connections for windows compatibility reasons
+    connect(search_widget, SIGNAL(sendDevicePreparedToAdd(QString, QHostAddress, QString)), this,
+            SLOT(onDevicePreparedToAdd(QString, QHostAddress, QString)));
+    connect(search_widget, SIGNAL(sendUpdateAddress(QString, QHostAddress)), this, SLOT(onUpdateAddress(QString, QHostAddress)));
+    connect(search_widget, SIGNAL(sendUnsetAddress(QString)), this, SLOT(onUnsetAddress(QString)));
 
     publisher_widget = new Publisher(options->device_name, this);
     connect(this, &MainWindow::sendDeviceMacAddressesUpdated, search_widget, &SearchWidget::onDeviceIdsUpdated);
@@ -71,40 +75,51 @@ void MainWindow::createLeftBar() {
     left_bar_widget->setMinimumWidth(300 * options->getScale());
 }
 
-MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
-    : application_screen(application_screen_),
-      QMainWindow(parent),
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent),
       current_search_widget_is_bluetooth(true),
       current_control_widget_is_settings(false),
       streaming_session_manager() {
     qDebug() << "MR: MainWindow initialization started";
+    application_screen = QGuiApplication::primaryScreen();
     qDebug() << application_screen->size();
     qDebug() << application_screen->orientation();
-
-    //    QStackedWidget* m_stackedWidget;
     options = new Options();
     data_base.getOptions(options);
-    qint32 max_screen_dimention = qMax(application_screen->size().width(), application_screen->size().height());
+    qint32 max_screen_dimention = application_screen->size().width();
     if (application_screen->orientation() & (Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation)) {
         if (options->scale_factor > max_screen_dimention * 100 / 950) {
-            settings_widget->setScale(max_screen_dimention * 100 / 950);
+            options->scale_factor = static_cast<qint16>(max_screen_dimention) * 100 / 950;
         }
     } else {
         if (options->scale_factor > max_screen_dimention * 100 / 650) {
-            settings_widget->setScale(max_screen_dimention * 100 / 650);
+            options->scale_factor = static_cast<qint16>(max_screen_dimention) * 100 / 650;
         }
     }
+    settings_widget = new SettingsWidget(options);
 
     QFont font = this->font();
     font.setPointSize(16 * getFontScaling(options->getScale()));
     this->setFont(font);
+
     main_widget = new QWidget();  // Setting up main window widgets.
     main_layout = new QGridLayout();
     main_widget->setLayout(main_layout);
-    this->setCentralWidget(main_widget);
+    stacked_widget_placeholder = new QLabel("This is a stacked widget.");
+
+    ////////////////STACKING WIDGETS FOR MOBILE USE//////////////
+    main_window_stack_widget = new QStackedWidget;
+    this->setCentralWidget(main_window_stack_widget);
+    main_window_stack_widget->addWidget(main_widget);
+    main_window_stack_widget->addWidget(stacked_widget_placeholder);
+    //    main_window_stack_widget->setCurrentWidget(main_widget);
+    main_window_stack_widget->grabGesture(Qt::SwipeGesture);
+    grabGesture(Qt::SwipeGesture);
+    ///////////////////////////////////////////////////////////////////
+
     // Creating main widget layouts
-    createRightBar();
     createLeftBar();
+    createRightBar();
 
     main_layout->addWidget(left_bar_widget, 0, 0);
     if (application_screen->orientation() & (Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation)) {
@@ -116,9 +131,7 @@ MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
         main_widget->setMinimumSize(650 * options->getScale(), 400 * options->getScale());
         qDebug() << "MR: 0, 1";
     }
-
-    getDeviceMacAddresses();  // Get device mac addresses and send them to classes that require them.
-
+    getDeviceMacAddresses();
     main_widget->show();
 
     // Initializing ssl server
@@ -128,11 +141,21 @@ MainWindow::MainWindow(QScreen* application_screen_, QWidget* parent)
     ssl_io_manager->moveToThread(ssl_io_manager_thread);
     ssl_io_manager_thread->start();
 
+    // using old style connection for windows compatibility
+    connect(search_widget, SIGNAL(sendRequestInitialization(QHostAddress, QString)), ssl_io_manager,
+            SLOT(onRequestInitialization(QHostAddress, QString)));
+    connect(ssl_io_manager, SIGNAL(sendInitializationResponse(QString, QString)), search_widget,
+            SLOT(onInitializationResponse(QString, QString)));
+
     connect(this, &MainWindow::killAll, ssl_io_manager_thread, &QThread::deleteLater);
-    connect(ssl_io_manager, &SslIOManager::sendReceivedPorts, &streaming_session_manager, &SessionManager::onReceivedPorts);
-    connect(&streaming_session_manager, &SessionManager::sendStartReciver, ssl_io_manager, &SslIOManager::onStartReciver);
-    connect(ssl_io_manager, &SslIOManager::sendStartReceivingSession, &streaming_session_manager, &SessionManager::onStartReceivingSession);
-    connect(&streaming_session_manager, &SessionManager::sendSetPorts, ssl_io_manager, &SslIOManager::onSendPorts);
+    connect(ssl_io_manager, SIGNAL(sendReceivedPorts(QHostAddress, qint32, qint32)), &streaming_session_manager,
+            SLOT(onReceivedPorts(QHostAddress, qint32, qint32)));
+    connect(&streaming_session_manager, SIGNAL(sendStartReciver(QHostAddress, const QString)), ssl_io_manager,
+            SLOT(onStartReciver(QHostAddress, QString)));
+    connect(ssl_io_manager, SIGNAL(sendStartReceivingSession(QHostAddress, QString)), &streaming_session_manager,
+            SLOT(onStartReceivingSession(QHostAddress, QString)));
+    connect(&streaming_session_manager, SIGNAL(sendSetPorts(QHostAddress, qint32, qint32)), ssl_io_manager,
+            SLOT(onSendPorts(QHostAddress, qint32, qint32)));
 }
 
 MainWindow::~MainWindow() {
@@ -140,12 +163,35 @@ MainWindow::~MainWindow() {
     delete options;
 }
 
+void MainWindow::mousePressEvent(QMouseEvent* event) {
+    if (event->button() == Qt::LeftButton) {
+        mouse_drag_start_pos = event->pos();
+        is_dragging_mouse = true;
+    }
+    QMainWindow::mousePressEvent(event);
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent* event) {
+    if (event->button() == Qt::LeftButton && is_dragging_mouse) {
+        is_dragging_mouse = false;
+        qDebug() << event->pos().x() - mouse_drag_start_pos.x();
+        if (event->pos().x() - mouse_drag_start_pos.x() > 200) {
+            main_window_stack_widget->setCurrentIndex(main_window_stack_widget->currentIndex() - 1);
+        }
+        if (event->pos().x() - mouse_drag_start_pos.x() < -200) {
+            main_window_stack_widget->setCurrentIndex(main_window_stack_widget->currentIndex() + 1);
+        }
+    }
+    QMainWindow::mouseReleaseEvent(event);
+}
+
 void MainWindow::makeDeviceConnections(DeviceWidget* device) {
     connect(device, &DeviceWidget::sendStartVideoSession, &streaming_session_manager, &SessionManager::onStartVideoSession);
     connect(device, &DeviceWidget::sendStopVideoSession, &streaming_session_manager, &SessionManager::onKillVideoSession);
     connect(device, &DeviceWidget::sendStartAudioSession, &streaming_session_manager, &SessionManager::onStartAudioSession);
     connect(device, &DeviceWidget::sendStopAudioSession, &streaming_session_manager, &SessionManager::onKillAudioSession);
-
+    connect(device, &DeviceWidget::sendStartBluetoothVideoSession, bluetooth_manager, &BluetoothManager::onStartBluetoothVideoSession);
+    connect(device, &DeviceWidget::sendStopBluetoothVideoSession, bluetooth_manager, &BluetoothManager::onStopBluetoothVideoSession);
     //    connect(devoce, &DeviceWidget::sendChangeVideoBitrait, &streaming_session_manager, &SessionManager::);
     //    connect(devoce, &DeviceWidget::sendChangeAudioBitrait, &streaming_session_manager, &SessionManager::);
     //    connect(devoce, &DeviceWidget::sendChangeVolume, &streaming_session_manager, &SessionManager::);
@@ -205,6 +251,17 @@ void MainWindow::onDevicePreparedToAdd(QString name, QHostAddress local_ipv4_add
     qDebug() << "Adding device: " << name;
     DeviceWidget* device_widget = new DeviceWidget(mac_address, name, 50, options->getScale());
     device_widget->setLocalIPv4(local_ipv4_address);
+    makeDeviceConnections(device_widget);
+    devices_layout->addLayout(device_widget);
+    data_base.addDevice(device_widget);
+    device_mac_addresses.insert(mac_address);
+    emit sendDeviceMacAddressesUpdated(device_mac_addresses);
+}
+
+void MainWindow::onBluetoothDevicePreparedToAdd(QString name, QBluetoothAddress bluetooth_address, QString mac_address) {
+    qDebug() << "Adding device: " << name;
+    DeviceWidget* device_widget = new DeviceWidget(mac_address, name, 50, options->getScale());
+    device_widget->setBluetoothAddress(bluetooth_address);
     makeDeviceConnections(device_widget);
     devices_layout->addLayout(device_widget);
     data_base.addDevice(device_widget);
