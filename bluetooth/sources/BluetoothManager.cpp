@@ -78,11 +78,17 @@ void BluetoothManager::onShowMessage(const QString& sender, const QString& messa
     label->show();
 }
 
-void BluetoothManager::onAddButtonCLicked() {}
+void BluetoothManager::onAddButtonCLicked() {
+    // Desc in header
+}
 
-void BluetoothManager::onStartBluetoothVideoSession(QBluetoothAddress bluetooth_address) {}
+void BluetoothManager::onStartBluetoothVideoSession(QBluetoothAddress bluetooth_address) {
+    // Desc in header
+}
 
-void BluetoothManager::onStopBluetoothVideoSession(QBluetoothAddress bluetooth_address) {}
+void BluetoothManager::onStopBluetoothVideoSession(QBluetoothAddress bluetooth_address) {
+    // Desc in header
+}
 
 void BluetoothManager::onDeviceMacAddressesUpdated(QSet<QString> device_mac_addresses_) {
     device_mac_addresses = std::move(device_mac_addresses_);
