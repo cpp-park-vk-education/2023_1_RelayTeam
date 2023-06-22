@@ -1,0 +1,85 @@
+compilation_database_dir: ../build-2023_1_RelayTeam-Desktop_Qt_5_15_2_GCC_64bit-Debug
+output_directory: puml
+diagrams:
+  MultiRelay_class_diagram:
+    type: class
+    glob:
+      - application/sources/main.cpp
+    include:
+      elements:
+        - MainWindow
+        - DeviceWidget
+        - DBManager
+        - SettingsWidget
+        - Options
+
+        - Publisher
+        - SearchWidget
+        - ServiceItem
+
+        - SessionManager
+        - Session
+        - ReciverAudio
+        - TransmiterVideo
+        - TransmiterAudio
+        - ReciverVideo
+        - ReciverAudio
+
+  application_class_diagram:
+    type: class
+    glob:
+      - application/sources/main.cpp
+    include:
+      elements:
+        - MainWindow
+        - DeviceWidget
+        - DBManager
+        - SettingsWidget
+        - Options
+
+  search_devices_class_diagram:
+    type: class
+    glob:
+      - application/sources/main.cpp
+    include:
+      elements:
+        - Publisher
+        - SearchWidget
+        - ServiceItem
+
+  gstreamer_interface_class_diagram:
+    type: class
+    glob:
+      - application/sources/main.cpp
+    include:
+      elements:
+        - SessionManager
+        - Session
+        - ReciverAudio
+        - TransmiterVideo
+        - TransmiterAudio
+        - ReciverVideo
+        - ReciverAudio
+
+  MultiRelay_prototype_class_diagram:
+    type: class
+    glob:
+      - application/sources/main.cpp
+    include:
+      elements:
+        - MainWindow
+        - DeviceWidget
+        - DBManager
+        - SettingsWidget
+        - Options
+
+        - Publisher
+        - SearchWidget
+        - ServiceItem
+
+        - SessionManager
+        - Session
+        - Transmiter
+        - Reciver
+
+        - SSHServer
